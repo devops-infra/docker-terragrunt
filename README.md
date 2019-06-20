@@ -21,6 +21,10 @@
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
+> #### Makefiles
+>
+> View **[cytopia/makefiles](https://github.com/cytopia/makefiles)** for seamless project integration, minimum required best-practice code linting and CI.
+
 View **[Dockerfile](https://github.com/cytopia/docker-terragrunt/blob/master/Dockerfile)** on GitHub.
 
 [![Docker hub](http://dockeri.co/image/cytopia/terragrunt)](https://hub.docker.com/r/cytopia/terragrunt)
