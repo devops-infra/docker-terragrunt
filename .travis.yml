@@ -1,0 +1,82 @@
+---
+
+###
+### Enable sudo (required for docker service)
+###
+sudo: required
+
+
+###
+### Language
+###
+language: python
+
+
+###
+### Add services
+###
+services:
+  - docker
+
+
+###
+### Build Matrix
+###
+env:
+  matrix:
+    - TF=0.11 TG=0.18
+    - TF=0.12 TG=0.19
+    - TF=latest TG=latest
+
+
+###
+### Install requirements
+###
+install:
+  # Get newer docker version
+  - while ! sudo apt-get update; do sleep 1; done
+  - while ! sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce; do sleep 1; done
+  - docker version
+
+
+###
+### Check generation changes, build and test
+###
+before_script:
+  - make lint
+  - while ! make build TF_VERSION=${TF} TG_VERSION=${TG}; do sleep 1; done
+  - while ! make test TF_VERSION=${TF} TG_VERSION=${TG}; do sleep 1; done
+  - git diff --quiet || { echo "Build Changes"; git diff; git status; false; }
+
+
+###
+### Push to Dockerhub
+###
+script:
+  # Push to docker hub on success
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+      while ! make login USER="${DOCKER_USERNAME}" PASS="${DOCKER_PASSWORD}"; do sleep 1; done;
+      if [ -n "${TRAVIS_TAG}" ]; then
+        if [ "${TF}" == "latest" ] && [ "${TG}" == "latest" ]; then
+          while ! make push TAG="latest-${TRAVIS_TAG}"; do sleep 1; done;
+        else
+          while ! make push TAG="${TF}-${TG}-${TRAVIS_TAG}"; do sleep 1; done;
+        fi
+      elif [ "${TRAVIS_BRANCH}" == "master" ]; then
+        if [ "${TF}" == "latest" ] && [ "${TG}" == "latest" ]; then
+          while ! make push TAG=latest; do sleep 1; done;
+        else
+          while ! make push TAG=${TF}-${TG}; do sleep 1; done;
+        fi
+      elif [[ ${TRAVIS_BRANCH} =~ ^(release-[.0-9]+)$ ]]; then
+        if [ "${TF}" == "latest" ] && [ "${TG}" == "latest" ]; then
+          while ! make push TAG="latest-${TRAVIS_BRANCH}"; do sleep 1; done;
+        else
+          while ! make push TAG="${TF}-${TG}-${TRAVIS_BRANCH}"; do sleep 1; done;
+        fi
+      else
+        echo "Skipping branch ${TRAVIS_BRANCH}";
+      fi
+    else
+      echo "Skipping push on PR";
+    fi

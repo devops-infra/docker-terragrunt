@@ -38,11 +38,11 @@ and its corresponding version of [terraform](https://github.com/hashicorp/terraf
 The following Docker image tags are rolling releases and built and updated nightly. This means
 they always contain the latest stable version as shown below.
 
-| Docker tag | Terraform version | Terragrunt version |
-|------------|-------------------|--------------------|
-| `latest`   | latest stable     | latest stable      |
-| `012-019`  | latest `0.12.x`   | latest `0.19.x`    |
-| `011-018`  | latest `0.11.x`   | latest `0.18.x`    |
+| Docker tag   | Terraform version      | Terragrunt version     |
+|--------------|------------------------|------------------------|
+| `latest`     | latest stable          | latest stable          |
+| `0.12-0.19`  | latest stable `0.12.x` | latest stable `0.19.x` |
+| `0.11-0.18`  | latest stable `0.11.x` | latest stable `0.18.x` |
 
 
 ### Point in time releases
@@ -50,18 +50,18 @@ If you want to ensure to have reproducible Terraform/Terragrunt executions you s
 this repository. Tags are incremented for each new version, but never updated itself. This means
 you will have to take care yourself and update your CI tools every time a new tag is being released.
 
-| Docker tag      | docker-terragrunt | Terraform version                 | Terragrunt version                |
-|-----------------|-------------------|-----------------------------------|-----------------------------------|
-| `latest-<tag>`  | Tag: `<tag>`      | latest stable during tag creation | latest stable during tag creation |
-| `012-019-<tag>` | Tag: `<tag>`      | latest 0.12.x during tag creation | latest stable during tag creation |
-| `011-018-<tag>` | Tag: `<tag>`      | latest 0.11.x during tag creation | latest stable during tag creation |
+| Docker tag        | docker-terragrunt | Terraform version                          | Terragrunt version                         |
+|-------------------|-------------------|--------------------------------------------|--------------------------------------------|
+| `latest-<tag>`    | Tag: `<tag>`      | latest stable during tag creation          | latest stable during tag creation          |
+| `0.12-0.19-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.12.x` during tag creation |
+| `0.11-0.18-<tag>` | Tag: `<tag>`      | latest stable `0.11.x` during tag creation | latest stable `0.11.x` during tag creation |
 
 Where `<tag>` refers to the chosen git tag from this repository.
 
 
 ## Docker mounts
 
-The working directory inside the Docker container is `/data/` and should be mounted to your local filesystem.
+The working directory inside the Docker container is **`/data/`** and should be mounted to your local filesystem.
 
 
 ## Usage
@@ -75,13 +75,13 @@ docker run --rm -v $(pwd):/data cytopia/terragrunt terraform <ARGS>
 ### Provision single sub-project on AWS
 Let's assume your Terragrunt project setup is as follows:
 ```
-.                                                   # <-- Terragrunt project root
+/my/tf                                              # Terragrunt project root
 └── envs
     └── aws
         ├── dev
         │   ├── eu-central-1
         │   │   ├── infra
-        │   │   │   └── vpc-k8s                     # <-- VPC sub-project directory
+        │   │   │   └── vpc-k8s                     # VPC sub-project directory
         │   │   │       ├── include_providers.tf
         │   │   │       ├── terraform.tfvars
         │   │   │       └── terragrunt.hcl
@@ -99,9 +99,9 @@ Let's assume your Terragrunt project setup is as follows:
 ```
 The VPC sub-project you want to provision is at the path `envs/aws/dev/eu-centra-1/infra/vpc-k8s/`.
 
-1. Mount the terragrunt root project dir into `/data/` into the container
+1. Mount the terragrunt root project dir (`/my/tf/`) into `/data/` into the container
 2. Use the workding dir (`-w` or `--workdir`) to point to your project inside the container
-3. Add AWS credentials from your environment
+3. Add AWS credentials from your environment to the container
 
 ```bash
 # Initialize the VPC project
@@ -109,7 +109,7 @@ docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-  -v $(pwd):/data cytopia/terragrunt \
+  -v /my/tf:/data cytopia/terragrunt \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
   terragrunt init
 
@@ -118,7 +118,7 @@ docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-  -v $(pwd):/data cytopia/terragrunt \
+  -v /my/tf:/data cytopia/terragrunt \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
   terragrunt plan
 
@@ -127,7 +127,7 @@ docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-  -v $(pwd):/data cytopia/terragrunt \
+  -v /my/tf:/data cytopia/terragrunt \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
   terragrunt --terragrunt-non-interactive apply
 ```
