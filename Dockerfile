@@ -55,7 +55,5 @@ RUN set -eux \
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
 
-ENV WORKDIR /data
 WORKDIR /data
-
 CMD ["terragrunt", "--version"]
