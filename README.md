@@ -7,7 +7,7 @@
 [![](https://img.shields.io/badge/github-cytopia%2Fdocker--terragrunt-red.svg)](https://github.com/cytopia/docker-terragrunt "github.com/cytopia/docker-terragrunt")
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
-> #### All awesome CI Docker images
+> #### All [#awesome-ci](https://github.com/topics/awesome-ci) Docker images
 >
 > [ansible](https://github.com/cytopia/docker-ansible) |
 > [ansible-lint](https://github.com/cytopia/docker-ansible-lint) |
@@ -25,8 +25,8 @@ View **[Dockerfile](https://github.com/cytopia/docker-terragrunt/blob/master/Doc
 
 [![Docker hub](http://dockeri.co/image/cytopia/terragrunt)](https://hub.docker.com/r/cytopia/terragrunt)
 
-Tiny Alpine-based multistage-build dockerized version of [terragrunt](https://github.com/gruntwork-io/terragrunt)<sup>[1]</sup>
-and its corresponding version of [terraform](https://github.com/hashicorp/terraform)<sup>[2]</sup>.
+Tiny Alpine-based multistage-build dockerized version of [Terragrunt](https://github.com/gruntwork-io/terragrunt)<sup>[1]</sup>
+and its comptaible version of [Terraform](https://github.com/hashicorp/terraform)<sup>[2]</sup>.
 
 * <sub>[1] Official project: https://github.com/gruntwork-io/terragrunt</sub>
 * <sub>[2] Official project: https://github.com/hashicorp/terraform</sub>
@@ -61,7 +61,8 @@ Where `<tag>` refers to the chosen git tag from this repository.
 
 ## Docker mounts
 
-The working directory inside the Docker container is **`/data/`** and should be mounted to your local filesystem.
+The working directory inside the Docker container is **`/data/`** and should be mounted to your local filesystem where your Terragrant project resides.
+(See [Usage](#usage) for in-depth examples of mount locations.)
 
 
 ## Usage
@@ -72,9 +73,64 @@ docker run --rm -v $(pwd):/data cytopia/terragrunt terragrunt <ARGS>
 docker run --rm -v $(pwd):/data cytopia/terragrunt terraform <ARGS>
 ```
 
-### Provision single sub-project on AWS
+### Simple: Provision single sub-project on AWS
 Let's assume your Terragrunt project setup is as follows:
+```bash
+/my/tf                                              # Terragrunt project root
+├── backend-app
+│   ├── main.tf
+│   └── terragrunt.hcl
+├── frontend-app
+│   ├── main.tf
+│   └── terragrunt.hcl
+├── mysql                                           # MySQL sub-project directory
+│   ├── main.tf
+│   └── terragrunt.hcl
+├── redis
+│   ├── main.tf
+│   └── terragrunt.hcl
+└── vpc
+    ├── main.tf
+    └── terragrunt.hcl
 ```
+The MySQL sub-project you want to provision is at the releative path `mysql/`.
+
+1. Mount the terragrunt root project dir (`/my/tf/`) into `/data/` into the container
+2. Use the workding dir (`-w` or `--workdir`) to point to your project inside the container
+3. Add AWS credentials from your environment to the container
+
+```bash
+# Initialize the MySQL project
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+  -v /my/tf:/data \
+  -w /data/mysql \
+  cytopia/terragrunt terragrunt init
+
+# Plan the MySQL project
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+  -v /my/tf:/data \
+  -w /data/mysql \
+  cytopia/terragrunt terragrunt plan
+
+# Apply the VPC project
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+  -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+  -v /my/tf:/data \
+  -w /data/mysql \
+  cytopia/terragrunt terragrunt --terragrunt-non-interactive apply
+```
+
+### Complex: Provision single sub-project on AWS
+Let's assume your Terragrunt project setup is as follows:
+```bash
 /my/tf                                              # Terragrunt project root
 └── envs
     └── aws
@@ -82,12 +138,10 @@ Let's assume your Terragrunt project setup is as follows:
         │   ├── eu-central-1
         │   │   ├── infra
         │   │   │   └── vpc-k8s                     # VPC sub-project directory
-        │   │   │       ├── include_providers.tf
         │   │   │       ├── terraform.tfvars
         │   │   │       └── terragrunt.hcl
         │   │   ├── microservices
         │   │   │   └── api-gateway
-        │   │   │       ├── include_providers.tf
         │   │   │       ├── terraform.tfvars
         │   │   │       └── terragrunt.hcl
         │   │   └── region.tfvars
@@ -97,7 +151,7 @@ Let's assume your Terragrunt project setup is as follows:
         └── _provider_include
             └── include_providers.tf
 ```
-The VPC sub-project you want to provision is at the path `envs/aws/dev/eu-centra-1/infra/vpc-k8s/`.
+The VPC sub-project you want to provision is at the relative path `envs/aws/dev/eu-centra-1/infra/vpc-k8s/`.
 
 1. Mount the terragrunt root project dir (`/my/tf/`) into `/data/` into the container
 2. Use the workding dir (`-w` or `--workdir`) to point to your project inside the container
@@ -109,27 +163,27 @@ docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-  -v /my/tf:/data cytopia/terragrunt \
+  -v /my/tf:/data \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
-  terragrunt init
+  cytopia/terragrunt terragrunt init
 
 # Plan the VPC project
 docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-  -v /my/tf:/data cytopia/terragrunt \
+  -v /my/tf:/data \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
-  terragrunt plan
+  cytopia/terragrunt terragrunt plan
 
-# Apply the VPC project
+# Apply the MySQL project
 docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-  -v /my/tf:/data cytopia/terragrunt \
+  -v /my/tf:/data \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
-  terragrunt --terragrunt-non-interactive apply
+  cytopia/terragrunt terragrunt --terragrunt-non-interactive apply
 ```
 
 
