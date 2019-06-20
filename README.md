@@ -21,7 +21,7 @@
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
-> #### Makefiles
+> #### All [#awesome-ci](https://github.com/topics/awesome-ci) Makefiles
 >
 > View **[cytopia/makefiles](https://github.com/cytopia/makefiles)** for seamless project integration, minimum required best-practice code linting and CI.
 
@@ -30,7 +30,7 @@ View **[Dockerfile](https://github.com/cytopia/docker-terragrunt/blob/master/Doc
 [![Docker hub](http://dockeri.co/image/cytopia/terragrunt)](https://hub.docker.com/r/cytopia/terragrunt)
 
 Tiny Alpine-based multistage-build dockerized version of [Terragrunt](https://github.com/gruntwork-io/terragrunt)<sup>[1]</sup>
-and its comptaible version of [Terraform](https://github.com/hashicorp/terraform)<sup>[2]</sup>.
+and its compatible version of [Terraform](https://github.com/hashicorp/terraform)<sup>[2]</sup>.
 
 * <sub>[1] Official project: https://github.com/gruntwork-io/terragrunt</sub>
 * <sub>[2] Official project: https://github.com/hashicorp/terraform</sub>
@@ -122,7 +122,7 @@ docker run --rm \
   -w /data/mysql \
   cytopia/terragrunt terragrunt plan
 
-# Apply the VPC project
+# Apply the MySQL project
 docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
@@ -180,7 +180,7 @@ docker run --rm \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
   cytopia/terragrunt terragrunt plan
 
-# Apply the MySQL project
+# Apply the VPC project
 docker run --rm \
   -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
   -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
