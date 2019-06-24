@@ -9,21 +9,27 @@
 
 > #### All [#awesome-ci](https://github.com/topics/awesome-ci) Docker images
 >
-> [ansible](https://github.com/cytopia/docker-ansible) |
-> [ansible-lint](https://github.com/cytopia/docker-ansible-lint) |
-> [awesome-ci](https://github.com/cytopia/awesome-ci) |
-> [eslint](https://github.com/cytopia/docker-eslint) |
-> [file-lint](https://github.com/cytopia/docker-file-lint) |
-> [jsonlint](https://github.com/cytopia/docker-jsonlint) |
-> [pycodestyle](https://github.com/cytopia/docker-pycodestyle) |
-> [terraform-docs](https://github.com/cytopia/docker-terraform-docs) |
-> [terragrunt](https://github.com/cytopia/docker-terragrunt) |
+> [ansible](https://github.com/cytopia/docker-ansible) **•**
+> [ansible-lint](https://github.com/cytopia/docker-ansible-lint) **•**
+> [awesome-ci](https://github.com/cytopia/awesome-ci) **•**
+> [black](https://github.com/cytopia/docker-black) **•**
+> [checkmake](https://github.com/cytopia/docker-checkmake) **•**
+> [eslint](https://github.com/cytopia/docker-eslint) **•**
+> [file-lint](https://github.com/cytopia/docker-file-lint) **•**
+> [gofmt](https://github.com/cytopia/docker-gofmt) **•**
+> [golint](https://github.com/cytopia/docker-golint) **•**
+> [jsonlint](https://github.com/cytopia/docker-jsonlint) **•**
+> [phpcs](https://github.com/cytopia/docker-phpcs) **•**
+> [pycodestyle](https://github.com/cytopia/docker-pycodestyle) **•**
+> [pylint](https://github.com/cytopia/docker-pylint) **•**
+> [terraform-docs](https://github.com/cytopia/docker-terraform-docs) **•**
+> [terragrunt](https://github.com/cytopia/docker-terragrunt) **•**
 > [yamllint](https://github.com/cytopia/docker-yamllint)
 
 
 > #### All [#awesome-ci](https://github.com/topics/awesome-ci) Makefiles
 >
-> View **[cytopia/makefiles](https://github.com/cytopia/makefiles)** for seamless project integration, minimum required best-practice code linting and CI.
+> Visit **[cytopia/makefiles](https://github.com/cytopia/makefiles)** for seamless project integration, minimum required best-practice code linting and CI.
 
 View **[Dockerfile](https://github.com/cytopia/docker-terragrunt/blob/master/Dockerfile)** on GitHub.
 
@@ -66,18 +72,21 @@ Where `<tag>` refers to the chosen git tag from this repository.
 ## Docker mounts
 
 The working directory inside the Docker container is **`/data/`** and should be mounted to your local filesystem where your Terragrant project resides.
-(See [Usage](#usage) for in-depth examples of mount locations.)
+(See [Examples](#examples) for mount location usage.)
 
 
 ## Usage
 
-### Generic
 ```bash
 docker run --rm -v $(pwd):/data cytopia/terragrunt terragrunt <ARGS>
 docker run --rm -v $(pwd):/data cytopia/terragrunt terraform <ARGS>
 ```
 
-### Simple: Provision single sub-project on AWS
+## Examples
+
+### 1. Simple: Provision single sub-project on AWS
+
+#### 1.1 Project overview
 Let's assume your Terragrunt project setup is as follows:
 ```bash
 /my/tf                                              # Terragrunt project root
@@ -97,12 +106,14 @@ Let's assume your Terragrunt project setup is as follows:
     ├── main.tf
     └── terragrunt.hcl
 ```
-The MySQL sub-project you want to provision is at the releative path `mysql/`.
+The **MySQL** sub-project you want to provision is at the releative path `mysql/`.
 
+#### 1.2 To consider
 1. Mount the terragrunt root project dir (`/my/tf/`) into `/data/` into the container
 2. Use the workding dir (`-w` or `--workdir`) to point to your project inside the container
 3. Add AWS credentials from your environment to the container
 
+#### 1.3 Docker commands
 ```bash
 # Initialize the MySQL project
 docker run --rm \
@@ -131,8 +142,11 @@ docker run --rm \
   -w /data/mysql \
   cytopia/terragrunt terragrunt --terragrunt-non-interactive apply
 ```
+<!-- #### 1.4 Makefile integration -->
 
-### Complex: Provision single sub-project on AWS
+### 2. Complex: Provision single sub-project on AWS
+
+#### 2.1 Project overview
 Let's assume your Terragrunt project setup is as follows:
 ```bash
 /my/tf                                              # Terragrunt project root
@@ -155,12 +169,14 @@ Let's assume your Terragrunt project setup is as follows:
         └── _provider_include
             └── include_providers.tf
 ```
-The VPC sub-project you want to provision is at the relative path `envs/aws/dev/eu-centra-1/infra/vpc-k8s/`.
+The **VPC** sub-project you want to provision is at the relative path `envs/aws/dev/eu-centra-1/infra/vpc-k8s/`.
 
+#### 2.2 To consider
 1. Mount the terragrunt root project dir (`/my/tf/`) into `/data/` into the container
 2. Use the workding dir (`-w` or `--workdir`) to point to your project inside the container
 3. Add AWS credentials from your environment to the container
 
+#### 2.3 Docker commands
 ```bash
 # Initialize the VPC project
 docker run --rm \
@@ -189,6 +205,41 @@ docker run --rm \
   -w /data/envs/aws/dev/eu-central-1/infra/vpc-k8s \
   cytopia/terragrunt terragrunt --terragrunt-non-interactive apply
 ```
+
+<!-- #### 2.4 Makefile integration -->
+
+
+## Related [#awesome-ci](https://github.com/topics/awesome-ci) projects
+
+### Docker images
+
+Save yourself from installing lot's of dependencies and pick a dockerized version of your favourite
+linter below for reproducible local or remote CI tests:
+
+| Docker image | Type | Description |
+|--------------|------|-------------|
+| [awesome-ci](https://github.com/cytopia/awesome-ci) | Basic | Tools for git, file and static source code analysis |
+| [file-lint](https://github.com/cytopia/docker-file-lint) | Basic | Baisc source code analysis |
+| [jsonlint](https://github.com/cytopia/docker-jsonlint) | Basic | Lint JSON files |
+| [yamllint](https://github.com/cytopia/docker-yamllint) | Basic | Lint Yaml files |
+| [ansible](https://github.com/cytopia/docker-ansible) | Ansible | Multiple versoins of Ansible |
+| [ansible-lint](https://github.com/cytopia/docker-ansible-lint) | Ansible | Lint  Ansible |
+| [gofmt](https://github.com/cytopia/docker-gofmt) | Go | Format Go source code |
+| [golint](https://github.com/cytopia/docker-golint) | Go | Lint Go code |
+| [eslint](https://github.com/cytopia/docker-eslint) | Javascript | Lint Javascript code |
+| [checkmake](https://github.com/cytopia/docker-checkmake) | Make | Lint Makefiles |
+| [phpcs](https://github.com/cytopia/docker-phpcs) | PHP | PHPCodeSniffer and Code Beautifier and Fixer |
+| [black](https://github.com/cytopia/docker-black) | Python | The uncompromising Python code formatter |
+| [pycodestyle](https://github.com/cytopia/docker-pycodestyle) | Python | Python style guide checker |
+| [pylint](https://github.com/cytopia/docker-pylint) | Python | Python source code, bug and quality checker |
+| [terraform-docs](https://github.com/cytopia/docker-terraform-docs) | Terraform | Terraform doc generator (TF 0.12 ready) |
+| [terragrunt](https://github.com/cytopia/docker-terragrunt) | Terraform | Terragrunt and Terraform |
+
+
+### Makefiles
+
+Visit **[cytopia/makefiles](https://github.com/cytopia/makefiles)** for dependency-less, seamless project integration and minimum required best-practice code linting for CI.
+The provided Makefiles will only require GNU Make and Docker itself removing the need to install anything else.
 
 
 ## License
