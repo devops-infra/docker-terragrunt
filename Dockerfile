@@ -1,4 +1,4 @@
-FROM alpine:latest as builder
+FROM alpine:3.9 as builder
 
 # Install build dependencies
 RUN set -eux \
@@ -46,7 +46,7 @@ RUN set -eux \
 	&& chmod +x /usr/bin/terragrunt
 
 # Use a clean tiny image to store artifacts in
-FROM alpine:latest
+FROM alpine:3.9
 LABEL \
 	maintainer="cytopia <cytopia@everythingcli.org>" \
 	repo="https://github.com/cytopia/docker-terragrunt"
