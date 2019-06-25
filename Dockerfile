@@ -1,10 +1,13 @@
-FROM alpine:3.9 as builder
+FROM debian:stable-slim as builder
 
 # Install build dependencies
 RUN set -eux \
-	&& apk add --no-cache \
+	&& DEBIAN_FRONTEND=noninteractive apt-get update -qq \
+	&& DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
+		ca-certificates \
 		curl \
-		git
+		git \
+		unzip
 
 # Get Terraform
 ARG TF_VERSION=latest
