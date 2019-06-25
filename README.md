@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.com/cytopia/docker-terragrunt.svg?branch=master)](https://travis-ci.com/cytopia/docker-terragrunt)
 [![Tag](https://img.shields.io/github/tag/cytopia/docker-terragrunt.svg)](https://github.com/cytopia/docker-terragrunt/releases)
-[![](https://images.microbadger.com/badges/version/cytopia/terragrunt:latest.svg)](https://microbadger.com/images/cytopia/terragrunt:latest "terragrunt")
-[![](https://images.microbadger.com/badges/image/cytopia/terragrunt:latest.svg)](https://microbadger.com/images/cytopia/terragrunt:latest "terragrunt")
+[![](https://images.microbadger.com/badges/version/cytopia/terragrunt:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/terragrunt:latest "terragrunt")
+[![](https://images.microbadger.com/badges/image/cytopia/terragrunt:latest.svg?&kill_cache=1)](https://microbadger.com/images/cytopia/terragrunt:latest "terragrunt")
 [![](https://img.shields.io/badge/github-cytopia%2Fdocker--terragrunt-red.svg)](https://github.com/cytopia/docker-terragrunt "github.com/cytopia/docker-terragrunt")
 [![License](https://img.shields.io/badge/license-MIT-%233DA639.svg)](https://opensource.org/licenses/MIT)
 
@@ -33,7 +33,7 @@
 
 View **[Dockerfile](https://github.com/cytopia/docker-terragrunt/blob/master/Dockerfile)** on GitHub.
 
-[![Docker hub](http://dockeri.co/image/cytopia/terragrunt)](https://hub.docker.com/r/cytopia/terragrunt)
+[![Docker hub](http://dockeri.co/image/cytopia/terragrunt?&kill_cache=1)](https://hub.docker.com/r/cytopia/terragrunt)
 
 Tiny Alpine-based multistage-build dockerized version of [Terragrunt](https://github.com/gruntwork-io/terragrunt)<sup>[1]</sup>
 and its compatible version of [Terraform](https://github.com/hashicorp/terraform)<sup>[2]</sup>.
