@@ -64,7 +64,8 @@ RUN set -eux \
     && pip3 install --no-cache --upgrade pip setuptools wheel \
     && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
     && python -m pip install ply \
-	&& python -m pip install pyhcl
+	&& python -m pip install pyhcl \
+	&& python -m pip install awscli
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
 
