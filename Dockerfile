@@ -52,11 +52,16 @@ RUN set -eux \
 FROM alpine:3.9
 LABEL \
 	maintainer="cytopia <cytopia@everythingcli.org>" \
-	repo="https://github.com/cytopia/docker-terragrunt"
+	repo="https://github.com/cytopia/docker-terragrunt" \
+	modifiedby="Krzysztof Szyper <krzysztof_szyper@epam.com>"
 RUN set -eux \
-	&& apk add --no-cache git
+	&& apk add --no-cache git \
+	&& apk add --no-cache python3 \
+	&& apk add --no-cache make \
+	&& python -m pip install ply \
+	&& python -m pip install pyhcl
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
 
 WORKDIR /data
-CMD ["terragrunt", "--version"]
+CMD terraform --version && terragrunt --version
