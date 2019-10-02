@@ -56,9 +56,14 @@ LABEL \
 	modifiedby="Krzysztof Szyper <krzysztof_szyper@epam.com>"
 RUN set -eux \
 	&& apk add --no-cache git \
-	&& apk add --no-cache python3 \
 	&& apk add --no-cache make \
-	&& python -m pip install ply \
+	&& apk add --no-cache python3 \
+    && if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi \
+    && python3 -m ensurepip \
+    && rm -r /usr/lib/python*/ensurepip \
+    && pip3 install --no-cache --upgrade pip setuptools wheel \
+    && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
+    && python -m pip install ply \
 	&& python -m pip install pyhcl
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
