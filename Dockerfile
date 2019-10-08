@@ -53,7 +53,8 @@ FROM alpine:3.9
 LABEL \
 	maintainer="cytopia <cytopia@everythingcli.org>" \
 	repo="https://github.com/cytopia/docker-terragrunt" \
-	modifiedby="Krzysztof Szyper <krzysztof_szyper@epam.com>"
+	modifiedby="Krzysztof Szyper <krzysztof_szyper@epam.com>" \
+	modifiedrepo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt"
 RUN set -eux \
 	&& apk add --no-cache git \
 	&& apk add --no-cache make \
