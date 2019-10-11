@@ -60,6 +60,7 @@ RUN set -eux \
 	&& apk add --no-cache make \
 	&& apk add --no-cache python3 \
 	&& apk add --no-cache bash \
+	&& apk add --no-cache curl \
 	&& apk add --no-cache docker \
 	&& apk add --no-cache zip \
     && if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi \
