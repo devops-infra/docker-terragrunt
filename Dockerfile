@@ -59,7 +59,7 @@ RUN set -eux \
 		VERSION="$( git tag | grep -E "${SC_VERSION}\.[.0-9]+" | sort -u | tail -1 )" ;\
 	fi \
 	&& curl -sS -L \
-		https://github.com/dmlittle/scenery/releases/download/v${VERSION}/scenery-v${VERSION}-linux-amd64 \
+		https://github.com/dmlittle/scenery/releases/download/${VERSION}/scenery-${VERSION}-linux-amd64 \
 		-o /usr/bin/scenery \
 	&& chmod +x /usr/bin/scenery
 
