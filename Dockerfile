@@ -48,6 +48,21 @@ RUN set -eux \
 		-o /usr/bin/terragrunt \
 	&& chmod +x /usr/bin/terragrunt
 
+# Get Scenery
+ARG SC_VERSION=latest
+RUN set -eux \
+	&& git clone https://github.com/dmlittle/scenery /scenery \
+	&& cd /scenery \
+	&& if [ "${SC_VERSION}" = "latest" ]; then \
+		VERSION="$( git describe --abbrev=0 --tags )"; \
+	else \
+		VERSION="$( git tag | grep -E "${SC_VERSION}\.[.0-9]+" | sort -u | tail -1 )" ;\
+	fi \
+	&& curl -sS -L \
+		https://github.com/dmlittle/scenery/releases/download/v${VERSION}/scenery-v${VERSION}-linux-amd64 \
+		-o /usr/bin/scenery \
+	&& chmod +x /usr/bin/scenery
+
 # Use a clean tiny image to store artifacts in
 FROM alpine:3.9
 LABEL \
@@ -74,6 +89,7 @@ RUN set -eux \
 	&& python -m pip install awscli
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
+COPY --from=builder /usr/bin/scenery /usr/bin/scenery
 
 WORKDIR /data
 CMD terraform --version && terragrunt --version
