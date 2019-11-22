@@ -55,7 +55,7 @@ RUN set -eux \
 RUN set -eux \
 	&& git clone https://github.com/dmlittle/scenery /scenery \
 	&& cd /scenery \
-	&& VERSION="$( git describe --abbrev=0 --tags )"
+	&& VERSION="$( git describe --abbrev=0 --tags )" \
 	&& curl -sS -L \
 		https://github.com/dmlittle/scenery/releases/download/${VERSION}/scenery-${VERSION}-linux-amd64 \
 		-o /usr/bin/scenery \
