@@ -75,7 +75,7 @@ COPY fmt/fmt.sh /fmt.sh
 COPY fmt/terragrunt-fmt.sh /terragrunt-fmt.sh
 # This part has some additions
 RUN set -eux \
-    && chmod a+x fmt/* /usr/bin/format-hcl.sh
+    && chmod a+x fmt/* /usr/bin/format-hcl.sh \
 	&& apk add --no-cache git \
 	&& apk add --no-cache make \
 	&& apk add --no-cache python3 \
