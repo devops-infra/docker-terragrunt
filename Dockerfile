@@ -69,13 +69,16 @@ LABEL \
 	repo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
 	original_maintainer="cytopia <cytopia@everythingcli.org>" \
 	original_repo="https://github.com/cytopia/docker-terragrunt"
-# This part was added
+# This part was moved and edited
 COPY fmt/format-hcl.sh /usr/bin/format-hcl.sh
 COPY fmt/fmt.sh /fmt.sh
 COPY fmt/terragrunt-fmt.sh /terragrunt-fmt.sh
+COPY --from=builder /usr/bin/terraform /usr/bin/terraform
+COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
+COPY --from=builder /usr/bin/scenery /usr/bin/scenery
 # This part has some additions
 RUN set -eux \
-    && chmod a+x /fmt/* /usr/bin/format-hcl.sh \
+    && chmod +x /usr/bin/format-hcl.sh /fmt.sh /terragrunt-fmt.sh \
 	&& apk add --no-cache git \
 	&& apk add --no-cache make \
 	&& apk add --no-cache python3 \
@@ -92,10 +95,6 @@ RUN set -eux \
     && python -m pip install ply \
 	&& python -m pip install pyhcl \
 	&& python -m pip install awscli
-# This part was edited
-COPY --from=builder /usr/bin/terraform /usr/bin/terraform
-COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
-COPY --from=builder /usr/bin/scenery /usr/bin/scenery
 
 WORKDIR /data
 CMD terraform --version && terragrunt --version
