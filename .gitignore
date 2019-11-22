@@ -124,3 +124,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# build version
+version.txt
+
+# intellij
+.idea/

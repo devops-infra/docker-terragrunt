@@ -10,6 +10,7 @@ RUN set -eux \
 		unzip
 
 # Get Terraform
+# Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.16
 ARG TF_VERSION=latest
 RUN set -eux \
 	&& if [ "${TF_VERSION}" = "latest" ]; then \
@@ -22,7 +23,7 @@ RUN set -eux \
 	else \
 		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ \
 			| tac | tac \
-			| grep -Eo "/${TF_VERSION}\.[.0-9]+/" \
+			| grep -Eo "/${TF_VERSION}/" \
 			| grep -Eo '[.0-9]+' \
 			| sort -V \
 			| tail -1 )"; \
@@ -34,6 +35,7 @@ RUN set -eux \
 	&& chmod +x /usr/bin/terraform
 
 # Get Terragrunt
+# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.6
 ARG TG_VERSION=latest
 RUN set -eux \
 	&& git clone https://github.com/gruntwork-io/terragrunt /terragrunt \
@@ -41,23 +43,19 @@ RUN set -eux \
 	&& if [ "${TG_VERSION}" = "latest" ]; then \
 		VERSION="$( git describe --abbrev=0 --tags )"; \
 	else \
-		VERSION="$( git tag | grep -E "v${TG_VERSION}\.[.0-9]+" | sort -u | tail -1 )" ;\
+		VERSION="$( git tag | grep -E "v${TG_VERSION}" | sort -u | tail -1 )" ;\
 	fi \
 	&& curl -sS -L \
 		https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 \
 		-o /usr/bin/terragrunt \
 	&& chmod +x /usr/bin/terragrunt
 
-# Get Scenery
-ARG SC_VERSION=latest
+# Get latest Scenery
+# This part was added
 RUN set -eux \
 	&& git clone https://github.com/dmlittle/scenery /scenery \
 	&& cd /scenery \
-	&& if [ "${SC_VERSION}" = "latest" ]; then \
-		VERSION="$( git describe --abbrev=0 --tags )"; \
-	else \
-		VERSION="$( git tag | grep -E "${SC_VERSION}\.[.0-9]+" | sort -u | tail -1 )" ;\
-	fi \
+	&& VERSION="$( git describe --abbrev=0 --tags )"
 	&& curl -sS -L \
 		https://github.com/dmlittle/scenery/releases/download/${VERSION}/scenery-${VERSION}-linux-amd64 \
 		-o /usr/bin/scenery \
@@ -65,11 +63,13 @@ RUN set -eux \
 
 # Use a clean tiny image to store artifacts in
 FROM alpine:3.9
+# This part was eddited
 LABEL \
-	maintainer="cytopia <cytopia@everythingcli.org>" \
-	repo="https://github.com/cytopia/docker-terragrunt" \
-	modifiedby="Krzysztof Szyper <krzysztof_szyper@epam.com>" \
-	modifiedrepo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt"
+	maintainer="Krzysztof Szyper <krzysztof_szyper@epam.com>" \
+	repo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+	original_maintainer="cytopia <cytopia@everythingcli.org>" \
+	original_repo="https://github.com/cytopia/docker-terragrunt"
+# This part has some additions
 RUN set -eux \
 	&& apk add --no-cache git \
 	&& apk add --no-cache make \
@@ -87,6 +87,10 @@ RUN set -eux \
     && python -m pip install ply \
 	&& python -m pip install pyhcl \
 	&& python -m pip install awscli
+# This part was added and edited
+COPY fmt/format-hcl.sh /usr/bin/format-hcl.sh
+COPY fmt/fmt.sh /fmt.sh
+COPY fmt/terragrunt-fmt.sh /terragrunt-fmt.sh
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
 COPY --from=builder /usr/bin/scenery /usr/bin/scenery

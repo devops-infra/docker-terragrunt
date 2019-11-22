@@ -1,132 +1,49 @@
-ifneq (,)
-.error This Makefile requires GNU Make.
+
+# Provide versions of Terraform and Terragrunt to use with this Docker image
+TF_VERSION ?= 0.12.16
+TG_VERSION ?= 0.21.6
+
+# Constants
+CURRENT_BRANCH := ${bamboo_planRepository_branchName}
+RELEASE_BRANCH := master
+DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
+
+# Version tag taken from environment, file, or calculated date
+VERSION_FILE := version.txt
+ifdef VERSION
+  $(shell echo "version=$(VERSION)" > $(VERSION_FILE))
+  $(info using version $(VERSION) from parameter input or environment)
+else ifneq ("$(wildcard $(VERSION_FILE))","")
+  VERSION=$(shell awk -F'=' '/version/{print $$2}' $(VERSION_FILE))
+  $(info using version $(VERSION) from file $(VERSION_FILE))
+else
+  VERSION=$(shell date -u +"%Y-%m-%dT%H-%M-%SZ")
+  $(shell echo "version=$(VERSION)" > $(VERSION_FILE))
+  $(info using version $(VERSION) which is self-calculated)
 endif
 
-.PHONY: build rebuild lint test _test-tf-version _test-tg-version _test-tf _test-tg tag pull login push enter
-
-CURRENT_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-
-DIR = .
-FILE = Dockerfile
-IMAGE = cytopia/terragrunt
-TAG = latest
-
-TF_VERSION = latest
-TG_VERSION = latest
-
-build:
-	docker build --build-arg TF_VERSION=$(TF_VERSION) --build-arg TG_VERSION=$(TG_VERSION) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
-
-rebuild: pull
-	docker build --no-cache --build-arg TF_VERSION=$(TF_VERSION) --build-arg TG_VERSION=$(TG_VERSION) -t $(IMAGE) -f $(DIR)/$(FILE) $(DIR)
-
-lint:
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-cr --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-crlf --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-trailing-single-newline --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-trailing-space --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-utf8 --text --ignore '.git/,.github/,tests/' --path .
-	@docker run --rm -v $(CURRENT_DIR):/data cytopia/file-lint file-utf8-bom --text --ignore '.git/,.github/,tests/' --path .
-
 test:
-	@$(MAKE) --no-print-directory _test-tf-version
-	@$(MAKE) --no-print-directory _test-tg-version
-	@$(MAKE) --no-print-directory _test-tf
-	@$(MAKE) --no-print-directory _test-tg
+	@echo version: $(VERSION)
 
-_test-tf-version:
-	@echo "------------------------------------------------------------"
-	@echo "- Testing correct Terraform version"
-	@echo "------------------------------------------------------------"
-	@if [ "$(TF_VERSION)" = "latest" ]; then \
-		echo "Fetching latest version from HashiCorp release page"; \
-		LATEST="$$( \
-			curl -L -sS https://releases.hashicorp.com/terraform/ \
-			| tac | tac \
-			| grep -Eo '/[.0-9]+/' \
-			| grep -Eo '[.0-9]+' \
-			| sort -V \
-			| tail -1 \
-		)"; \
-		echo "Testing for latest: $${LATEST}"; \
-		if ! docker run --rm $(IMAGE) terraform --version | grep -E "^Terraform[[:space:]]*v?$${LATEST}$$"; then \
-			echo "Failed"; \
-			exit 1; \
-		fi; \
-	else \
-		echo "Testing for tag: $(TF_VERSION)"; \
-		if ! docker run --rm $(IMAGE) terraform --version | grep -E "^Terraform[[:space:]]*v?$(TF_VERSION)\.[.0-9]+$$"; then \
-			echo "Failed"; \
-			exit 1; \
-		fi; \
-	fi; \
-	echo "Success"; \
+clean:
+	rm -f $(VERSION_FILE)
 
-_test-tg-version:
-	@echo "------------------------------------------------------------"
-	@echo "- Testing correct Terragrunt version"
-	@echo "------------------------------------------------------------"
-	@if [ "$(TG_VERSION)" = "latest" ]; then \
-		echo "Fetching latest version from GitHub"; \
-		LATEST="$$( \
-			curl -L -sS https://github.com/gruntwork-io/terragrunt/releases \
-			| tac | tac \
-			| grep -Eo '/v[.0-9]+/' \
-			| grep -Eo 'v[.0-9]+' \
-			| sort -u \
-			| sort -V \
-			| tail -1 \
-		)"; \
-		echo "Testing for latest: $${LATEST}"; \
-		if ! docker run --rm $(IMAGE) terragrunt --version | grep -E "^terragrunt[[:space:]]*version[[:space:]]*v?$${LATEST}$$"; then \
-			echo "Failed"; \
-			exit 1; \
-		fi; \
-	else \
-		echo "Testing for tag: $(TG_VERSION)"; \
-		if ! docker run --rm $(IMAGE) terragrunt --version | grep -E "^terragrunt[[:space:]]*version[[:space:]]*v?$(TG_VERSION)\.[.0-9]+$$"; then \
-			echo "Failed"; \
-			exit 1; \
-		fi; \
-	fi; \
-	echo "Success"; \
+docker-create:
+	docker rm $(DOCKER_NAME):latest || true
+	docker build \
+	  --build-arg TF_VERSION=$(TF_VERSION) \
+	  --build-arg TG_VERSION=$(TG_VERSION) \
+      --file=Dockerfile \
+      --tag=$(DOCKER_NAME):$(VERSION) .
 
-_test-tf:
-	@echo "------------------------------------------------------------"
-	@echo "- Testing Terraform"
-	@echo "------------------------------------------------------------"
-	@if ! docker run --rm -v $(CURRENT_DIR)/tests/terraform:/data $(IMAGE) terraform fmt; then \
-		echo "Failed"; \
-		exit 1; \
-	fi; \
-	echo "Success";
+docker-push:
+ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
+	docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
+	docker push $(DOCKER_NAME):$(VERSION)
+	docker push $(DOCKER_NAME):latest
+else
+	docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+	docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+endif
 
-_test-tg:
-	@echo "------------------------------------------------------------"
-	@echo "- Testing Terragrunt"
-	@echo "------------------------------------------------------------"
-	@if ! docker run --rm -v $(CURRENT_DIR)/tests/terragrunt:/data $(IMAGE) terragrunt terragrunt-info; then \
-		docker run --rm -v $(CURRENT_DIR)/tests/terragrunt:/data $(IMAGE) sh -c "if test -d .terragrunt-cache; then rm -rf .terragrunt-cache; fi"; \
-		echo "Failed"; \
-		exit 1; \
-	fi; \
-	docker run --rm -v $(CURRENT_DIR)/tests/terragrunt:/data $(IMAGE) sh -c "if test -d .terragrunt-cache; then rm -rf .terragrunt-cache; fi"; \
-	echo "Success";
-
-tag:
-	docker tag $(IMAGE) $(IMAGE):$(TAG)
-
-pull:
-	@grep -E '^\s*FROM' Dockerfile \
-		| sed -e 's/^FROM//g' -e 's/[[:space:]]*as[[:space:]]*.*$$//g' \
-		| xargs -n1 docker pull;
-
-login:
-	yes | docker login --username $(USER) --password $(PASS)
-
-push:
-	@$(MAKE) tag TAG=$(TAG)
-	docker push $(IMAGE):$(TAG)
-
-enter:
-	docker run --rm --name $(subst /,-,$(IMAGE)) -it --entrypoint=/bin/sh $(ARG) $(IMAGE):$(TAG)
+build-deploy: clean docker-create docker-push
