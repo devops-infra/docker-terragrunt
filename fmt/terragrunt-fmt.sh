@@ -25,9 +25,9 @@ ARG_PATH=
 ### Show Usage
 ###
 print_usage() {
-	echo "Usage: cytopia/terragrunt-fmt [options] [DIR]"
-	echo "       cytopia/terragrunt-fmt --help"
-	echo "       cytopia/terragrunt-fmt --version"
+	echo "Usage: /terragrunt-fmt.sh [options] [DIR]"
+	echo "       /terragrunt-fmt.sh --help"
+	echo "       /terragrunt-fmt.sh --version"
 	echo
 	echo "       Rewrites all Terragrunt configuration files to a canonical format. All"
 	echo "       hcl configuration files (.hcl) are updated."
