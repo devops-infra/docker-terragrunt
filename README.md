@@ -5,6 +5,8 @@ Those two images are [docker-terragrunt](https://github.com/cytopia/docker-terra
 
 Some changes have been applied to add more software to the image - list below.
 
+Docker image is available at [DockerHub](https://hub.docker.com/) as [krzysztofszyperepam/docker-terragrunt](https://hub.docker.com/repository/docker/krzysztofszyperepam/docker-terragrunt)
+
 
 # Available binaries
 * [awscli](https://github.com/aws/aws-cli)
