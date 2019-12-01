@@ -1,0 +1,15 @@
+name: Build and Push to DockerHub
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Build and Push Docker image
+        env:
+          DOCKER_USER_ID: ${{ secrets.DOCKER_USER_ID }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: make build-and-push

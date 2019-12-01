@@ -31,24 +31,27 @@ endif
 	$(info Using branch: $(CURRENT_BRANCH))
 	$(info Using version tag: $(VERSION))
 
+docker-login:
+	@docker login -u $(DOCKER_USER_ID) -p $(DOCKER_TOKEN)
+
 docker-build: get-versions
-	docker rm $(DOCKER_NAME):latest || true
-	docker rm $(DOCKER_NAME):$(VERSION) || true
-	docker build \
+	@docker rm $(DOCKER_NAME):latest || true
+	@docker rm $(DOCKER_NAME):$(VERSION) || true
+	@docker build \
 	  --build-arg TF_VERSION=$(TF_VERSION) \
 	  --build-arg TG_VERSION=$(TG_VERSION) \
       --file=Dockerfile \
       --tag=$(DOCKER_NAME):$(VERSION) .
 
-docker-push:
+docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
-	docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	docker push $(DOCKER_NAME):$(VERSION)
-	docker push $(DOCKER_NAME):latest
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
+	@docker push $(DOCKER_NAME):$(VERSION)
+	@docker push $(DOCKER_NAME):latest
 else
-	docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
 endif
 
-build-and-deploy: docker-build docker-push
+build-and-push: docker-build docker-push

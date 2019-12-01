@@ -50,7 +50,7 @@ RUN set -eux \
 		-o /usr/bin/terragrunt \
 	&& chmod +x /usr/bin/terragrunt
 
-# Get latest Scenery
+# Get the latest Scenery
 # This part was added
 RUN set -eux \
 	&& git clone https://github.com/dmlittle/scenery /scenery \
