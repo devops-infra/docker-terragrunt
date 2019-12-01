@@ -1,35 +1,39 @@
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-TF_VERSION ?= 0.12.16
-TG_VERSION ?= 0.21.6
+# Can be partial (e.g. 0.12.16) or partial (e.g. 0.12; will get latest)
+TF_VERSION ?= latest
+TG_VERSION ?= latest
 
 # Constants
-CURRENT_BRANCH := ${bamboo_planRepository_branchName}
+GITHUB_REF ?= refs/heads/master
+CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 RELEASE_BRANCH := master
 DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
 
-# Version tag taken from environment, file, or calculated date
-VERSION_FILE := version.txt
-ifdef VERSION
-  $(shell echo "version=$(VERSION)" > $(VERSION_FILE))
-  $(info using version $(VERSION) from parameter input or environment)
-else ifneq ("$(wildcard $(VERSION_FILE))","")
-  VERSION=$(shell awk -F'=' '/version/{print $$2}' $(VERSION_FILE))
-  $(info using version $(VERSION) from file $(VERSION_FILE))
+get-versions:
+ifeq ($(TF_VERSION),latest)
+	$(eval TF_VERSION = $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases/latest' \
+    	| grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
 else
-  VERSION=$(shell date -u +"%Y-%m-%dT%H-%M-%SZ")
-  $(shell echo "version=$(VERSION)" > $(VERSION_FILE))
-  $(info using version $(VERSION) which is self-calculated)
+	$(eval TF_VERSION = $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases' \
+        | grep '"tag_name":' | grep '$(TF_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
 endif
+ifeq ($(TG_VERSION),latest)
+	$(eval TG_VERSION = $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest' \
+    	| grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
+else
+	$(eval TG_VERSION = $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases' \
+        | grep '"tag_name":' | grep '$(TG_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
+endif
+	$(eval VERSION = $(TF_VERSION)-$(TG_VERSION))
+	$(info Using Terraform version: $(TF_VERSION))
+	$(info Using Terragrunt version: $(TG_VERSION))
+	$(info Using branch: $(CURRENT_BRANCH))
+	$(info Using version tag: $(VERSION))
 
-test:
-	@echo version: $(VERSION)
-
-clean:
-	rm -f $(VERSION_FILE)
-
-docker-create:
+docker-build: get-versions
 	docker rm $(DOCKER_NAME):latest || true
+	docker rm $(DOCKER_NAME):$(VERSION) || true
 	docker build \
 	  --build-arg TF_VERSION=$(TF_VERSION) \
 	  --build-arg TG_VERSION=$(TG_VERSION) \
@@ -44,6 +48,7 @@ ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 else
 	docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 	docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+	docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
 endif
 
-build-deploy: clean docker-create docker-push
+build-and-deploy: docker-build docker-push
