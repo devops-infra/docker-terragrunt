@@ -9,6 +9,11 @@ RUN set -eux \
 		git \
 		unzip
 
+# For MicroBadger
+ARG VCS_REF
+LABEL org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.vcs-url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt"
+
 # Get Terraform
 # Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.16
 ARG TF_VERSION=latest

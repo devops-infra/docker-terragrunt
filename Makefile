@@ -1,11 +1,11 @@
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-# Can be partial (e.g. 0.12.16) or partial (e.g. 0.12; will get latest)
+# Can be full (e.g. 0.12.16) or partial (e.g. 0.12; will get latest)
 TF_VERSION ?= latest
 TG_VERSION ?= latest
 
 # Constants
-GITHUB_REF ?= refs/heads/master
+GITHUB_REF ?= refs/heads/null
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 RELEASE_BRANCH := master
 DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
@@ -38,20 +38,23 @@ docker-build: get-versions
 	@docker rm $(DOCKER_NAME):latest || true
 	@docker rm $(DOCKER_NAME):$(VERSION) || true
 	@docker build \
-	  --build-arg TF_VERSION=$(TF_VERSION) \
-	  --build-arg TG_VERSION=$(TG_VERSION) \
-      --file=Dockerfile \
-      --tag=$(DOCKER_NAME):$(VERSION) .
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+ifdef GITHUB_SHORT_SHA
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+endif
+		--file=Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION) .
 
 docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	@docker push $(DOCKER_NAME):$(VERSION)
 	@docker push $(DOCKER_NAME):latest
+	@docker push $(DOCKER_NAME):$(VERSION)
 else
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 endif
 
 build-and-push: docker-build docker-push

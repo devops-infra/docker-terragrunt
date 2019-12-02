@@ -1,4 +1,7 @@
-[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/main/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions)
+[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20and%20Push%20to%20DockerHub/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions)
+[![](https://images.microbadger.com/badges/image/krzysztofszyperepam/docker-terragrunt.svg)](https://microbadger.com/images/krzysztofszyperepam/docker-terragrunt "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/krzysztofszyperepam/docker-terragrunt.svg)](https://microbadger.com/images/krzysztofszyperepam/docker-terragrunt "Get your own version badge on microbadger.com")
+[![](https://images.microbadger.com/badges/commit/krzysztofszyperepam/docker-terragrunt.svg)](https://microbadger.com/images/krzysztofszyperepam/docker-terragrunt "Get your own commit badge on microbadger.com")
 
 # Docker image with all components to easily manage Terraform/Terragrunt infrastructure.
 Dockerfile is based on two images made by [cytopia](https://github.com/cytopia).
