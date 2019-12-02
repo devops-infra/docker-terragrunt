@@ -10,8 +10,9 @@ Those two images are [docker-terragrunt](https://github.com/cytopia/docker-terra
 
 Some changes have been applied to add more software to the image - list below.
 
-Docker image is available at [DockerHub](https://hub.docker.com/) as [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt)
+Docker image is available at [DockerHub](https://hub.docker.com/) under [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt).
 
+Source code is available at [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt).
 
 # Available binaries
 * [awscli](https://github.com/aws/aws-cli)
