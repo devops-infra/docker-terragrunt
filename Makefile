@@ -4,10 +4,13 @@
 TF_VERSION ?= latest
 TG_VERSION ?= latest
 
-# Constants
+# GitHub Actions variables
 GITHUB_REF ?= refs/heads/null
-GITHUB_SHORT_SHA ?= null
+GITHUB_SHA ?= aabbccddeeff
+
+# Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
+GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-8)
 RELEASE_BRANCH := master
 DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
 
@@ -27,13 +30,14 @@ else
         | grep '"tag_name":' | grep '$(TG_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
 endif
 	$(eval VERSION = $(TF_VERSION)-$(TG_VERSION))
-	$(info Using Terraform version: $(TF_VERSION))
-	$(info Using Terragrunt version: $(TG_VERSION))
-	$(info Using branch: $(CURRENT_BRANCH))
-	$(info Using version tag: $(VERSION))
+	$(info Terraform version: $(TF_VERSION))
+	$(info Terragrunt version: $(TG_VERSION))
+	$(info Version tag: $(VERSION))
+	$(info Current branch: $(CURRENT_BRANCH))
+	$(info Commit hash: $(GITHUB_SHORT_SHA))
 
 docker-login:
-	@docker login -u $(DOCKER_USER_ID) -p $(DOCKER_TOKEN)
+	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
 
 docker-build: get-versions
 	@docker rm $(DOCKER_NAME):latest || true

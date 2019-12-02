@@ -12,5 +12,4 @@ jobs:
         env:
           DOCKER_USER_ID: ${{ secrets.DOCKER_USER_ID }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          GITHUB_SHORT_SHA: $(echo ${GITHUB_SHA} | cut -c1-8)
         run: make build-and-push
