@@ -12,7 +12,7 @@ GITHUB_SHA ?= aabbccddeeff
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-7)
 RELEASE_BRANCH := master
-DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
+DOCKER_NAME := christophshyper/docker-terragrunt
 
 get-versions:
 ifeq ($(TF_VERSION),latest)
