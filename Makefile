@@ -46,6 +46,7 @@ docker-build: get-versions
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ") \
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION) .
 

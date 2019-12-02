@@ -1,6 +1,6 @@
 FROM debian:stable-slim as builder
 
-# Install build dependencies
+# Install build dependencies on builder
 RUN set -eux \
 	&& DEBIAN_FRONTEND=noninteractive apt-get update -qq \
 	&& DEBIAN_FRONTEND=noninteractive apt-get install -qq -y --no-install-recommends --no-install-suggests \
@@ -8,11 +8,6 @@ RUN set -eux \
 		curl \
 		git \
 		unzip
-
-# For MicroBadger
-ARG VCS_REF
-LABEL org.label-schema.vcs-ref=${VCS_REF} \
-    org.label-schema.vcs-url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt"
 
 # Get Terraform
 # Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.16
@@ -68,12 +63,23 @@ RUN set -eux \
 
 # Use a clean tiny image to store artifacts in
 FROM alpine:3.9
-# This part was eddited
+
+# For http://label-schema.org/rc1/#build-time-labels
+ARG VCS_REF
 LABEL \
-	maintainer="Krzysztof Szyper <krzysztof_szyper@epam.com>" \
+	maintainer="Krzysztof Szyper <biotyk@mail.com>" \
 	repo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
 	original_maintainer="cytopia <cytopia@everythingcli.org>" \
-	original_repo="https://github.com/cytopia/docker-terragrunt"
+	original_repo="https://github.com/cytopia/docker-terragrunt" \
+    org.label-schema.description = "Docker image with all components to easily manage Terraform/Terragrunt infrastructure." \
+	org.label-schema.name = "docker-terragrunt" \
+	org.label-schema.schema-version = "1.0"	\
+    org.label-schema.url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+	org.label-schema.vcs-ref=${VCS_REF} \
+    org.label-schema.vcs-url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    org.label-schema.vendor = "Krzysztof Szyper <biotyk@mail.com>" \
+    org.label-schema.version = "${TF_VERSION}-${TG_VERSION}"
+
 # This part was moved and edited
 COPY fmt/format-hcl.sh /usr/bin/format-hcl.sh
 COPY fmt/fmt.sh /fmt.sh
