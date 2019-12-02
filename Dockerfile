@@ -67,18 +67,18 @@ FROM alpine:3.9
 # For http://label-schema.org/rc1/#build-time-labels
 ARG VCS_REF
 LABEL \
-	maintainer="Krzysztof Szyper <biotyk@mail.com>" \
-	repo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
-	original_maintainer="cytopia <cytopia@everythingcli.org>" \
-	original_repo="https://github.com/cytopia/docker-terragrunt" \
     org.label-schema.description="Docker image with all components to easily manage Terraform/Terragrunt infrastructure." \
 	org.label-schema.name="docker-terragrunt" \
 	org.label-schema.schema-version="1.0"	\
     org.label-schema.url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
-	org.label-schema.vcs-ref=${VCS_REF} \
+	org.label-schema.vcs-ref="${VCS_REF}" \
     org.label-schema.vcs-url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
     org.label-schema.vendor="Krzysztof Szyper <biotyk@mail.com>" \
-    org.label-schema.version="${TF_VERSION}-${TG_VERSION}"
+    org.label-schema.version="${TF_VERSION}-${TG_VERSION}" \
+    maintainer="Krzysztof Szyper <biotyk@mail.com>" \
+    repo="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    original_maintainer="cytopia <cytopia@everythingcli.org>" \
+    original_repo="https://github.com/cytopia/docker-terragrunt"
 
 # This part was moved and edited
 COPY fmt/format-hcl.sh /usr/bin/format-hcl.sh
