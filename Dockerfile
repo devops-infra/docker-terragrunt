@@ -11,22 +11,15 @@ RUN set -eux \
 
 # Get Terraform
 # Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.16
+# To choose latest from minor version provide a proper parameter for the Makefile
 ARG TF_VERSION=latest
 RUN set -eux \
 	&& if [ "${TF_VERSION}" = "latest" ]; then \
-		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ \
-			| tac | tac \
-			| grep -Eo '/[.0-9]+/' \
-			| grep -Eo '[.0-9]+' \
-			| sort -V \
-			| tail -1 )"; \
+		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ | cat \
+			| grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
+			| sort -V | tail -1 )"; \
 	else \
-		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ \
-			| tac | tac \
-			| grep -Eo "/${TF_VERSION}/" \
-			| grep -Eo '[.0-9]+' \
-			| sort -V \
-			| tail -1 )"; \
+		VERSION="${TF_VERSION}/";
 	fi \
 	&& curl -sS -L -O \
 		https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
@@ -36,6 +29,7 @@ RUN set -eux \
 
 # Get Terragrunt
 # Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.6
+# To choose latest from minor version provide a proper parameter for the Makefile
 ARG TG_VERSION=latest
 RUN set -eux \
 	&& git clone https://github.com/gruntwork-io/terragrunt /terragrunt \
@@ -43,7 +37,7 @@ RUN set -eux \
 	&& if [ "${TG_VERSION}" = "latest" ]; then \
 		VERSION="$( git describe --abbrev=0 --tags )"; \
 	else \
-		VERSION="$( git tag | grep -E "v${TG_VERSION}" | sort -u | tail -1 )" ;\
+		VERSION="v${TG_VERSION}";\
 	fi \
 	&& curl -sS -L \
 		https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 \
@@ -81,12 +75,14 @@ LABEL \
     original_repo="https://github.com/cytopia/docker-terragrunt"
 
 # This part was moved and edited
+# Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl.sh /usr/bin/format-hcl.sh
 COPY fmt/fmt.sh /fmt.sh
 COPY fmt/terragrunt-fmt.sh /terragrunt-fmt.sh
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
 COPY --from=builder /usr/bin/scenery /usr/bin/scenery
+
 # This part has some additions
 RUN set -eux \
     && chmod +x /usr/bin/format-hcl.sh /fmt.sh /terragrunt-fmt.sh \
