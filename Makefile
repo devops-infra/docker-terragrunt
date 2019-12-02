@@ -6,6 +6,7 @@ TG_VERSION ?= latest
 
 # Constants
 GITHUB_REF ?= refs/heads/null
+GITHUB_SHORT_SHA ?= null
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 RELEASE_BRANCH := master
 DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
@@ -40,9 +41,7 @@ docker-build: get-versions
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
-ifdef GITHUB_SHORT_SHA
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
-endif
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION) .
 
