@@ -19,7 +19,7 @@ RUN set -eux \
 			| grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
 			| sort -V | tail -1 )"; \
 	else \
-		VERSION="${TF_VERSION}/";
+		VERSION="${TF_VERSION}/"; \
 	fi \
 	&& curl -sS -L -O \
 		https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
