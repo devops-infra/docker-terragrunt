@@ -1,3 +1,5 @@
+[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/main/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions)
+
 # Docker image with all components to easily manage Terraform/Terragrunt infrastructure.
 Dockerfile is based on two images made by [cytopia](https://github.com/cytopia).
 
