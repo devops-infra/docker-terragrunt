@@ -10,7 +10,7 @@ GITHUB_SHA ?= aabbccddeeff
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
-GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-8)
+GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-7)
 RELEASE_BRANCH := master
 DOCKER_NAME := krzysztofszyperepam/docker-terragrunt
 
