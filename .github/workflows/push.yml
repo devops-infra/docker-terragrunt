@@ -1,14 +1,12 @@
-name: Build on pull request
+name: Build and push to Docker Hub
 
 on:
-  pull_request:
-    types:
-      - opened
+  push:
     branches:
       - master
 
 jobs:
-  build:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,6 +18,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TARGET: Dockerfile
 
-      - name: Build Docker image
-        if:  github.actor != 'Krzysztof-Szyper-Epam'
-        run: make docker-build
+      - name: Build and Push Docker image
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+        run: make build-and-push

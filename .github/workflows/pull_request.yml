@@ -1,7 +1,10 @@
-name: Build and push to Docker Hub
+name: Build on pull request
 
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - edited
     branches:
       - master
 
@@ -18,7 +21,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TARGET: Dockerfile
 
-      - name: Build and Push Docker image
-        env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-        run: make build-and-push
+      - name: Build Docker image
+        if:  github.actor == 'Krzysztof-Szyper-Epam'
+        run: make docker-build
