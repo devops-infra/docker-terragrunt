@@ -4,6 +4,7 @@ on:
   pull_request:
     types:
       - opened
+      - edited
     branches:
       - master
 
@@ -21,5 +22,5 @@ jobs:
           TARGET: Dockerfile
 
       - name: Build Docker image
-        if:  github.actor != 'Krzysztof-Szyper-Epam'
+        if:  github.actor == 'Krzysztof-Szyper-Epam'
         run: make docker-build
