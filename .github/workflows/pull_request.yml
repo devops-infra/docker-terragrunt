@@ -20,7 +20,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TARGET: Dockerfile
-
-      - name: Build Docker image (conditional)
-        if:  github.actor == 'Krzysztof-Szyper-Epam'
-        run: make docker-build

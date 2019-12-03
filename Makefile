@@ -7,6 +7,7 @@ TG_VERSION ?= latest
 # GitHub Actions variables
 GITHUB_REF ?= refs/heads/null
 GITHUB_SHA ?= aabbccddeeff
+BUILD_NUMBER ?= 1
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
@@ -55,10 +56,12 @@ docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
 	@docker push $(DOCKER_NAME):latest
+	@docker push $(DOCKER_NAME):build-$(BUILD_NUMBER)
 	@docker push $(DOCKER_NAME):$(VERSION)
 else
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER)
 	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 endif
 
