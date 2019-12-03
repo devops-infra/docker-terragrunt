@@ -1,4 +1,4 @@
-name: Build on pull request
+name: On pull request
 
 on:
   pull_request:
@@ -21,6 +21,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TARGET: Dockerfile
 
-      - name: Build Docker image
-        if:  github.actor == 'Krzysztof-Szyper-Epam'
+      - name: Build Docker image (conditional)
+        if:  github.actor == 'Krzysztof-Szyper-Epam' || github.actor == 'github-actions'
         run: make docker-build
