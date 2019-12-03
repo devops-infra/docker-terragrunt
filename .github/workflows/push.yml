@@ -17,17 +17,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate build number
-        id: buildnumber
-        uses: einaregilsson/build-number@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push Docker image (conditional)
         if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref == 'refs/heads/master'
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: make build-and-push
+
+      - name: Generate build number (conditional)
+        if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref != 'refs/heads/master'
+        id: buildnumber
+        uses: einaregilsson/build-number@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create pull request (conditional)
         if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref != 'refs/heads/master'
