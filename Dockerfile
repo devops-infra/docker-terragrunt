@@ -94,6 +94,7 @@ RUN set -eux \
 	&& apk add --no-cache docker \
 	&& apk add --no-cache zip \
 	&& apk add --no-cache openssl \
+	&& apk add --no-cache jq \
     && if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi \
     && python3 -m ensurepip \
     && rm -r /usr/lib/python*/ensurepip \
