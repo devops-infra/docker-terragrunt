@@ -4,9 +4,8 @@
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20and%20push%20to%20Docker%20Hub/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22Build+and+push+to+Docker+Hub%22 "github.com")
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20on%20pull%20request/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22Build+on+pull+request%22 "github.com")
 ![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 <br>
-![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile "shields.io")
+![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub repo size](https://img.shields.io/github/repo-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub search hit counter](https://img.shields.io/github/search/krzysztof-szyper-epam/docker-terragrunt/terragrunt "shields.io")
@@ -14,6 +13,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 <br>
 [![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
+![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile "shields.io")
 [![Docker Stars](https://img.shields.io/docker/stars/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own image badge on microbadger.com")
 [![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own version badge on microbadger.com")
