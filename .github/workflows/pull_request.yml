@@ -22,5 +22,5 @@ jobs:
           TARGET: Dockerfile
 
       - name: Build Docker image (conditional)
-        if:  github.actor == 'Krzysztof-Szyper-Epam' || github.actor == 'github-actions'
+        if:  github.actor == 'Krzysztof-Szyper-Epam'
         run: make docker-build
