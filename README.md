@@ -1,7 +1,8 @@
 # Docker image with Terraform/Terragrunt and all needed components to easily manage AWS infrastructure.
 
 [![GitHub krzysztof-szyper-epam/docker-terragrunt](https://img.shields.io/badge/github-krzysztof--szyper--epam%2Fdocker--terragrunt-blue.svg)](https://github.com/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20and%20Push%20to%20DockerHub/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions "github.com")
+[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20and%20push%20to%20Docker%20Hub/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22Build+and+push+to+Docker+Hub%22 "github.com")
+[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20on%20pull%20request/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22Build+on+pull+request%22 "github.com")
 ![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 <br>

@@ -12,6 +12,7 @@ GITHUB_SHA ?= aabbccddeeff
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-7)
 RELEASE_BRANCH := master
+DOCKER_USER_ID := christophshyper
 DOCKER_NAME := christophshyper/docker-terragrunt
 
 get-versions:
@@ -36,9 +37,6 @@ endif
 	$(info Current branch: $(CURRENT_BRANCH))
 	$(info Commit hash: $(GITHUB_SHORT_SHA))
 
-docker-login:
-	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
-
 docker-build: get-versions
 	@docker rm $(DOCKER_NAME):latest || true
 	@docker rm $(DOCKER_NAME):$(VERSION) || true
@@ -49,6 +47,9 @@ docker-build: get-versions
 		--build-arg BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ") \
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION) .
+
+docker-login:
+	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
 
 docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
