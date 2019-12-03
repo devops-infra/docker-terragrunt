@@ -1,14 +1,25 @@
+# Docker image with Terraform/Terragrunt and all needed components to easily manage AWS infrastructure.
+
+[![GitHub krzysztof-szyper-epam/docker-terragrunt](https://img.shields.io/badge/github-krzysztof--szyper--epam%2Fdocker--terragrunt-blue.svg)](https://github.com/krzysztof-szyper-epam/docker-terragrunt)
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/Build%20and%20Push%20to%20DockerHub/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions)
+![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt)
+![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt)
+<br>
+![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/krzysztof-szyper-epam/docker-terragrunt)
 ![GitHub repo size](https://img.shields.io/github/repo-size/krzysztof-szyper-epam/docker-terragrunt)
+![GitHub search hit counter](https://img.shields.io/github/search/krzysztof-szyper-epam/docker-terragrunt/terragrunt)
+![GitHub language count](https://img.shields.io/github/languages/count/krzysztof-szyper-epam/docker-terragrunt)
+![GitHub top language](https://img.shields.io/github/languages/top/krzysztof-szyper-epam/docker-terragrunt)
 <br>
 [![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt)
+[![Docker Stars](https://img.shields.io/docker/stars/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt)
 [![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own image badge on microbadger.com")
 [![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own version badge on microbadger.com")
 [![MicroBadger Commit](https://images.microbadger.com/badges/commit/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own commit badge on microbadger.com")
+<br>
+[![dockeri.co](https://dockeri.co/image/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt)
 
-
-# Docker image with all components to easily manage Terraform/Terragrunt infrastructure.
 Dockerfile is based on two images made by [cytopia](https://github.com/cytopia).
 
 Those two images are [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7).
