@@ -1,4 +1,4 @@
-name: Build and push to Docker Hub
+name: On commit push
 
 on:
   push:
@@ -18,17 +18,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TARGET: Dockerfile
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image (conditional)
         if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref == 'refs/heads/master'
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
         run: make build-and-push
 
-      - name: Create pull request
+      - name: Create pull request (conditional)
         if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref != 'refs/heads/master'
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_label: "auto-pull-request"
           pr_body: "*Automated pull request*"
-          pr_title: "Auto: ${{ github.event.commits[0].message }}"
+          pr_title: "${{ github.event.commits[0].message }}"
+          pr_reviewer: "Krzysztof-Szyper-Epam"
+          pr_assignee: "Krzysztof-Szyper-Epam"
