@@ -14,7 +14,11 @@ CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-7)
 RELEASE_BRANCH := master
 DOCKER_USER_ID := christophshyper
-DOCKER_NAME := christophshyper/docker-terragrunt
+DOCKER_IMAGE := docker-terragrunt
+DOCKER_NAME := $(DOCKER_USER_ID)/$(DOCKER_IMAGE)
+
+clean:
+	@docker images -a | grep "$(DOCKER_IMAGE)" | awk '{print $3}' | xargs docker rmi
 
 get-versions:
 ifeq ($(TF_VERSION),latest)
@@ -40,10 +44,6 @@ endif
 	$(info Build number: $(BUILD_NUMBER))
 
 docker-build: get-versions
-	@docker rm $(DOCKER_NAME):latest || true
-	@docker rmi $(DOCKER_NAME):latest || true
-	@docker rm $(DOCKER_NAME):$(VERSION) || true
-	@docker rmi $(DOCKER_NAME):$(VERSION) || true
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -57,18 +57,12 @@ docker-login:
 
 docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
-	@docker push $(DOCKER_NAME):$(VERSION) \
-		&& docker tag $(DOCKER_NAME):$(VERSION) build-$(BUILD_NUMBER) \
-		&& docker push $(DOCKER_NAME):build-$(BUILD_NUMBER) \
-		&& docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest \
-		&& docker push $(DOCKER_NAME):latest
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
+	@docker push $(DOCKER_NAME)
 else
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) \
-		&& docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) \
-		&& docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER) \
-		&& docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER) \
-		&& docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest \
-		&& docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker push $(DOCKER_NAME)
 endif
 
-build-and-push: docker-build docker-push
+build-and-push: docker-build docker-push clean
