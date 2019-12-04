@@ -35,12 +35,46 @@ Their original README files are included in this repository: [docker-terragrunt]
 <br>
 Some changes have been applied to add more software to the image - list below.
 
+# Usage
+Mount working directory under `/data`.
+
+For example:
+```bash
+# Format all HCL files in current directory.
+docker run --rm \ 
+    -u $(id -u):$(id -g) \
+    -v $(pwd):/data \
+    -w /data \
+    christophshyper/docker-terragrunt format.hcl
+
+# Plan terraform deployment
+docker run --rm \
+    -ti \
+    -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+    -e AWS_SECRET_ACCESS_KEY={$AWS_SECRET_ACCESS_KEY} \
+    -e AWS_SESSION_TOKEN={$AWS_SESSION_TOKEN} \
+    -u $(id -u):$(id -g) \
+    -v $(pwd):/data \
+    -w /data/infra \
+    christophshyper/docker-terragrunt terraform plan
+
+# Apply terragrunt deployment
+docker run --rm \
+    -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+    -e AWS_SECRET_ACCESS_KEY={$AWS_SECRET_ACCESS_KEY} \
+    -e AWS_SESSION_TOKEN={$AWS_SESSION_TOKEN} \
+    -u $(id -u):$(id -g) \
+    -v $(pwd):/data \
+    -w /data/infra \
+    christophshyper/docker-terragrunt terragrunt apply
+```
+
 
 # Available scripts
 * format-hcl.sh
     * For formatting HCL files into format suggested by [Hashicorp](https://github.com/hashicorp/hcl).
-    * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) plus additionally calling `terraform fmt`.
-    * Will search for fall HCL files (`.hcl`, `.tf` and `.tfvars` recursively in work directory.
+    * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) (it can also only output list of files or needed diffs) plus additionally calling `terraform fmt`.
+    * Will search for fall HCL files (`.hcl`, `.tf` and `.tfvars`) recursively in work directory and modify them automatically by default.
 
 
 # Available binaries
