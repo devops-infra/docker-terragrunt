@@ -37,6 +37,7 @@ endif
 	$(info Version tag: $(VERSION))
 	$(info Current branch: $(CURRENT_BRANCH))
 	$(info Commit hash: $(GITHUB_SHORT_SHA))
+	$(info Build number: $(BUILD_NUMBER))
 
 docker-build: get-versions
 	@docker rm $(DOCKER_NAME):latest || true
