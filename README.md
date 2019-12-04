@@ -6,13 +6,12 @@
 ![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 <br>
 ![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt "shields.io")
+[![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub repo size](https://img.shields.io/github/repo-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-![GitHub search hit counter](https://img.shields.io/github/search/krzysztof-szyper-epam/docker-terragrunt/terragrunt "shields.io")
 ![GitHub language count](https://img.shields.io/github/languages/count/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub top language](https://img.shields.io/github/languages/top/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 <br>
-[![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![Docker Stars](https://img.shields.io/docker/stars/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own image badge on microbadger.com")
@@ -21,20 +20,27 @@
 <br>
 [![dockeri.co](https://dockeri.co/image/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "dockeri.co")
 
-**Docker image is available on [DockerHub](https://hub.docker.com/) under [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt).**
 
-**Source code is available on [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt).**
+**Docker image is available at [DockerHub](https://hub.docker.com/) under [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt).**
+<br>
+Tag of Docker image tells which version of Terraform and Terragrunt it's bundled with.
+<br>
+For example `christophshyper/docker-terragrunt:0.12.17-0.21.7` means it's Terraform v0.12.17 and Terragrunt v0.21.7.
 
-Dockerfile is based on two images made by [cytopia](https://github.com/cytopia). 
-Those two images are [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7). 
+**Source code is available at [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt).**
+
+Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7). 
+<br>
+Their original README files are included in this repository: [docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
+<br>
 Some changes have been applied to add more software to the image - list below.
 
 
 # Available scripts
 * format-hcl.sh
-    * For formatting HCL files into format suggested by [Hashicorp](https://github.com/hashicorp/hcl)
-    * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) plus additionally calling `terraform fmt`
-    * Will search for fall HCL files recursively in work directory.
+    * For formatting HCL files into format suggested by [Hashicorp](https://github.com/hashicorp/hcl).
+    * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) plus additionally calling `terraform fmt`.
+    * Will search for fall HCL files (`.hcl`, `.tf` and `.tfvars` recursively in work directory.
 
 
 # Available binaries
