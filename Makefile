@@ -58,16 +58,16 @@ ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):build-$(BUILD_NUMBER)
 	@docker push $(DOCKER_NAME)
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):build-$(BUILD_NUMBER)
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION)
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest || true
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):build-$(BUILD_NUMBER) || true
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION) || true
 else
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
 	@docker push $(DOCKER_NAME)
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION)
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) || true
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest || true
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION) || true
 endif
 
 build-and-push: docker-build docker-push clean
