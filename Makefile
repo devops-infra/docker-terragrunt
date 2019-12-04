@@ -41,7 +41,9 @@ endif
 
 docker-build: get-versions
 	@docker rm $(DOCKER_NAME):latest || true
+	@docker rmi $(DOCKER_NAME):latest || true
 	@docker rm $(DOCKER_NAME):$(VERSION) || true
+	@docker rmi $(DOCKER_NAME):$(VERSION) || true
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -55,18 +57,18 @@ docker-login:
 
 docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
-	@docker tag $(DOCKER_NAME):$(VERSION) build-$(BUILD_NUMBER)
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	@docker push $(DOCKER_NAME):$(VERSION)
-	@docker push $(DOCKER_NAME):build-$(BUILD_NUMBER)
-	@docker push $(DOCKER_NAME):latest
+	@docker push $(DOCKER_NAME):$(VERSION) \
+		&& docker tag $(DOCKER_NAME):$(VERSION) build-$(BUILD_NUMBER) \
+		&& docker push $(DOCKER_NAME):build-$(BUILD_NUMBER) \
+		&& docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest \
+		&& docker push $(DOCKER_NAME):latest
 else
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER)
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
-	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER)
-	@docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) \
+		&& docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) \
+		&& docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER) \
+		&& docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-build-$(BUILD_NUMBER) \
+		&& docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest \
+		&& docker push $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
 endif
 
 build-and-push: docker-build docker-push
