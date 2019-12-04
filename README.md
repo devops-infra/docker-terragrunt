@@ -29,16 +29,18 @@ For example `christophshyper/docker-terragrunt:0.12.17-0.21.7` means it's Terraf
 
 **Source code is available at [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt).**
 
-Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7).
+Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7). 
 <br>
-Some changes have been applied to add more software to the image - list below. Their orignal README files are included in this repository: [docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
+Their original README files are included in this repository: [docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
+<br>
+Some changes have been applied to add more software to the image - list below.
 
 
 # Available scripts
 * format-hcl.sh
-    * For formatting HCL files into format suggested by [Hashicorp](https://github.com/hashicorp/hcl)
-    * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) plus additionally calling `terraform fmt`
-    * Will search for fall HCL files recursively in work directory.
+    * For formatting HCL files into format suggested by [Hashicorp](https://github.com/hashicorp/hcl).
+    * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) plus additionally calling `terraform fmt`.
+    * Will search for fall HCL files (`.hcl`, `.tf` and `.tfvars` recursively in work directory.
 
 
 # Available binaries
