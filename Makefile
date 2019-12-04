@@ -70,4 +70,4 @@ else
 	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION) || true
 endif
 
-build-and-push: docker-build docker-push clean
+build-and-push: docker-build docker-push
