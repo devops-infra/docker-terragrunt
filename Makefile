@@ -17,8 +17,6 @@ DOCKER_USER_ID := christophshyper
 DOCKER_IMAGE := docker-terragrunt
 DOCKER_NAME := $(DOCKER_USER_ID)/$(DOCKER_IMAGE)
 
-clean:
-	@docker images -a | grep "$(DOCKER_IMAGE)" | awk '{print $3}' | xargs docker rmi
 
 get-versions:
 ifeq ($(TF_VERSION),latest)
@@ -58,12 +56,18 @@ docker-login:
 docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	@docker tag $(DOCKER_NAME):$(VERSION) build-$(BUILD_NUMBER)
+	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):build-$(BUILD_NUMBER)
 	@docker push $(DOCKER_NAME)
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):build-$(BUILD_NUMBER)
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION)
 else
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
 	@docker push $(DOCKER_NAME)
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
+	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION)
 endif
 
 build-and-push: docker-build docker-push clean
