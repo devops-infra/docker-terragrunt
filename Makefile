@@ -58,6 +58,7 @@ docker-login:
 docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
+	@docker tag $(DOCKER_NAME):$(VERSION) build-$(BUILD_NUMBER)
 	@docker push $(DOCKER_NAME)
 else
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
