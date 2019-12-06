@@ -47,7 +47,7 @@ docker run --rm \
     -w /data \
     christophshyper/docker-terragrunt format.hcl
 
-# Plan terraform deployment
+# Plan terraform deployment in current directory
 docker run --rm \
     -ti \
     -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
@@ -58,14 +58,14 @@ docker run --rm \
     -w /data/infra \
     christophshyper/docker-terragrunt terraform plan
 
-# Apply terragrunt deployment
+# Apply terragrunt deployment in subdirectory
 docker run --rm \
     -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
     -e AWS_SECRET_ACCESS_KEY={$AWS_SECRET_ACCESS_KEY} \
     -e AWS_SESSION_TOKEN={$AWS_SESSION_TOKEN} \
     -u $(id -u):$(id -g) \
     -v $(pwd):/data \
-    -w /data/infra \
+    -w /data/infra/some/module \
     christophshyper/docker-terragrunt terragrunt apply
 ```
 
