@@ -94,5 +94,6 @@ docker run --rm \
 
 
 # Available Python libraries
-* [ply](https://github.com/dabeaz/ply) - Dependency for [pyhcl](https://github.com/virtuald/pyhcl)
+* [boto3](https://github.com/boto/boto3) - For interacting with AWS infrastructure in Python scripts.
+* [ply](https://github.com/dabeaz/ply) - Dependency for [pyhcl](https://github.com/virtuald/pyhcl).
 * [pyhcl](https://github.com/virtuald/pyhcl) - For easily parsing of any file in HCL format, whether it's `.hcl`, `.tfvars` or `.tf`.
