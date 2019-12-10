@@ -11,7 +11,7 @@ RUN set -eux \
 	&& rm -rf /var/lib/apt/lists/*
 
 # Get Terraform
-# Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.16
+# Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.17
 # To choose latest from minor version provide a proper parameter for the Makefile
 ARG TF_VERSION=latest
 RUN set -eux \
@@ -29,7 +29,7 @@ RUN set -eux \
 	&& chmod +x /usr/bin/terraform
 
 # Get Terragrunt
-# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.6
+# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.9
 # To choose latest from minor version provide a proper parameter for the Makefile
 ARG TG_VERSION=latest
 RUN set -eux \
