@@ -62,6 +62,8 @@ FROM alpine:3.9
 # For http://label-schema.org/rc1/#build-time-labels
 ARG VCS_REF
 ARG BUILD_DATE
+ARG TF_VERSION
+ARG TG_VERSION
 LABEL \
     org.label-schema.build-date="${BUILD_DATE}" \
     org.label-schema.description="Docker image with Terraform v${TF_VERSION}, Terragrunt v${TG_VERSION} and all needed components to easily manage AWS infrastructure." \
