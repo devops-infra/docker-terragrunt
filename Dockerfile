@@ -91,6 +91,8 @@ COPY --from=builder /usr/bin/scenery /usr/bin/scenery
 # This part has some additions
 RUN set -eux \
     && chmod +x /usr/bin/format-hcl.sh /fmt.sh /terragrunt-fmt.sh \
+    && apk update --no-cache \
+    && apk upgrade --no-cache \
 	&& apk add --no-cache git \
 	&& apk add --no-cache make \
 	&& apk add --no-cache python3 \
@@ -105,10 +107,12 @@ RUN set -eux \
     && rm -r /usr/lib/python*/ensurepip \
     && pip3 install --no-cache --upgrade pip setuptools wheel \
     && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
-    && python -m pip install ply \
-	&& python -m pip install pyhcl \
-	&& python -m pip install awscli \
-    && python -m pip install boto3
+    && python3 -m pip install ply \
+	&& python3 -m pip install pyhcl \
+	&& python3 -m pip install awscli \
+    && python3 -m pip install boto3 \
+    && rm -rf /var/cache/* \
+    && rm -rf /root/.cache/*
 
 WORKDIR /data
 CMD terraform --version && terragrunt --version
