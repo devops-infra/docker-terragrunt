@@ -64,7 +64,7 @@ ARG VCS_REF
 ARG BUILD_DATE
 LABEL \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Docker image with Terraform/Terragrunt and all needed components to easily manage AWS infrastructure." \
+    org.label-schema.description="Docker image with Terraform v${TF_VERSION}, Terragrunt v${TG_VERSION} and all needed components to easily manage AWS infrastructure." \
 	org.label-schema.name="docker-terragrunt" \
 	org.label-schema.schema-version="1.0"	\
     org.label-schema.url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
@@ -73,7 +73,9 @@ LABEL \
     org.label-schema.vendor="Krzysztof Szyper <biotyk@mail.com>" \
     org.label-schema.version="${TF_VERSION}-${TG_VERSION}" \
     maintainer="Krzysztof Szyper <biotyk@mail.com>" \
-    repository="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt"
+    repository="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    tf_version="${TF_VERSION}" \
+    tg_version="${TG_VERSION}"
 
 # This part was moved and edited
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
