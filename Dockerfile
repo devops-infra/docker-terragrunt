@@ -103,7 +103,8 @@ RUN set -eux \
     && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
     && python -m pip install ply \
 	&& python -m pip install pyhcl \
-	&& python -m pip install awscli
+	&& python -m pip install awscli \
+    && python -m pip install boto3
 
 WORKDIR /data
 CMD terraform --version && terragrunt --version
