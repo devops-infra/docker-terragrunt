@@ -1,0 +1,7 @@
+.github
+.idea
+.gitignore
+LICENSE
+Makefile
+README.*
+!README.md
