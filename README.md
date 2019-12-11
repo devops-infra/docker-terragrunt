@@ -25,7 +25,7 @@
 <br>
 Tag of Docker image tells which version of Terraform and Terragrunt it's bundled with.
 <br>
-For example `christophshyper/docker-terragrunt:0.12.17-0.21.9` means it's Terraform v0.12.17 and Terragrunt v0.21.9.
+For example `christophshyper/docker-terragrunt:0.12.18-0.21.9` means it's Terraform v0.12.18 and Terragrunt v0.21.9.
 
 **Source code is available at [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt).**
 
