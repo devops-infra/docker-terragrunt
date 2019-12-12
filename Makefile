@@ -102,42 +102,20 @@ docker-login:
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
 
 docker-push: docker-login
-	$(info $(nl)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
+	$(info $(nl)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
 	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
 	@docker push $(DOCKER_NAME):$(VERSION)
-	@docker push $(DOCKER_NAME):latest
 	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):aws-$(VERSION) $(DOCKER_NAME):aws-latest
 	@docker push $(DOCKER_NAME):aws-$(VERSION)
-	@docker push $(DOCKER_NAME):aws-latest
 #	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
-#	@docker push $(DOCKER_NAME):gcp-latest
 #	@docker push $(DOCKER_NAME):gcp-$(VERSION)
 #	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
-#	@docker push $(DOCKER_NAME):azure-latest
 #	@docker push $(DOCKER_NAME):azure-$(VERSION)
-else
-	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
-	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-$(VERSION)$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-$(VERSION)
-	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-latest$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-latest
-#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-$(VERSION)
-#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-latest$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-latest
-#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-$(VERSION)
-#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest
-	@docker push $(DOCKER_NAME)
 endif
 
 build-and-push: docker-build docker-push
