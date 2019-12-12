@@ -21,13 +21,13 @@ jobs:
         if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref == 'refs/heads/master'
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          TERM: xterm256
+          TERM: xterm-256color
         run: make build-and-push
 
       - name: Print versions (conditional)
         if: github.actor == 'Krzysztof-Szyper-Epam' && github.ref != 'refs/heads/master'
         env:
-          TERM: xterm256
+          TERM: xterm-256color
         run: make get-versions
 
       - name: Create pull request (conditional)
