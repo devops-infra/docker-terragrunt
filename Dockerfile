@@ -57,27 +57,34 @@ RUN set -eux \
 	&& chmod +x /usr/bin/scenery
 
 # Use a clean tiny image to store artifacts in
-FROM alpine:3.9
+FROM alpine:3.10
 
 # For http://label-schema.org/rc1/#build-time-labels
-ARG VCS_REF
-ARG BUILD_DATE
+ARG VCS_REF=abcdef1
+ARG BUILD_DATE=2019-12-01T00:00:00Z
 ARG TF_VERSION
 ARG TG_VERSION
+ARG AWS=no
+#ARG GCP=no
+#ARG AZURE=no
 LABEL \
     org.label-schema.build-date="${BUILD_DATE}" \
-    org.label-schema.description="Docker image with Terraform v${TF_VERSION}, Terragrunt v${TG_VERSION} and all needed components to easily manage AWS infrastructure." \
+    org.label-schema.description="Docker image with Terraform v${TF_VERSION}, Terragrunt v${TG_VERSION} and all needed components to easily manage cloud infrastructure." \
 	org.label-schema.name="docker-terragrunt" \
 	org.label-schema.schema-version="1.0"	\
     org.label-schema.url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
 	org.label-schema.vcs-ref="${VCS_REF}" \
     org.label-schema.vcs-url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
     org.label-schema.vendor="Krzysztof Szyper <biotyk@mail.com>" \
-    org.label-schema.version="${TF_VERSION}-${TG_VERSION}" \
+    org.label-schema.version="tf-${TF_VERSION}-tg-${TG_VERSION}" \
     maintainer="Krzysztof Szyper <biotyk@mail.com>" \
     repository="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    alpine="3.10" \
     tf_version="${TF_VERSION}" \
-    tg_version="${TG_VERSION}"
+    tg_version="${TG_VERSION}" \
+    aws_enabled="${AWS}"
+#    gcp_enabled="${GCP}"
+#    azure_enabled="${AZURE}
 
 # This part was moved and edited
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
@@ -107,10 +114,11 @@ RUN set -eux \
     && rm -r /usr/lib/python*/ensurepip \
     && pip3 install --no-cache --upgrade pip setuptools wheel \
     && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
-    && python3 -m pip install boto3 \
-	&& python3 -m pip install awscli \
     && python3 -m pip install ply \
 	&& python3 -m pip install pyhcl \
+    && if [ "${AWS}" == "yes" ]; then python3 -m pip install boto3; python3 -m pip install awscli; fi \
+#    && if [ "${GCP}" == "yes" ]; then echo GCP; fi \
+#    && if [ "${AZURE}" == "yes" ]; then echo AZURE; fi \
     && rm -rf /var/cache/* \
     && rm -rf /root/.cache/*
 
