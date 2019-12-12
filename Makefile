@@ -106,12 +106,12 @@ docker-push: docker-login
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	@docker push $(DOCKER_NAME):latest
 	@docker push $(DOCKER_NAME):$(VERSION)
+	@docker push $(DOCKER_NAME):latest
 	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):aws-$(VERSION) $(DOCKER_NAME):aws-latest
-	@docker push $(DOCKER_NAME):aws-latest
 	@docker push $(DOCKER_NAME):aws-$(VERSION)
+	@docker push $(DOCKER_NAME):aws-latest
 #	$(info $(nl)$(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
 #	@docker push $(DOCKER_NAME):gcp-latest
@@ -120,10 +120,6 @@ ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 #	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
 #	@docker push $(DOCKER_NAME):azure-latest
 #	@docker push $(DOCKER_NAME):azure-$(VERSION)
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION) || true
-	@docker rmi $(DOCKER_NAME):aws-$(VERSION) $(DOCKER_NAME):aws-$(VERSION) || true
-#	@docker rmi $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-$(VERSION) || true
-#	@docker rmi $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-$(VERSION) || true
 else
 	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
@@ -142,11 +138,6 @@ else
 #	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest
 	@docker push $(DOCKER_NAME)
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) || true
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-$(VERSION) || true
-#	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-$(VERSION) || true
-#	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-$(VERSION) || true
-	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(VERSION) || true
 endif
 
 build-and-push: docker-build docker-push

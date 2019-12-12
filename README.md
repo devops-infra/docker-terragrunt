@@ -19,13 +19,13 @@
 <br>
 [![dockeri.co](https://dockeri.co/image/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "dockeri.co")
 <br>
-**christophshyper/docker-terragrunt:latest**
 [![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own version badge on microbadger.com")
 [![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own image badge on microbadger.com")
+**christophshyper/docker-terragrunt:latest**
 <br>
-**christophshyper/docker-terragrunt:aws-latest**
 [![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt:aws-latest.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt:aws-latest "Get your own version badge on microbadger.com")
 [![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt:aws-latest.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt:aws-latest "Get your own image badge on microbadger.com")
+**christophshyper/docker-terragrunt:aws-latest**
 
 -----
 **Docker image is available at [DockerHub](https://hub.docker.com/) under [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt).**
