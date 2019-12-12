@@ -45,12 +45,12 @@ else
 endif
 	$(info $(nl)$(TXT_GREEN) == STARTING BUILD ==$(TXT_RESET))
 	$(eval VERSION = tf-$(TF_VERSION)-tg-$(TG_VERSION))
-	$(info $(TXT_GREEN)Terraform version:$(TXT_YELLOW) $(TF_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Terraform version:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
 	$(info $(TXT_GREEN)Terragrunt version:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Version tag:$(TXT_YELLOW) $(VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Current branch:$(TXT_YELLOW) $(CURRENT_BRANCH)$(TXT_RESET))
-	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW) $(GITHUB_SHORT_SHA)$(TXT_RESET))
-	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW) $(BUILD_DATE)$(TXT_RESET))
+	$(info $(TXT_GREEN)Version tag:$(TXT_YELLOW)        $(VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Current branch:$(TXT_YELLOW)     $(CURRENT_BRANCH)$(TXT_RESET))
+	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW)        $(GITHUB_SHORT_SHA)$(TXT_RESET))
+	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW)         $(BUILD_DATE)$(TXT_RESET))
 
 docker-build: get-versions docker-build-plain docker-build-aws
 
@@ -98,6 +98,7 @@ docker-build-azure:
 		--tag=$(DOCKER_NAME):azure-$(VERSION) .
 
 docker-login:
+	@echo " "
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
 
 docker-push: docker-login

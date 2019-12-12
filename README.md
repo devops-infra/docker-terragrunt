@@ -1,11 +1,11 @@
 # Docker image with Terraform, Terragrunt and all needed components to easily manage cloud infrastructure.
 
 [![GitHub krzysztof-szyper-epam/docker-terragrunt](https://img.shields.io/badge/github-krzysztof--szyper--epam%2Fdocker--terragrunt-blue.svg)](https://github.com/krzysztof-szyper-epam/docker-terragrunt "shields.io")
+[![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/commits/master "shields.io")
+[![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt "shields.io")
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20pull%20request/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+pull+request%22 "github.com")
-![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 <br>
-![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 [![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub repo size](https://img.shields.io/github/repo-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
@@ -14,9 +14,13 @@
 <br>
 [![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![Docker Stars](https://img.shields.io/docker/stars/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
+[![MicroBadger Commit](https://images.microbadger.com/badges/commit/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own commit badge on microbadger.com")
+<br>
 [![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own image badge on microbadger.com")
 [![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own version badge on microbadger.com")
-[![MicroBadger Commit](https://images.microbadger.com/badges/commit/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own commit badge on microbadger.com")
+<br>
+[![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt:aws-latest.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt:aws-latest "Get your own image badge on microbadger.com")
+[![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt:aws-latest.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt:aws-latest "Get your own version badge on microbadger.com")
 <br>
 [![dockeri.co](https://dockeri.co/image/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "dockeri.co")
 
