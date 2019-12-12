@@ -18,14 +18,15 @@ DOCKER_NAME := $(DOCKER_USER_ID)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Some cosmetics
+SHELL := bash
 define nl
 
 
 endef
-TXT_RED = $(shell tput setaf 1)
-TXT_GREEN = $(shell tput setaf 2)
-TXT_YELLOW = $(shell tput setaf 3)
-TXT_RESET = $(shell tput sgr0)
+TXT_RED := $(shell tput setaf 1)
+TXT_GREEN := $(shell tput setaf 2)
+TXT_YELLOW := $(shell tput setaf 3)
+TXT_RESET := $(shell tput sgr0)
 
 get-versions:
 ifeq ($(TF_VERSION),latest)
