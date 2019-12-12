@@ -19,6 +19,7 @@ BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Some cosmetics
 SHELL := bash
+XTERM := xterm-256colors
 define nl
 
 
