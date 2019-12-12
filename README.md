@@ -1,4 +1,4 @@
-# Docker image with Terraform/Terragrunt and all needed components to easily manage AWS infrastructure.
+# Docker image with Terraform, Terragrunt and all needed components to easily manage cloud infrastructure.
 
 [![GitHub krzysztof-szyper-epam/docker-terragrunt](https://img.shields.io/badge/github-krzysztof--szyper--epam%2Fdocker--terragrunt-blue.svg)](https://github.com/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
@@ -23,9 +23,11 @@
 
 **Docker image is available at [DockerHub](https://hub.docker.com/) under [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt).**
 <br>
-Tag of Docker image tells which version of Terraform and Terragrunt it's bundled with.
+Tag of Docker image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's bundled with or not (see below).
 <br>
-For example `christophshyper/docker-terragrunt:0.12.18-0.21.9` means it's Terraform v0.12.18 and Terragrunt v0.21.9.
+For example:
+ * `christophshyper/docker-terragrunt:tf-0.12.18-tg-0.21.9` means it's Terraform v0.12.18 and Terragrunt v0.21.9 without additional CLI.
+ * `christophshyper/docker-terragrunt:aws-tf-0.12.18-tg-0.21.9` means it's Terraform v0.12.18 and Terragrunt v0.21.9 with AWS CLI.
 
 **Source code is available at [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt).**
 
@@ -35,6 +37,31 @@ Their original README files are included in this repository: [docker-terragrunt]
 <br>
 Some changes have been applied to add more software to the image - list below.
 
+-----
+# Available flavours
+**Please note focus of those images is to maintain availability of cutting edge versions of Terraform and Terragrunt, not CLIs or other dependencies.**
+<br>
+Hence images are updated when new version of Terraform or Terragrunt is releases. 
+<br>
+Furthermore, versioning labels of images contain versions of said software to emphasize it.
+
+## Without public cloud provider CLIs
+Use `christophshyper/docker-terragrunt:latest` or `christophshyper/docker-terragrunt:tf-0.12.18-tg-0.21.9`
+
+## Amazon Web Services
+Use `christophshyper/docker-terragrunt:aws-latest` or `christophshyper/docker-terragrunt:aws-tf-0.12.18-tg-0.21.9`
+<br>
+Contains additionally:
+* [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.
+* [boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
+
+~~## Google Cloud Platform - TO BE ADDED SOON~~
+~~Use christophshyper/docker-terragrunt:aws-latest or christophshyper/docker-terragrunt:gcp-tf-0.12.18-tg-0.21.9~~
+
+~~## Microsoft Azure - TO BE ADDED SOON~~
+~~Use christophshyper/docker-terragrunt:azure-latest or christophshyper/docker-terragrunt:azure-tf-0.12.18-tg-0.21.9~~
+
+-----
 # Usage
 Mount working directory under `/data`.
 
@@ -56,7 +83,7 @@ docker run --rm \
     -u $(id -u):$(id -g) \
     -v $(pwd):/data \
     -w /data/infra \
-    christophshyper/docker-terragrunt terraform plan
+    christophshyper/docker-terragrunt:aws-latest terraform plan
 
 # Apply terragrunt deployment in subdirectory
 docker run --rm \
@@ -65,20 +92,19 @@ docker run --rm \
     -e AWS_SESSION_TOKEN={$AWS_SESSION_TOKEN} \
     -u $(id -u):$(id -g) \
     -v $(pwd):/data \
-    -w /data/infra/some/module \
-    christophshyper/docker-terragrunt terragrunt apply
+    -w /data \
+    christophshyper/docker-terragrunt:aws-latest terragrunt apply --terragrunt-working-dir infra/some/module
 ```
 
-
+-----
 # Available scripts
 * format-hcl.sh
     * For formatting HCL files into format suggested by [Hashicorp](https://github.com/hashicorp/hcl).
     * Using [cytopia's](https://github.com/cytopia) [terragrunt-fmt.sh](https://github.com/cytopia/docker-terragrunt-fmt) (it can also only output list of files or needed diffs) plus additionally calling `terraform fmt`.
     * Will search for fall HCL files (`.hcl`, `.tf` and `.tfvars`) recursively in work directory and modify them automatically by default.
 
-
-# Available binaries
-* [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.
+-----
+# Available binaries and Python libraries
 * [bash](https://www.gnu.org/software/bash/) - For color output from `terraform` and`terragrunt`. Assures also access to some builtins.
 * [curl](https://curl.haxx.se/) - For interacting with [ElasticSearch](https://github.com/elastic/elasticsearch) and [Kibana](https://github.com/elastic/kibana).
 * [docker](https://github.com/docker/docker-ce) - For running another container, e.g. for deploying Lambdas with [LambCI's](https://github.com/lambci) [docker-lambda](https://github.com/lambci/docker-lambda).
@@ -86,14 +112,10 @@ docker run --rm \
 * [jq](https://stedolan.github.io/jq/) - For parsing JSON outputs of [awscli](https://github.com/aws/aws-cli).
 * [make](https://www.gnu.org/software/make/) - For using `Makefile` instead of scripts in deployment process.
 * [openssl](https://github.com/openssl/openssl) - For calculating BASE64SHA256 hash of Lambda packages. Assures updating Lambdas only when package hash changed.
+* [ply](https://github.com/dabeaz/ply) - Python library, dependency for [pyhcl](https://github.com/virtuald/pyhcl).
+* [pyhcl](https://github.com/virtuald/pyhcl) - Python library for easily parsing of any files in HCL format, whether it's `.hcl`, `.tfvars` or `.tf`.
 * [python3](https://www.python.org/) - For running more complex scripts during deployment process.
 * [scenery](https://github.com/dmlittle/scenery) - For better coloring and visualization of `terraform plan` outputs.
 * [terraform](https://github.com/hashicorp/terraform) - For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). 
 * [terragrunt](https://github.com/gruntwork-io/terragrunt) - For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform).
 * [zip](http://infozip.sourceforge.net/) - For creating packages for Lambdas.
-
-
-# Available Python libraries
-* [boto3](https://github.com/boto/boto3) - For interacting with AWS infrastructure in Python scripts.
-* [ply](https://github.com/dabeaz/ply) - Dependency for [pyhcl](https://github.com/virtuald/pyhcl).
-* [pyhcl](https://github.com/virtuald/pyhcl) - For easily parsing of any file in HCL format, whether it's `.hcl`, `.tfvars` or `.tf`.
