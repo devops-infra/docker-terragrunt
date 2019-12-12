@@ -43,19 +43,19 @@ else
 	$(eval TG_VERSION = $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases' \
         | grep '"tag_name":' | grep '$(TG_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
 endif
-	$(info $(nl)$(TXT_GREEN) == STARTING BUILD == $(TXT_RESET))
+	$(info $(nl)$(TXT_GREEN) == STARTING BUILD ==$(TXT_RESET))
 	$(eval VERSION = tf-$(TF_VERSION)-tg-$(TG_VERSION))
-	$(info $(TXT_YELLOW)Terraform version:$(TXT_RESET) $(TF_VERSION))
-	$(info $(TXT_YELLOW)Terragrunt version:$(TXT_RESET) $(TG_VERSION))
-	$(info $(TXT_YELLOW)Version tag:$(TXT_RESET) $(VERSION))
-	$(info $(TXT_YELLOW)Current branch:$(TXT_RESET) $(CURRENT_BRANCH))
-	$(info $(TXT_YELLOW)Commit hash:$(TXT_RESET) $(GITHUB_SHORT_SHA))
-	$(info $(TXT_YELLOW)Build date:$(TXT_RESET) $(BUILD_DATE))
+	$(info $(TXT_GREEN)Terraform version:$(TXT_YELLOW) $(TF_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Terragrunt version:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Version tag:$(TXT_YELLOW) $(VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Current branch:$(TXT_YELLOW) $(CURRENT_BRANCH)$(TXT_RESET))
+	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW) $(GITHUB_SHORT_SHA)$(TXT_RESET))
+	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW) $(BUILD_DATE)$(TXT_RESET))
 
 docker-build: get-versions docker-build-plain docker-build-aws
 
 docker-build-plain:
-	$(info $(nl)$(TXT_YELLOW)Building Docker image:$(TXT_RESET) $(DOCKER_NAME):$(VERSION))
+	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -65,7 +65,7 @@ docker-build-plain:
 		--tag=$(DOCKER_NAME):$(VERSION) .
 
 docker-build-aws:
-	$(info $(nl)$(TXT_YELLOW)Building Docker image:$(TXT_RESET) $(DOCKER_NAME):aws-$(VERSION))
+	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -76,7 +76,7 @@ docker-build-aws:
 		--tag=$(DOCKER_NAME):aws-$(VERSION) .
 
 docker-build-gcp:
-	$(info $(nl)$(TXT_YELLOW)Building Docker image:$(TXT_RESET) $(DOCKER_NAME):gcp-$(VERSION))
+	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -87,7 +87,7 @@ docker-build-gcp:
 		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
 
 docker-build-azure:
-	$(info $(nl)$(TXT_YELLOW)Building Docker image:$(TXT_RESET) $(DOCKER_NAME):azure-$(VERSION))
+	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -103,13 +103,13 @@ docker-login:
 docker-push: docker-login
 	$(info $(nl)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
 ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
-	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(VERSION))
+	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):aws-$(VERSION))
+	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):aws-$(VERSION) $(DOCKER_NAME):aws-latest
-#	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):gcp-$(VERSION))
+#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
-#	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):azure-$(VERSION))
+#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
 	@docker push $(DOCKER_NAME)
 	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest || true
@@ -121,21 +121,21 @@ ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 #	@docker rmi $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest || true
 #	@docker rmi $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-$(VERSION) || true
 else
-	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION))
+	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION)
-	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest)
+	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-latest
-	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-$(VERSION))
+	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-$(VERSION)
-	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-latest)
+	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-latest$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-aws-latest
-#	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-$(VERSION))
+#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-$(VERSION)
-#	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-latest)
+#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-latest$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-gcp-latest
-#	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-$(VERSION))
+#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-$(VERSION)
-#	$(info $(TXT_YELLOW)Using image:$(TXT_RESET) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest)
+#	$(info $(TXT_GREEN)Using image:$(TXT_YELLOW) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-azure-latest
 	@docker push $(DOCKER_NAME)
 	@docker rmi $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):$(CURRENT_BRANCH)-$(VERSION) || true
