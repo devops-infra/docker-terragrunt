@@ -56,6 +56,16 @@ RUN set -eux \
 		-o /usr/bin/scenery \
 	&& chmod +x /usr/bin/scenery
 
+# Get the latest tfmask
+RUN set -eux \
+	&& git clone https://github.com/cloudposse/tfmask /tfmask \
+	&& cd /tfmask \
+	&& VERSION="$( git describe --abbrev=0 --tags )" \
+	&& curl -sS -L \
+		https://github.com/cloudposse/tfmask/releases/download/${VERSION}/tfmask_linux_amd64 \
+		-o /usr/bin/tfmask \
+	&& chmod +x /usr/bin/tfmask
+
 # Use a clean tiny image to store artifacts in
 FROM alpine:3.10
 
@@ -94,6 +104,7 @@ COPY fmt/terragrunt-fmt.sh /terragrunt-fmt.sh
 COPY --from=builder /usr/bin/terraform /usr/bin/terraform
 COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
 COPY --from=builder /usr/bin/scenery /usr/bin/scenery
+COPY --from=builder /usr/bin/tfmask /usr/bin/tfmask
 
 # This part has some additions
 RUN set -eux \

@@ -2,10 +2,10 @@
 
 [![GitHub krzysztof-szyper-epam/docker-terragrunt](https://img.shields.io/badge/github-krzysztof--szyper--epam%2Fdocker--terragrunt-blue.svg)](https://github.com/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 [![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/commits/master "shields.io")
-[![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt "shields.io")
 <br>
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
 [![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20pull%20request/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+pull+request%22 "github.com")
+[![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt "shields.io")
 <br>
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
 ![GitHub repo size](https://img.shields.io/github/repo-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
@@ -125,4 +125,5 @@ docker run --rm \
 * [scenery](https://github.com/dmlittle/scenery) - For better coloring and visualization of `terraform plan` outputs.
 * [terraform](https://github.com/hashicorp/terraform) - For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). 
 * [terragrunt](https://github.com/gruntwork-io/terragrunt) - For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform).
+* [tfmask](https://github.com/cloudposse/tfmask) - For masking sensitive outputs in `terraform plan`.
 * [zip](http://infozip.sourceforge.net/) - For creating packages for Lambdas.
