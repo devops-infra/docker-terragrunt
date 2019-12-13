@@ -125,5 +125,4 @@ docker run --rm \
 * [scenery](https://github.com/dmlittle/scenery) - For better coloring and visualization of `terraform plan` outputs.
 * [terraform](https://github.com/hashicorp/terraform) - For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). 
 * [terragrunt](https://github.com/gruntwork-io/terragrunt) - For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform).
-* [tfmask](https://github.com/cloudposse/tfmask) - For masking sensitive outputs in `terraform plan`.
 * [zip](http://infozip.sourceforge.net/) - For creating packages for Lambdas.
