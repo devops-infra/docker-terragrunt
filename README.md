@@ -1,6 +1,6 @@
 # Docker image with Terraform, Terragrunt and all needed components to easily manage cloud infrastructure.
 
-[![GitHub ChristophShyper/docker-terragrunt](https://img.shields.io/badge/github-christoph-shyper-%2Fdocker--terragrunt-blue.svg)](https://github.com/christophshyper/docker-terragrunt "shields.io")
+[![GitHub ChristophShyper/docker-terragrunt](https://img.shields.io/badge/github-ChristophShyper%2Fdocker--terragrunt-blue.svg)](https://github.com/christophshyper/docker-terragrunt "shields.io")
 [![GitHub last commit](https://img.shields.io/github/last-commit/christophshyper/docker-terragrunt)](https://github.com/ChristophShyper/docker-terragrunt/commits/master "shields.io")
 <br>
 [![Actions Status](https://github.com/ChristophShyper/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
