@@ -72,13 +72,13 @@ LABEL \
     org.label-schema.description="Docker image with Terraform v${TF_VERSION}, Terragrunt v${TG_VERSION} and all needed components to easily manage cloud infrastructure." \
 	org.label-schema.name="docker-terragrunt" \
 	org.label-schema.schema-version="1.0"	\
-    org.label-schema.url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    org.label-schema.url="https://github.com/ChristophShyper/docker-terragrunt" \
 	org.label-schema.vcs-ref="${VCS_REF}" \
-    org.label-schema.vcs-url="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    org.label-schema.vcs-url="https://github.com/ChristophShyper/docker-terragrunt" \
     org.label-schema.vendor="Krzysztof Szyper <biotyk@mail.com>" \
     org.label-schema.version="tf-${TF_VERSION}-tg-${TG_VERSION}" \
     maintainer="Krzysztof Szyper <biotyk@mail.com>" \
-    repository="https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt" \
+    repository="https://github.com/ChristophShyper/docker-terragrunt" \
     alpine="3.10" \
     tf_version="${TF_VERSION}" \
     tg_version="${TG_VERSION}" \

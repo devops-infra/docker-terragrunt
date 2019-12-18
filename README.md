@@ -1,18 +1,18 @@
 # Docker image with Terraform, Terragrunt and all needed components to easily manage cloud infrastructure.
 
-[![GitHub krzysztof-szyper-epam/docker-terragrunt](https://img.shields.io/badge/github-krzysztof--szyper--epam%2Fdocker--terragrunt-blue.svg)](https://github.com/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-[![GitHub last commit](https://img.shields.io/github/last-commit/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/commits/master "shields.io")
+[![GitHub ChristophShyper/docker-terragrunt](https://img.shields.io/badge/github-ChristophShyper%2Fdocker--terragrunt-blue.svg)](https://github.com/christophshyper/docker-terragrunt "shields.io")
+[![GitHub last commit](https://img.shields.io/github/last-commit/christophshyper/docker-terragrunt)](https://github.com/ChristophShyper/docker-terragrunt/commits/master "shields.io")
 <br>
-[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
-[![Actions Status](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/workflows/On%20pull%20request/badge.svg)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/actions?query=workflow%3A%22On+pull+request%22 "github.com")
-[![GitHub](https://img.shields.io/github/license/krzysztof-szyper-epam/docker-terragrunt)](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt "shields.io")
+[![Actions Status](https://github.com/ChristophShyper/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
+[![Actions Status](https://github.com/ChristophShyper/docker-terragrunt/workflows/On%20pull%20request/badge.svg)](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22On+pull+request%22 "github.com")
+[![GitHub](https://img.shields.io/github/license/christophshyper/docker-terragrunt)](https://github.com/ChristophShyper/docker-terragrunt "shields.io")
 <br>
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-![GitHub repo size](https://img.shields.io/github/repo-size/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-![GitHub language count](https://img.shields.io/github/languages/count/krzysztof-szyper-epam/docker-terragrunt "shields.io")
-![GitHub top language](https://img.shields.io/github/languages/top/krzysztof-szyper-epam/docker-terragrunt "shields.io")
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/christophshyper/docker-terragrunt "shields.io")
+![GitHub repo size](https://img.shields.io/github/repo-size/christophshyper/docker-terragrunt "shields.io")
+![GitHub language count](https://img.shields.io/github/languages/count/christophshyper/docker-terragrunt "shields.io")
+![GitHub top language](https://img.shields.io/github/languages/top/christophshyper/docker-terragrunt "shields.io")
 <br>
-[![GitHub file size in bytes](https://img.shields.io/github/size/krzysztof-szyper-epam/docker-terragrunt/Dockerfile?label=Dockerfile)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
+[![GitHub file size in bytes](https://img.shields.io/github/size/christophshyper/docker-terragrunt/Dockerfile?label=Dockerfile)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![Docker Stars](https://img.shields.io/docker/stars/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 [![MicroBadger Commit](https://images.microbadger.com/badges/commit/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own commit badge on microbadger.com")
@@ -36,11 +36,11 @@ For example:
  * `christophshyper/docker-terragrunt:tf-0.12.18-tg-0.21.9` means it's Terraform v0.12.18 and Terragrunt v0.21.9 without additional CLI.
  * `christophshyper/docker-terragrunt:aws-tf-0.12.18-tg-0.21.9` means it's Terraform v0.12.18 and Terragrunt v0.21.9 with AWS CLI.
 
-**Source code is available at [GitHub](https://github.com/) under [Krzysztof-Szyper-Epam/docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt) (will change soon to match DockerHub's value christophshyper).**
+**Source code is available at [GitHub](https://github.com/) under [ChristophShyper/docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt) (will change soon to match DockerHub's value christophshyper).**
 
 Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7). 
 <br>
-Their original README files are included in this repository: [docker-terragrunt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
+Their original README files are included in this repository: [docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
 <br>
 Some changes have been applied to add more software to the image - list below.
 
@@ -116,7 +116,7 @@ docker run --rm \
 ### Scripts
 Script name | Is included in PATH | Purpose | Source/Documentation
 :--- | :---: | :--- | :---
-`format-hcl.sh` | Yes | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). |  [Krzysztof-Szyper-Epam](https://github.com/Krzysztof-Szyper-Epam/docker-terragrunt/blob/master/fmt/format-hcl.sh)
+`format-hcl.sh` | Yes | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). |  [ChristophShyper](https://github.com/ChristophShyper/docker-terragrunt/blob/master/fmt/format-hcl.sh)
 `/terragrunt-fmt.sh` | No | Dependency for `format-hcl.sh` | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) 
 
 ### Binaries and Python libraries
