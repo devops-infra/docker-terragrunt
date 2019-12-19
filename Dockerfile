@@ -1,5 +1,9 @@
 FROM debian:stable-slim as builder
 
+# Set latest versions as default for Terraform and Terragrunt
+ARG TF_VERSION=latest
+ARG TG_VERSION=latest
+
 # Install build dependencies on builder
 RUN set -eux \
 	&& DEBIAN_FRONTEND=noninteractive apt-get update -qq \
@@ -8,13 +12,10 @@ RUN set -eux \
 		curl \
 		git \
 		unzip \
-	&& rm -rf /var/lib/apt/lists/*
-
+	&& rm -rf /var/lib/apt/lists/* \
 # Get Terraform
 # Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.18
 # To choose latest from minor version provide a proper parameter for the Makefile
-ARG TF_VERSION=latest
-RUN set -eux \
 	&& if [ "${TF_VERSION}" = "latest" ]; then \
 		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ | cat \
 			| grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
@@ -26,13 +27,10 @@ RUN set -eux \
 		https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
 	&& unzip terraform_${VERSION}_linux_amd64.zip \
 	&& mv terraform /usr/bin/terraform \
-	&& chmod +x /usr/bin/terraform
-
+	&& chmod +x /usr/bin/terraform \
 # Get Terragrunt
-# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.9
+# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.10
 # To choose latest from minor version provide a proper parameter for the Makefile
-ARG TG_VERSION=latest
-RUN set -eux \
 	&& git clone https://github.com/gruntwork-io/terragrunt /terragrunt \
 	&& cd /terragrunt \
 	&& if [ "${TG_VERSION}" = "latest" ]; then \
@@ -43,11 +41,8 @@ RUN set -eux \
 	&& curl -sS -L \
 		https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 \
 		-o /usr/bin/terragrunt \
-	&& chmod +x /usr/bin/terragrunt
-
+	&& chmod +x /usr/bin/terragrunt \
 # Get the latest Scenery
-# This part was added
-RUN set -eux \
 	&& git clone https://github.com/dmlittle/scenery /scenery \
 	&& cd /scenery \
 	&& VERSION="$( git describe --abbrev=0 --tags )" \
@@ -86,14 +81,10 @@ LABEL \
 #    gcp_enabled="${GCP}"
 #    azure_enabled="${AZURE}
 
-# This part was moved and edited
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
-COPY fmt/format-hcl.sh /usr/bin/format-hcl.sh
-COPY fmt/fmt.sh /fmt.sh
-COPY fmt/terragrunt-fmt.sh /terragrunt-fmt.sh
-COPY --from=builder /usr/bin/terraform /usr/bin/terraform
-COPY --from=builder /usr/bin/terragrunt /usr/bin/terragrunt
-COPY --from=builder /usr/bin/scenery /usr/bin/scenery
+COPY fmt/format-hcl.sh /usr/bin/
+COPY fmt/fmt.sh fmt/terragrunt-fmt.sh /
+COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/scenery /usr/bin/
 
 # This part has some additions
 RUN set -eux \
