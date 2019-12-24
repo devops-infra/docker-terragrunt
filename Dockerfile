@@ -74,7 +74,7 @@ LABEL \
     org.label-schema.version="tf-${TF_VERSION}-tg-${TG_VERSION}" \
     maintainer="Krzysztof Szyper <biotyk@mail.com>" \
     repository="https://github.com/ChristophShyper/docker-terragrunt" \
-    alpine="3.10" \
+    alpine="3.11" \
     tf_version="${TF_VERSION}" \
     tg_version="${TG_VERSION}" \
     aws_enabled="${AWS}"
