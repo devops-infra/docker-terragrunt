@@ -52,7 +52,7 @@ RUN set -eux \
 	&& chmod +x /usr/bin/scenery
 
 # Use a clean tiny image to store artifacts in
-FROM alpine:3.10
+FROM alpine:3.11
 
 # For http://label-schema.org/rc1/#build-time-labels
 ARG VCS_REF=abcdef1
