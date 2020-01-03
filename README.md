@@ -45,14 +45,14 @@ Their original README files are included in this repository: [docker-terragrunt]
 Some changes have been applied to add more software to the image - list below.
 
 -----
-# Available flavours
+# Summary
 **Please note focus of those images is to maintain availability of cutting edge versions of Terraform and Terragrunt, not CLIs or other dependencies.**
 <br>
 Hence, images are updated when new version of Terraform or Terragrunt is released. 
 <br>
 Furthermore, versioning labels of images contain versions of said software to emphasize it. See below.
 
-### Summary
+### Available flavours
 Docker image | Terraform version | Terragrunt version | Additional software
 :--- | :--- | :--- | :--- 
 `christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.18-tg-0.21.10` |  v0.12.18 | v0.21.10 | N/A
@@ -63,10 +63,6 @@ Use for example `christophshyper/docker-terragrunt:latest`.
 
 ### Amazon Web Services
 Use for example `christophshyper/docker-terragrunt:aws-latest`.
-<br>
-Contains additionally:
-* [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.
-* [boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
 ### Google Cloud Platform - TO BE ADDED SOON
 ~~Use for example `christophshyper/docker-terragrunt:aws-latest`.~~
