@@ -63,10 +63,6 @@ Use for example `christophshyper/docker-terragrunt:latest`.
 
 ### Amazon Web Services
 Use for example `christophshyper/docker-terragrunt:aws-latest`.
-<br>
-Contains additionally:
-* [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.
-* [boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
 ### Google Cloud Platform - TO BE ADDED SOON
 ~~Use for example `christophshyper/docker-terragrunt:aws-latest`.~~
