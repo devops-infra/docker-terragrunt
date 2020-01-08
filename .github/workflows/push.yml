@@ -52,6 +52,17 @@ jobs:
           pr_reviewer: ChristophShyper
           pr_assignee: ChristophShyper
 
+      - name: Create pull request - version-update (conditional)
+        if: github.actor == 'ChristophShyper' && startsWith(github.ref, 'refs/heads/version-update')
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_label: "auto-pull-request,version-update"
+          pr_body: "*Automated pull request*"
+          pr_title: "${{ github.event.commits[0].message }}"
+          pr_reviewer: ChristophShyper
+          pr_assignee: ChristophShyper
+
       - name: Create pull request (conditional)
         if: github.actor == 'ChristophShyper' && github.ref != 'refs/heads/master' && startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement')
         uses: repo-sync/pull-request@v2
