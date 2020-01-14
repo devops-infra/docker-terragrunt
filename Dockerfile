@@ -29,7 +29,7 @@ RUN set -eux \
 	&& mv terraform /usr/bin/terraform \
 	&& chmod +x /usr/bin/terraform \
 # Get Terragrunt
-# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.10
+# Contrary to orignal by cytopia (https://github.com/cytopia) TG_VERSION needs to point to explicit version, e.g. 0.21.11
 # To choose latest from minor version provide a proper parameter for the Makefile
 	&& git clone https://github.com/gruntwork-io/terragrunt /terragrunt \
 	&& cd /terragrunt \
