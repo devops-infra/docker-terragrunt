@@ -33,8 +33,8 @@
 Tag of Docker image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's bundled with or not (see below).
 <br>
 For example:
- * `christophshyper/docker-terragrunt:tf-0.12.19-tg-0.21.11` means it's Terraform v0.12.19 and Terragrunt v0.21.11 without additional CLI.
- * `christophshyper/docker-terragrunt:aws-tf-0.12.19-tg-0.21.11` means it's Terraform v0.12.19 and Terragrunt v0.21.11 with AWS CLI.
+ * `christophshyper/docker-terragrunt:tf-0.12.20-tg-0.21.11` means it's Terraform v0.12.20 and Terragrunt v0.21.11 without additional CLI.
+ * `christophshyper/docker-terragrunt:aws-tf-0.12.20-tg-0.21.11` means it's Terraform v0.12.20 and Terragrunt v0.21.11 with AWS CLI.
 
 **Source code is available at [GitHub](https://github.com/) under [ChristophShyper/docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt) (will change soon to match DockerHub's value christophshyper).**
 
@@ -55,8 +55,8 @@ Furthermore, versioning labels of images contain versions of said software to em
 ### Available flavours
 Docker image | Terraform version | Terragrunt version | Additional software
 :--- | :--- | :--- | :--- 
-`christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.19-tg-0.21.11` |  v0.12.19 | v0.21.11 | N/A
-`christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.19-tg-0.21.11` |  v0.12.19 | v0.21.11 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
+`christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.20-tg-0.21.11` |  v0.12.20 | v0.21.11 | N/A
+`christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.20-tg-0.21.11` |  v0.12.20 | v0.21.11 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
 ### Without public cloud provider CLIs
 Use for example `christophshyper/docker-terragrunt:latest`.
