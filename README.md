@@ -33,12 +33,12 @@
 Tag of Docker image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's bundled with or not (see below).
 <br>
 For example:
- * `christophshyper/docker-terragrunt:tf-0.12.20-tg-0.21.12` means it's Terraform v0.12.20 and Terragrunt v0.21.12 without additional CLI.
- * `christophshyper/docker-terragrunt:aws-tf-0.12.20-tg-0.21.12` means it's Terraform v0.12.20 and Terragrunt v0.21.12 with AWS CLI.
+ * `christophshyper/docker-terragrunt:tf-0.12.20-tg-0.21.13` means it's Terraform v0.12.20 and Terragrunt v0.21.13 without additional CLI.
+ * `christophshyper/docker-terragrunt:aws-tf-0.12.20-tg-0.21.13` means it's Terraform v0.12.20 and Terragrunt v0.21.13 with AWS CLI.
 
 **Source code is available at [GitHub](https://github.com/) under [ChristophShyper/docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt) (will change soon to match DockerHub's value christophshyper).**
 
-Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7). 
+Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7).
 <br>
 Their original README files are included in this repository: [docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
 <br>
@@ -48,15 +48,15 @@ Some changes have been applied to add more software to the image - list below.
 # Summary
 **Please note focus of those images is to maintain availability of cutting edge versions of Terraform and Terragrunt, not CLIs or other dependencies.**
 <br>
-Hence, images are updated when new version of Terraform or Terragrunt is released. 
+Hence, images are updated when new version of Terraform or Terragrunt is released.
 <br>
 Furthermore, versioning labels of images contain versions of said software to emphasize it. See below.
 
 ### Available flavours
 Docker image | Terraform version | Terragrunt version | Additional software
-:--- | :--- | :--- | :--- 
-`christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.20-tg-0.21.12` |  v0.12.20 | v0.21.12 | N/A
-`christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.20-tg-0.21.12` |  v0.12.20 | v0.21.12 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
+:--- | :--- | :--- | :---
+`christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.20-tg-0.21.13` |  v0.12.20 | v0.21.13 | N/A
+`christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.20-tg-0.21.13` |  v0.12.20 | v0.21.13 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
 ### Without public cloud provider CLIs
 Use for example `christophshyper/docker-terragrunt:latest`.
@@ -74,12 +74,12 @@ Use for example `christophshyper/docker-terragrunt:aws-latest`.
 # Usage
 Mount working directory under `/data` and run any deployment action, script or check.
 <br>
-Don't forget to pass cloud provider's credentials as additional file or environment variables. 
+Don't forget to pass cloud provider's credentials as additional file or environment variables.
 
 For example:
 ```bash
 # Format all HCL files in current directory.
-docker run --rm \ 
+docker run --rm \
     -u $(id -u):$(id -g) \
     -v $(pwd):/data \
     -w /data \
@@ -113,7 +113,7 @@ docker run --rm \
 Script name | Is included in PATH | Purpose | Source/Documentation
 :--- | :---: | :--- | :---
 `format-hcl` | Yes | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). |  [ChristophShyper](https://github.com/ChristophShyper/docker-terragrunt/blob/master/fmt/format-hcl)
-`/terragrunt-fmt.sh` | No | Dependency for `format-hcl` | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) 
+`/terragrunt-fmt.sh` | No | Dependency for `format-hcl` | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh)
 
 ### Binaries and Python libraries
 Name | Type | Purpose | Source/Documentation
@@ -129,6 +129,6 @@ ply | Python library | Dependency for [pyhcl](https://github.com/virtuald/pyhcl)
 pyhcl | Python library | For easily parsing of any files in HCL format, whether it's `.hcl`, `.tfvars` or `.tf`. | https://github.com/virtuald/pyhcl
 python3 | Binary | For running more complex scripts during deployment process. | https://www.python.org/
 scenery | Binary | For better coloring and visualization of `terraform plan` outputs. | https://github.com/dmlittle/scenery
-terraform | Binary | For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). | https://github.com/hashicorp/terraform 
+terraform | Binary | For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). | https://github.com/hashicorp/terraform
 terragrunt | Binary | For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform). | https://github.com/gruntwork-io/terragrunt
 zip | Binary |  For creating packages for Lambdas. | http://infozip.sourceforge.net/
