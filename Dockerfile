@@ -14,7 +14,7 @@ RUN set -eux \
 		unzip \
 	&& rm -rf /var/lib/apt/lists/* \
 # Get Terraform
-# Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.20
+# Contrary to orignal by cytopia (https://github.com/cytopia) TF_VERSION needs to point to explicit version, e.g. 0.12.21
 # To choose latest from minor version provide a proper parameter for the Makefile
 	&& if [ "${TF_VERSION}" = "latest" ]; then \
 		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ | cat \
