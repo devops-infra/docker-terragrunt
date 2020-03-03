@@ -83,7 +83,7 @@ docker run --rm \
     -u $(id -u):$(id -g) \
     -v $(pwd):/data \
     -w /data \
-    christophshyper/docker-terragrunt format.hcl
+    christophshyper/docker-terragrunt format-hcl
 
 # Plan terraform deployment in current directory
 docker run --rm \
