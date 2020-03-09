@@ -1,6 +1,6 @@
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-# Can be full (e.g. 0.12.21) or partial (e.g. 0.12 - which will get latest in that family)
+# Can be full (e.g. 0.12.23) or partial (e.g. 0.12 - which will get latest in that family)
 TF_VERSION ?= latest
 TG_VERSION ?= latest
 
