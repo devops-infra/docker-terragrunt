@@ -93,6 +93,7 @@ RUN set -eux \
     && apk upgrade --no-cache \
 	&& apk add --no-cache git \
 	&& apk add --no-cache make \
+	&& apk add --no-cache ncurses \
 	&& apk add --no-cache python3 \
 	&& apk add --no-cache bash \
 	&& apk add --no-cache curl \
