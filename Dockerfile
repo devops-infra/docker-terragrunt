@@ -91,16 +91,17 @@ RUN set -eux \
     && chmod +x /usr/bin/format-hcl /fmt.sh /terragrunt-fmt.sh \
     && apk update --no-cache \
     && apk upgrade --no-cache \
-	&& apk add --no-cache git \
-	&& apk add --no-cache make \
-	&& apk add --no-cache ncurses \
-	&& apk add --no-cache python3 \
 	&& apk add --no-cache bash \
 	&& apk add --no-cache curl \
 	&& apk add --no-cache docker \
-	&& apk add --no-cache zip \
-	&& apk add --no-cache openssl \
+	&& apk add --no-cache git \
 	&& apk add --no-cache jq \
+	&& apk add --no-cache make \
+	&& apk add --no-cache ncurses \
+	&& apk add --no-cache openssh \
+	&& apk add --no-cache openssl \
+	&& apk add --no-cache python3 \
+	&& apk add --no-cache zip \
     && if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi \
     && python3 -m ensurepip \
     && rm -r /usr/lib/python*/ensurepip \

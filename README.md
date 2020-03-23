@@ -125,6 +125,7 @@ git | Binary | For interacting with [Github](https://github.com) repositories. |
 jq | Binary | For parsing JSON outputs of [awscli](https://github.com/aws/aws-cli). | https://stedolan.github.io/jq/
 make | Binary | For using `Makefile` instead of scripts in deployment process. | https://www.gnu.org/software/make/
 ncurses | Binary | For expanding `Makefile` with some colors. | https://invisible-island.net/ncurses/announce.html
+openssh | Binary | For allowing outgoing SSH connections. | https://www.openssh.com/
 openssl | Binary | For calculating BASE64SHA256 hash of Lambda packages. Assures updating Lambdas only when package hash changed. | https://github.com/openssl/openssl
 ply | Python library | Dependency for [pyhcl](https://github.com/virtuald/pyhcl). | https://github.com/dabeaz/ply
 pyhcl | Python library | For easily parsing of any files in HCL format, whether it's `.hcl`, `.tfvars` or `.tf`. | https://github.com/virtuald/pyhcl
