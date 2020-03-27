@@ -112,6 +112,7 @@ RUN set -eux \
     && if [ "${AWS}" == "yes" ]; then python3 -m pip install boto3 --no-cache-dir; python3 -m pip install awscli --no-cache-dir; fi \
 #    && if [ "${GCP}" == "yes" ]; then echo GCP; fi \
 #    && if [ "${AZURE}" == "yes" ]; then echo AZURE; fi \
+    && ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
     && rm -rf /var/cache/* \
     && rm -rf /root/.cache/*
 
