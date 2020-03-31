@@ -90,7 +90,7 @@ LABEL \
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl /usr/bin/
 COPY fmt/fmt.sh fmt/terragrunt-fmt.sh /
-COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/scenery /usr/bin/
+COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/scenery /usr/bin/tflint /usr/bin/
 
 # This part has some additions
 RUN set -eux \
