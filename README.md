@@ -58,53 +58,58 @@ Docker image | Terraform version | Terragrunt version | Additional software
 `christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.24-tg-0.23.4` |  v0.12.24 | v0.23.4 | N/A
 `christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.24-tg-0.23.4` |  v0.12.24 | v0.23.4 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
-### Without public cloud provider CLIs
+**Without public cloud provider CLIs**<br>
 Use for example `christophshyper/docker-terragrunt:latest`.
 
-### Amazon Web Services
+**Amazon Web Services**<br>
 Use for example `christophshyper/docker-terragrunt:aws-latest`.
 
-### Google Cloud Platform - TO BE ADDED SOON
+_Google Cloud Platform - TO BE ADDED_<br>
 ~~Use for example `christophshyper/docker-terragrunt:gcp-latest`.~~
 
-### Microsoft Azure - TO BE ADDED SOON
+_Microsoft Azure - TO BE ADDED_<br>
 ~~Use for example `christophshyper/docker-terragrunt:azure-latest`.~~
 
 -----
 # Usage
-Mount working directory under `/data` and run any deployment action, script or check.
-<br>
-Don't forget to pass cloud provider's credentials as additional file or environment variables.
+* Mount working directory under `/data`, e.g. `--volume $(pwd):/data`.
+* Pass cloud provider's credentials as additional file or environment variables, e.g. `--env AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}` or `--volume ~/.aws/credentials:/root/.aws/credentials`.
+* Run different Docker container inside this one by sharing the socket, e.g. `--volume /var/run/docker.sock:/var/run/docker.sock`.
+* Access private GitHub repos by SSH (`git::git@github.com:my/private-repo.git`) by sharing private key, e.g. `--volume ~/.ssh/id_rsa_github_key:/root/.ssh/id_rsa`.
 
 For example:
 ```bash
-# Format all HCL files in current directory.
+# Format all HCL files in current directory. Including subdirectories.
 docker run --rm \
-    -u $(id -u):$(id -g) \
-    -v $(pwd):/data \
-    -w /data \
-    christophshyper/docker-terragrunt format-hcl
+    --user $(id -u):$(id -g) \
+    --volume $(pwd):/data \
+    christophshyper/docker-terragrunt:latest format-hcl
 
-# Plan terraform deployment in current directory
+# Plan terraform deployment in AWS for files in current directory.
 docker run --rm \
-    -ti \
-    -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
-    -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
-    -e AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
-    -u $(id -u):$(id -g) \
-    -v $(pwd):/data \
-    -w /data/infra \
+    --tty --interactive \
+    --env AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
+    --env AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+    --env AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+    --env AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
+    --user $(id -u):$(id -g) \
+    --volume $(pwd):/data \
     christophshyper/docker-terragrunt:aws-latest terraform plan
 
-# Apply terragrunt deployment in subdirectory
+# Apply terragrunt deployment in subdirectory. With SSH access to GitHub using a private key.
 docker run --rm \
-    -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
-    -e AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
-    -e AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
-    -u $(id -u):$(id -g) \
-    -v $(pwd):/data \
-    -w /data \
-    christophshyper/docker-terragrunt:aws-latest terragrunt apply --terragrunt-working-dir infra/some/module
+    --tty --interactive \
+    --user $(id -u):$(id -g) \
+    --volume $(pwd):/data \
+    --volume ~/.ssh/id_rsa_github_integration:/root/.ssh/id_rsa \
+    christophshyper/docker-terragrunt:aws-latest terragrunt apply --terragrunt-working-dir some/module
+
+# Run a Makefile target as orchestration script.
+docker run --rm \
+    --tty --interactive \
+    --user $(id -u):$(id -g) \
+    --volume $(pwd):/data \
+    christophshyper/docker-terragrunt:aws-latest make build
 ```
 
 -----
@@ -133,4 +138,5 @@ python3 | Binary | For running more complex scripts during deployment process. |
 scenery | Binary | For better coloring and visualization of `terraform plan` outputs. | https://github.com/dmlittle/scenery
 terraform | Binary | For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). | https://github.com/hashicorp/terraform
 terragrunt | Binary | For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform). | https://github.com/gruntwork-io/terragrunt
+tflint | Binary | For linting Terraform files. | https://github.com/terraform-linters/tflint
 zip | Binary |  For creating packages for Lambdas. | http://infozip.sourceforge.net/
