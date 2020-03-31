@@ -49,7 +49,13 @@ RUN set -eux \
 	&& curl -sS -L \
 		https://github.com/dmlittle/scenery/releases/download/${VERSION}/scenery-${VERSION}-linux-amd64 \
 		-o /usr/bin/scenery \
-	&& chmod +x /usr/bin/scenery
+	&& chmod +x /usr/bin/scenery \
+# Get latest TFLint
+	&& curl -L "$( curl -Ls https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" \
+	    -o tflint.zip
+	&& unzip tflint.zip \
+	&& mv tflint /usr/bin/tflint \
+    && chmod +x /usr/bin/tflint
 
 # Use a clean tiny image to store artifacts in
 FROM alpine:3.11
