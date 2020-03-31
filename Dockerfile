@@ -52,7 +52,7 @@ RUN set -eux \
 	&& chmod +x /usr/bin/scenery \
 # Get latest TFLint
 	&& curl -L "$( curl -Ls https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" \
-	    -o tflint.zip
+	    -o tflint.zip \
 	&& unzip tflint.zip \
 	&& mv tflint /usr/bin/tflint \
     && chmod +x /usr/bin/tflint
