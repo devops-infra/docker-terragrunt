@@ -25,9 +25,9 @@ ARG_PATH=
 ### Show Usage
 ###
 print_usage() {
-	echo "Usage: /terragrunt-fmt.sh [options] [DIR]"
-	echo "       /terragrunt-fmt.sh --help"
-	echo "       /terragrunt-fmt.sh --version"
+	echo "Usage: terragrunt-fmt.sh [options] [DIR]"
+	echo "       terragrunt-fmt.sh --help"
+	echo "       terragrunt-fmt.sh --version"
 	echo
 	echo "       Rewrites all Terragrunt configuration files to a canonical format. All"
 	echo "       hcl configuration files (.hcl) are updated."
@@ -246,7 +246,7 @@ fi
 ### (1/3) Single file
 ###
 if [ -f "${ARG_PATH}" ]; then
-	/fmt.sh "${ARG_LIST}" "${ARG_WRITE}" "${ARG_DIFF}" "${ARG_CHECK}" "${ARG_PATH}"
+	fmt.sh "${ARG_LIST}" "${ARG_WRITE}" "${ARG_DIFF}" "${ARG_CHECK}" "${ARG_PATH}"
 	exit "${?}"
 else
 	###
@@ -268,7 +268,7 @@ else
 		echo "[INFO] Finding files: ${find_cmd}"
 		eval "${find_cmd} -print0 | xargs -n1 -0 sh -c '\
 			if [ -f \"\${1}\" ]; then \
-				if ! /fmt.sh \"${ARG_LIST}\" \"${ARG_WRITE}\" \"${ARG_DIFF}\" \"${ARG_CHECK}\" \"\${1}\"; then \
+				if ! fmt.sh \"${ARG_LIST}\" \"${ARG_WRITE}\" \"${ARG_DIFF}\" \"${ARG_CHECK}\" \"\${1}\"; then \
 					echo 1 > /tmp/exit.txt; \
 				fi \
 			fi' --"
@@ -284,7 +284,7 @@ else
 		ret=0
 		for file in *.hcl; do
 			if [ -f "${file}" ]; then
-				if ! /fmt.sh "${ARG_LIST}" "${ARG_WRITE}" "${ARG_DIFF}" "${ARG_CHECK}" "${file}"; then
+				if ! fmt.sh "${ARG_LIST}" "${ARG_WRITE}" "${ARG_DIFF}" "${ARG_CHECK}" "${file}"; then
 					ret="1"
 				fi
 			fi
