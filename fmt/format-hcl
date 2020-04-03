@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # Formats all HCL-format files under working directory including subdirectories
 # Runs `terraform fmt` for all .tf files
@@ -7,8 +7,10 @@
 # Using terraform for .tf and .tfvars
 # Default action is to search recursively and modify all files.
 
-echo -e "\n=> Searching for .hcl files"
+echo " "
+echo "=> Searching for .hcl files"
 terragrunt-fmt.sh -recursive -write=true
 
-echo -e "\n=> Searching for .tf and .tfvars files"
+echo " "
+echo "=> Searching for .tf and .tfvars files"
 terraform fmt -recursive -write=true
