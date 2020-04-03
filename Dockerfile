@@ -88,13 +88,12 @@ LABEL \
 #    azure_enabled="${AZURE}
 
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
-COPY fmt/format-hcl /usr/bin/
-COPY fmt/fmt.sh fmt/terragrunt-fmt.sh /
+COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
 COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/scenery /usr/bin/tflint /usr/bin/
 
 # This part has some additions
 RUN set -eux \
-    && chmod +x /usr/bin/format-hcl /fmt.sh /terragrunt-fmt.sh \
+    && chmod +x /usr/bin/format-hcl /usr/bin/fmt.sh /usr/bin/terragrunt-fmt.sh \
     && apk update --no-cache \
     && apk upgrade --no-cache \
 	&& apk add --no-cache bash \

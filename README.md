@@ -118,7 +118,7 @@ docker run --rm \
 Script name | Is included in PATH | Purpose | Source/Documentation
 :--- | :---: | :--- | :---
 `format-hcl` | Yes | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). |  [ChristophShyper](https://github.com/ChristophShyper/docker-terragrunt/blob/master/fmt/format-hcl)
-`/terragrunt-fmt.sh` | No | Dependency for `format-hcl` | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh)
+`terragrunt-fmt.sh` | No | Dependency for `format-hcl` | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh)
 
 ### Binaries and Python libraries
 Name | Type | Purpose | Source/Documentation
