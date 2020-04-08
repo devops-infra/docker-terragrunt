@@ -1,3 +1,5 @@
+.PHONY: phony
+phony: help
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
 # Can be full (e.g. 0.12.24) or partial (e.g. 0.12 - which will get latest in that family)
@@ -28,7 +30,13 @@ TXT_GREEN := $(shell tput setaf 2)
 TXT_YELLOW := $(shell tput setaf 3)
 TXT_RESET := $(shell tput sgr0)
 
-get-versions:
+.PHONY: help get-versions build build-plain build-aws build-gcp build-azure push
+
+help: ## display help prompt
+	$(info Available options:)
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(TXT_YELLOW)%-25s $(TXT_RESET) %s\n", $$1, $$2}'
+
+get-versions: ## check TF and TG versions before building
 ifeq ($(TF_VERSION),latest)
 	$(eval TF_VERSION = $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases/latest' \
     	| grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
@@ -52,9 +60,9 @@ endif
 	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW)        $(GITHUB_SHORT_SHA)$(TXT_RESET))
 	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW)         $(BUILD_DATE)$(TXT_RESET))
 
-docker-build: get-versions docker-build-plain docker-build-aws
+build: get-versions build-plain build-aws push ## build and push image
 
-docker-build-plain:
+build-plain: ## build image without cloud CLIs
 	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -64,7 +72,7 @@ docker-build-plain:
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION) .
 
-docker-build-aws:
+build-aws: ## build image with AWS CLI
 	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
@@ -75,7 +83,7 @@ docker-build-aws:
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):aws-$(VERSION) .
 
-docker-build-gcp:
+build-gcp: ## build image with GCP CLI
 	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg GCP=yes \
@@ -86,7 +94,7 @@ docker-build-gcp:
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
 
-docker-build-azure:
+build-azure: ## build image with Azure CLI
 	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AZURE=yes \
@@ -97,12 +105,10 @@ docker-build-azure:
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):azure-$(VERSION) .
 
-docker-login:
+push: ## push image to DockerHub
+ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	@echo " "
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
-
-docker-push: docker-login
-ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 	$(info $(nl)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
 	$(info $(nl)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
@@ -121,5 +127,3 @@ ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
 #	@docker push $(DOCKER_NAME):azure-$(VERSION)
 #	@docker push $(DOCKER_NAME):azure-latest
 endif
-
-build-and-push: docker-build docker-push
