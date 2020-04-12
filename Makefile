@@ -21,7 +21,7 @@ BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Some cosmetics
 SHELL := bash
-define nl
+define NL
 
 
 endef
@@ -51,7 +51,7 @@ else
 	$(eval TG_VERSION = $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases' \
         | grep '"tag_name":' | grep '$(TG_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
 endif
-	$(info $(nl)$(TXT_GREEN) == STARTING BUILD ==$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN) == STARTING BUILD ==$(TXT_RESET))
 	$(eval VERSION = tf-$(TF_VERSION)-tg-$(TG_VERSION))
 	$(info $(TXT_GREEN)Terraform version:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
 	$(info $(TXT_GREEN)Terragrunt version:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
@@ -60,10 +60,10 @@ endif
 	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW)        $(GITHUB_SHORT_SHA)$(TXT_RESET))
 	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW)         $(BUILD_DATE)$(TXT_RESET))
 
-build: get-versions build-plain build-aws push ## build and push image
+build: get-versions build-plain build-aws ## build and push image
 
 build-plain: ## build image without cloud CLIs
-	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -73,7 +73,7 @@ build-plain: ## build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION) .
 
 build-aws: ## build image with AWS CLI
-	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -84,7 +84,7 @@ build-aws: ## build image with AWS CLI
 		--tag=$(DOCKER_NAME):aws-$(VERSION) .
 
 build-gcp: ## build image with GCP CLI
-	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -95,7 +95,7 @@ build-gcp: ## build image with GCP CLI
 		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
 
 build-azure: ## build image with Azure CLI
-	$(info $(nl)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -106,24 +106,22 @@ build-azure: ## build image with Azure CLI
 		--tag=$(DOCKER_NAME):azure-$(VERSION) .
 
 push: ## push image to DockerHub
-ifeq ($(CURRENT_BRANCH),$(RELEASE_BRANCH))
-	@echo " "
+	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Logging to DockerHub$(TXT_RESET))
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
-	$(info $(nl)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
-	$(info $(nl)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
 	@docker push $(DOCKER_NAME):$(VERSION)
 	@docker push $(DOCKER_NAME):latest
-	$(info $(nl)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):aws-$(VERSION) $(DOCKER_NAME):aws-latest
 	@docker push $(DOCKER_NAME):aws-$(VERSION)
 	@docker push $(DOCKER_NAME):aws-latest
-#	$(info $(nl)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
+#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
 #	@docker push $(DOCKER_NAME):gcp-$(VERSION)
 #	@docker push $(DOCKER_NAME):gcp-latest
-#	$(info $(nl)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
+#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 #	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
 #	@docker push $(DOCKER_NAME):azure-$(VERSION)
 #	@docker push $(DOCKER_NAME):azure-latest
-endif

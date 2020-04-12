@@ -1,0 +1,69 @@
+name: Push to other
+
+on:
+  push:
+    branches-ignore: master
+
+jobs:
+  lint:
+    name: Lint files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Docker Lint
+        uses: luke142367/Docker-Lint-Action@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Build image
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          TERM: xterm-256color
+        run: make build
+
+  pull_request:
+    name: Create Pull Request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1 # Needs to be in v1 version otherwise will not work with pull-request@v2
+
+      - name: Create pull request - enhancement (conditional)
+        if: startsWith(github.ref, 'refs/heads/enhancement')
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_label: "auto,enhancement"
+          pr_body: "*Automated pull request*"
+          pr_title: "${{ github.event.commits[0].message }}"
+          pr_assignee: "${{ github.actor }}"
+
+      - name: Create pull request - documentation (conditional)
+        if: startsWith(github.ref, 'refs/heads/documentation')
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_label: "auto,documentation"
+          pr_body: "*Automated pull request*"
+          pr_title: "${{ github.event.commits[0].message }}"
+          pr_assignee: "${{ github.actor }}"
+
+      - name: Create pull request - other (conditional)
+        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement')
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_label: "auto"
+          pr_body: "*Automated pull request*"
+          pr_title: "${{ github.event.commits[0].message }}"
+          pr_assignee: "${{ github.actor }}"
