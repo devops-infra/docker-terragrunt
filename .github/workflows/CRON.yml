@@ -1,4 +1,4 @@
-name: Check for update
+name: Check for updates
 
 on:
   schedule:
@@ -11,15 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v1 # Needs to be in v1 version otherwise will not work with pull-request@v2
 
-      - name: Build Docker image and push to registry
+      - name: Check for new tags
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           TERM: xterm-256color
         run: make check
 
       - name: Commit and push changes
+        if: ${VERSION_TAG} != "n/a"
         uses: ChristophShyper/action-commit-push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
