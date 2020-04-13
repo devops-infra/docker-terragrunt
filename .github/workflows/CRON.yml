@@ -1,3 +1,5 @@
+name: Check for update
+
 on:
   schedule:
     # Run every day at 5.00 AM UTC
