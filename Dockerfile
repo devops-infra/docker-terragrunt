@@ -3,6 +3,9 @@ FROM debian:stable-slim as builder
 # Set latest versions as default for Terraform and Terragrunt
 ARG TF_VERSION=latest
 ARG TG_VERSION=latest
+ARG AWS=no
+#ARG GCP=no
+#ARG AZURE=no
 
 # Install build dependencies on builder
 RUN set -eux \
