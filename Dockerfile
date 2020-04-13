@@ -3,9 +3,6 @@ FROM debian:stable-slim as builder
 # Set latest versions as default for Terraform and Terragrunt
 ARG TF_VERSION=latest
 ARG TG_VERSION=latest
-ARG AWS=no
-ARG GCP=no
-ARG AZURE=no
 
 # Install build dependencies on builder
 RUN set -eux \
@@ -97,6 +94,11 @@ LABEL \
   aws_enabled="${AWS}" \
   gcp_enabled="${GCP}" \
   azure_enabled="${AZURE}"
+
+# Switch for enabling cloud CLIs
+ARG AWS=no
+ARG GCP=no
+ARG AZURE=no
 
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
