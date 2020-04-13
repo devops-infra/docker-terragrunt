@@ -1,4 +1,4 @@
-# IaaC dockerized framework for Terragrunt/Terragrunt
+# IaaC dockerized framework for Terraform and Terragrunt
 
 Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud infrastructure.
 
