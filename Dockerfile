@@ -94,7 +94,7 @@ LABEL \
   org.opencontainers.image.description="${DESCRIPTION}" \
   maintainer="${AUTHOR}" \
   repository="${REPO_URL}" \
-  aws_enabled="${AWS}"
+  aws_enabled="${AWS}" \
   gcp_enabled="${GCP}" \
   azure_enabled="${AZURE}"
 
