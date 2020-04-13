@@ -51,15 +51,14 @@ This project grew much bigger than the original ones and is intended to be a fra
 ](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 <!-- ![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt/aws-latest?color=blue&label=Pulls&logo=docker&style=flat-square) -->
 
------
 
------
 # Summary
 **Please note focus of those images is to maintain availability of cutting edge versions of Terraform and Terragrunt, not CLIs or other dependencies.**
 <br>
 Hence, images are updated when new version of Terraform or Terragrunt is released.
 <br>
 Furthermore, versioning labels of images contain versions of said software to emphasize it. See below.
+
 
 ### Available flavours
 Docker image | Terraform version | Terragrunt version | Additional software
@@ -79,7 +78,7 @@ _Google Cloud Platform - TO BE ADDED_<br>
 _Microsoft Azure - TO BE ADDED_<br>
 ~~Use for example `christophshyper/docker-terragrunt:azure-latest`.~~
 
------
+
 # Usage
 * Mount working directory under `/data`, e.g. `--volume $(pwd):/data`.
 * Pass cloud provider's credentials as additional file or environment variables, e.g. `--env AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}` or `--volume ~/.aws/credentials:/root/.aws/credentials`.
@@ -121,13 +120,14 @@ docker run --rm \
     christophshyper/docker-terragrunt:aws-latest make build
 ```
 
------
+
 # Additional software available in all images
 ### Scripts
 Script name | Is included in PATH | Purpose | Source/Documentation
 :--- | :---: | :--- | :---
 `format-hcl` | Yes | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). |  [ChristophShyper](https://github.com/ChristophShyper/docker-terragrunt/blob/master/fmt/format-hcl)
 `terragrunt-fmt.sh` | No | Dependency for `format-hcl` | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh)
+
 
 ### Binaries and Python libraries
 Name | Type | Purpose | Source/Documentation
