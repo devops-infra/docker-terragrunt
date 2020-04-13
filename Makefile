@@ -2,9 +2,9 @@
 phony: help
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-# Can be full (e.g. 0.12.24) or partial (e.g. 0.12 - which will get latest in that family)
-TF_VERSION ?= latest
-TG_VERSION ?= latest
+# Can be full (e.g. 0.12.24), partial (e.g. 0.12 - which will get latest in that family) or latest
+TF_VERSION ?= 0.12.24
+TG_VERSION ?= 0.23.8
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
@@ -21,22 +21,23 @@ BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Some cosmetics
 SHELL := bash
-define NL
-
-
-endef
 TXT_RED := $(shell tput setaf 1)
 TXT_GREEN := $(shell tput setaf 2)
 TXT_YELLOW := $(shell tput setaf 3)
 TXT_RESET := $(shell tput sgr0)
+define NL
 
+
+endef
+
+# Main actions
 .PHONY: help get-versions build build-plain build-aws build-gcp build-azure push
 
-help: ## display help prompt
+help: ## Display help prompt
 	$(info Available options:)
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(TXT_YELLOW)%-25s $(TXT_RESET) %s\n", $$1, $$2}'
 
-get-versions: ## check TF and TG versions before building
+get-versions: ## Check TF and TG versions before building
 ifeq ($(TF_VERSION),latest)
 	$(eval TF_VERSION = $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases/latest' \
     	| grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
@@ -60,9 +61,9 @@ endif
 	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW)        $(GITHUB_SHORT_SHA)$(TXT_RESET))
 	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW)         $(BUILD_DATE)$(TXT_RESET))
 
-build: get-versions build-plain build-aws ## build and push image
+build: get-versions build-plain build-aws ## Build Docker image
 
-build-plain: ## build image without cloud CLIs
+build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -72,7 +73,7 @@ build-plain: ## build image without cloud CLIs
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION) .
 
-build-aws: ## build image with AWS CLI
+build-aws: ## Build image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
@@ -83,7 +84,7 @@ build-aws: ## build image with AWS CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):aws-$(VERSION) .
 
-build-gcp: ## build image with GCP CLI
+build-gcp: ## Build image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg GCP=yes \
@@ -94,7 +95,7 @@ build-gcp: ## build image with GCP CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
 
-build-azure: ## build image with Azure CLI
+build-azure: ## Build image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AZURE=yes \
@@ -105,7 +106,7 @@ build-azure: ## build image with Azure CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):azure-$(VERSION) .
 
-push: ## push image to DockerHub
+push: ## Push to DockerHub
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET))
 	$(info $(NL)$(TXT_GREEN)Logging to DockerHub$(TXT_RESET))
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
