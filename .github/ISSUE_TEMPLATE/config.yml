@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contributiong details
+    url: https://github.com/ChristophShyper/template-action/blob/master/.github/CONTRIBUTING.md
+    about: Details about controbuting rules.
+  - name: Code of Conduct
+    url: https://github.com/ChristophShyper/template-action/blob/master/.github/CODE_OF_CONDUCT.md
+    about: Details about Code of Conduct.
