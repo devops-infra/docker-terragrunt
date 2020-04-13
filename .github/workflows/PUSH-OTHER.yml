@@ -59,7 +59,7 @@ jobs:
           path: ./.github/PULL_REQUEST_TEMPLATE/DOCUMENTATION.md
 
       - name: Read the template - other (conditional)
-        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement')
+        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement') && startsWith(github.ref, '!refs/heads/bug')
         id: pr-template-other
         uses: juliangruber/read-file-action@v1
         with:
@@ -96,7 +96,7 @@ jobs:
           pr_assignee: "${{ github.actor }}"
 
       - name: Create pull request - other (conditional)
-        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement')
+        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement') && startsWith(github.ref, '!refs/heads/bug')
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

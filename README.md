@@ -7,8 +7,8 @@ Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all need
 Tag of Docker image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's bundled with or not (see below).
 <br>
 For example:
- * `christophshyper/docker-terragrunt:tf-0.12.24-tg-0.23.8` means it's Terraform v0.12.24 and Terragrunt v0.23.8 without additional CLI.
- * `christophshyper/docker-terragrunt:aws-tf-0.12.24-tg-0.23.8` means it's Terraform v0.12.24 and Terragrunt v0.23.8 with AWS CLI.
+ * `christophshyper/docker-terragrunt:tf-0.12.23-tg-0.23.7` means it's Terraform v0.12.23 and Terragrunt v0.23.7 without additional CLI.
+ * `christophshyper/docker-terragrunt:aws-tf-0.12.23-tg-0.23.7` means it's Terraform v0.12.23 and Terragrunt v0.23.7 with AWS CLI.
 
 **Source code is available at [ChristophShyper/docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt).**
 
@@ -41,7 +41,6 @@ This project grew much bigger than the original ones and is intended to be a fra
 ![DockerHub](https://img.shields.io/badge/docker-christophshyper%2Fdocker--terragrunt:latest-blue.svg?style=flat-square&logo=docker)
 ![Docker version](https://img.shields.io/docker/v/christophshyper/docker-terragrunt/latest?color=blue&label=Version&logo=docker&style=flat-square)
 ![Image size](https://img.shields.io/docker/image-size/christophshyper/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)
-![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt?color=blue&label=Pulls&logo=docker&style=flat-square)
 ](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
 <br>
 [
@@ -63,8 +62,8 @@ Furthermore, versioning labels of images contain versions of said software to em
 ### Available flavours
 Docker image | Terraform version | Terragrunt version | Additional software
 :--- | :--- | :--- | :---
-`christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.24-tg-0.23.8` |  v0.12.24 | v0.23.8 | N/A
-`christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.24-tg-0.23.8` |  v0.12.24 | v0.23.8 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
+`christophshyper/docker-terragrunt:latest`<br>`christophshyper/docker-terragrunt:tf-0.12.23-tg-0.23.7` |  v0.12.23 | v0.23.7 | N/A
+`christophshyper/docker-terragrunt:aws-latest`<br>`christophshyper/docker-terragrunt:aws-tf-0.12.23-tg-0.23.7` |  v0.12.23 | v0.23.7 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
 **Without public cloud provider CLIs**<br>
 Use for example `christophshyper/docker-terragrunt:latest`.

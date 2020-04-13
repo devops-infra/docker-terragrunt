@@ -2,13 +2,18 @@
 phony: help
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-# Can be full (e.g. 0.12.24), partial (e.g. 0.12 - which will get latest in that family) or latest
-TF_VERSION ?= 0.12.24
-TG_VERSION ?= 0.23.8
+TF_VERSION := 0.12.23
+TG_VERSION := 0.23.7
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
 GITHUB_SHA ?= aabbccddeeff
+
+# Set version tags
+TF_LATEST := $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases/latest' | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//')
+TG_LATEST := $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest' | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//')
+VERSION := tf-$(TF_VERSION)-tg-$(TG_VERSION)
+VERSION_LATEST := tf-$(TF_LATEST)-tg-$(TG_LATEST)
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
@@ -31,37 +36,31 @@ define NL
 endef
 
 # Main actions
-.PHONY: help get-versions build build-plain build-aws build-gcp build-azure push
+.PHONY: help check build build-plain build-aws build-gcp build-azure push
 
 help: ## Display help prompt
 	$(info Available options:)
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(TXT_YELLOW)%-25s $(TXT_RESET) %s\n", $$1, $$2}'
 
-get-versions: ## Check TF and TG versions before building
-ifeq ($(TF_VERSION),latest)
-	$(eval TF_VERSION = $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases/latest' \
-    	| grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
-else
-	$(eval TF_VERSION = $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases' \
-        | grep '"tag_name":' | grep '$(TF_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
-endif
-ifeq ($(TG_VERSION),latest)
-	$(eval TG_VERSION = $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest' \
-    	| grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
-else
-	$(eval TG_VERSION = $(shell curl -s 'https://api.github.com/repos/gruntwork-io/terragrunt/releases' \
-        | grep '"tag_name":' | grep '$(TG_VERSION)' | head -1 | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//'))
-endif
-	$(info $(NL)$(TXT_GREEN) == STARTING BUILD ==$(TXT_RESET))
-	$(eval VERSION = tf-$(TF_VERSION)-tg-$(TG_VERSION))
-	$(info $(TXT_GREEN)Terraform version:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Terragrunt version:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Version tag:$(TXT_YELLOW)        $(VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Current branch:$(TXT_YELLOW)     $(CURRENT_BRANCH)$(TXT_RESET))
-	$(info $(TXT_GREEN)Commit hash:$(TXT_YELLOW)        $(GITHUB_SHORT_SHA)$(TXT_RESET))
-	$(info $(TXT_GREEN)Build date:$(TXT_YELLOW)         $(BUILD_DATE)$(TXT_RESET))
+check: ## Check TF and TG versions
+	$(info $(NL)$(TXT_GREEN) == CHECKING VERSIONS ==$(TXT_RESET))
+	$(info $(TXT_GREEN)Requested Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Requested Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Requested tag:$(TXT_YELLOW)        $(VERSION)$(TXT_RESET))
+	@if [[ $(VERSION) != $(VERSION_LATEST) ]]; then \
+  		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)"; \
+  		echo -e "$(TXT_GREEN)Latest Terraform:$(TXT_YELLOW)     $(TF_LATEST)$(TXT_RESET)"; \
+  		echo -e "$(TXT_GREEN)Latest Terragrunt:$(TXT_YELLOW)    $(TG_LATEST)$(TXT_RESET)"; \
+  		echo -e "$(TXT_GREEN)Latest tag:$(TXT_YELLOW)           $(VERSION_LATEST)$(TXT_RESET)"; \
+  		echo "::set-env name=VERSION_TAG::$(VERSION_LATEST)"; \
+		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g"; \
+		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TF_VERSION)/$(TF_LATEST)/g"; \
+	else \
+		echo "::set-env name=VERSION_TAG::n/a"; \
+		echo -e "\n$(TXT_YELLOW) == NO CHANGES NEEDED ==$(TXT_RESET)"; \
+	fi
 
-build: get-versions build-plain build-aws ## Build Docker image
+build: check build-plain build-aws ## Build Docker image
 
 build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
