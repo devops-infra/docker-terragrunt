@@ -4,8 +4,8 @@ FROM debian:stable-slim as builder
 ARG TF_VERSION=latest
 ARG TG_VERSION=latest
 ARG AWS=no
-#ARG GCP=no
-#ARG AZURE=no
+ARG GCP=no
+ARG AZURE=no
 
 # Install build dependencies on builder
 RUN set -eux \
@@ -94,9 +94,9 @@ LABEL \
   org.opencontainers.image.description="${DESCRIPTION}" \
   maintainer="${AUTHOR}" \
   repository="${REPO_URL}" \
-#  gcp_enabled="${GCP}" \
-#  azure_enabled="${AZURE} \
   aws_enabled="${AWS}"
+  gcp_enabled="${GCP}" \
+  azure_enabled="${AZURE}"
 
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
