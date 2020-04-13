@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    name: Lint files
+    name: Run linters
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,7 +27,6 @@ jobs:
 
       - name: Build Docker image
         env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           TERM: xterm-256color
         run: make build
 
@@ -38,13 +37,51 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1 # Needs to be in v1 version otherwise will not work with pull-request@v2
 
+      - name: Read the template - bug (conditional)
+        if: startsWith(github.ref, 'refs/heads/bug')
+        id: pr-template-bug
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.github/PULL_REQUEST_TEMPLATE/BUG.md
+
+      - name: Read the template - enhancement (conditional)
+        if: startsWith(github.ref, 'refs/heads/enhancement')
+        id: pr-template-enhancement
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.github/PULL_REQUEST_TEMPLATE/ENHANCEMENT.md
+
+      - name: Read the template - documentation (conditional)
+        if: startsWith(github.ref, 'refs/heads/documentation')
+        id: pr-template-documentation
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.github/PULL_REQUEST_TEMPLATE/DOCUMENTATION.md
+
+      - name: Read the template - other (conditional)
+        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement')
+        id: pr-template-other
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./.github/PULL_REQUEST_TEMPLATE/ENHANCEMENT.md
+
+      - name: Create pull request - bug (conditional)
+        if: startsWith(github.ref, 'refs/heads/bug')
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_label: "auto,bug"
+          pr_body: "{{ steps.pr-template-bug.outputs.content }}"
+          pr_title: "${{ github.event.commits[0].message }}"
+          pr_assignee: "${{ github.actor }}"
+
       - name: Create pull request - enhancement (conditional)
         if: startsWith(github.ref, 'refs/heads/enhancement')
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_label: "auto,enhancement"
-          pr_body: "*Automated pull request*"
+          pr_body: "${{ steps.pr-template-enhancement.outputs.content }}"
           pr_title: "${{ github.event.commits[0].message }}"
           pr_assignee: "${{ github.actor }}"
 
@@ -54,7 +91,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_label: "auto,documentation"
-          pr_body: "*Automated pull request*"
+          pr_body: "${{ steps.pr-template-documentation.outputs.content }}"
           pr_title: "${{ github.event.commits[0].message }}"
           pr_assignee: "${{ github.actor }}"
 
@@ -63,7 +100,7 @@ jobs:
         uses: repo-sync/pull-request@v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_label: "auto"
-          pr_body: "*Automated pull request*"
+          pr_label: "auto,enhancement"
+          pr_body: "${{ steps.pr-template-other.outputs.content }}"
           pr_title: "${{ github.event.commits[0].message }}"
           pr_assignee: "${{ github.actor }}"

@@ -5,8 +5,21 @@ on:
     branches: master
 
 jobs:
+  lint:
+    name: Run linters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Docker Lint
+        uses: luke142367/Docker-Lint-Action@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build_and_push:
     name: Build and push image
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
