@@ -333,7 +333,7 @@ linter below for reproducible local or remote CI tests:
 [pylint-hub-img]: https://img.shields.io/docker/pulls/cytopia/pylint.svg
 [pylint-hub-lnk]: https://hub.docker.com/r/cytopia/pylint
 
-[tfdocs-git-lnk]: https://github.com/cytopia/docker-terraform-docs
+[tfdocs-git-lnk]: https://github.com/cytopia/docker-terragrunt-docs
 [tfdocs-hub-img]: https://img.shields.io/docker/pulls/cytopia/terraform-docs.svg
 [tfdocs-hub-lnk]: https://hub.docker.com/r/cytopia/terraform-docs
 

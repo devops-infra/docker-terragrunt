@@ -1,33 +1,7 @@
-# Docker image with Terraform, Terragrunt and all needed components to easily manage cloud infrastructure.
+# IaaC dockerized framework for Terragrunt/Terragrunt
 
-[![GitHub ChristophShyper/docker-terragrunt](https://img.shields.io/badge/github-ChristophShyper%2Fdocker--terragrunt-blue.svg)](https://github.com/christophshyper/docker-terragrunt "shields.io")
-[![GitHub last commit](https://img.shields.io/github/last-commit/christophshyper/docker-terragrunt)](https://github.com/ChristophShyper/docker-terragrunt/commits/master "shields.io")
-<br>
-[![Actions Status](https://github.com/ChristophShyper/docker-terragrunt/workflows/On%20commit%20push/badge.svg)](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22On+commit+push%22 "github.com")
-[![Actions Status](https://github.com/ChristophShyper/docker-terragrunt/workflows/On%20pull%20request/badge.svg)](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22On+pull+request%22 "github.com")
-[![GitHub](https://img.shields.io/github/license/christophshyper/docker-terragrunt)](https://github.com/ChristophShyper/docker-terragrunt "shields.io")
-<br>
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/christophshyper/docker-terragrunt "shields.io")
-![GitHub repo size](https://img.shields.io/github/repo-size/christophshyper/docker-terragrunt "shields.io")
-![GitHub language count](https://img.shields.io/github/languages/count/christophshyper/docker-terragrunt "shields.io")
-![GitHub top language](https://img.shields.io/github/languages/top/christophshyper/docker-terragrunt "shields.io")
-<br>
-[![GitHub file size in bytes](https://img.shields.io/github/size/christophshyper/docker-terragrunt/Dockerfile?label=Dockerfile)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
-[![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
-[![Docker Stars](https://img.shields.io/docker/stars/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
-[![MicroBadger Commit](https://images.microbadger.com/badges/commit/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own commit badge on microbadger.com")
-<br>
-[![dockeri.co](https://dockeri.co/image/christophshyper/docker-terragrunt)](https://hub.docker.com/r/christophshyper/docker-terragrunt "dockeri.co")
-<br>
-[![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own version badge on microbadger.com")
-[![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt "Get your own image badge on microbadger.com")
-**christophshyper/docker-terragrunt:latest**
-<br>
-[![MicroBadger Version](https://images.microbadger.com/badges/version/christophshyper/docker-terragrunt:aws-latest.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt:aws-latest "Get your own version badge on microbadger.com")
-[![MicroBadger Image](https://images.microbadger.com/badges/image/christophshyper/docker-terragrunt:aws-latest.svg)](https://microbadger.com/images/christophshyper/docker-terragrunt:aws-latest "Get your own image badge on microbadger.com")
-**christophshyper/docker-terragrunt:aws-latest**
+Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud infrastructure.
 
------
 **Docker image is available at [DockerHub](https://hub.docker.com/) under [christophshyper/docker-terragrunt](https://hub.docker.com/repository/docker/christophshyper/docker-terragrunt).**
 <br>
 Tag of Docker image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's bundled with or not (see below).
@@ -36,13 +10,48 @@ For example:
  * `christophshyper/docker-terragrunt:tf-0.12.24-tg-0.23.8` means it's Terraform v0.12.24 and Terragrunt v0.23.8 without additional CLI.
  * `christophshyper/docker-terragrunt:aws-tf-0.12.24-tg-0.23.8` means it's Terraform v0.12.24 and Terragrunt v0.23.8 with AWS CLI.
 
-**Source code is available at [GitHub](https://github.com/) under [ChristophShyper/docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt) (will change soon to match DockerHub's value christophshyper).**
+**Source code is available at [ChristophShyper/docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt).**
 
 Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7).
 <br>
-Their original README files are included in this repository: [docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
+Original README files are included in this repository: [docker-terragrunt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt.md) and [docker-terragrunt-fmt](https://github.com/ChristophShyper/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md).
+
+This project grew much bigger than the original ones and is intended to be a framework for cloud Infrastructure-as-a-Code. 
+
+
+## Badge swag
+[
+![GitHub](https://img.shields.io/badge/github-ChristophShyper%2Fdocker--terragrunt-brightgreen.svg?style=flat-square&logo=github)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/christophshyper/docker-terragrunt?color=brightgreen&label=Code%20size&style=flat-square&logo=github)
+![GitHub last commit](https://img.shields.io/github/last-commit/christophshyper/docker-terragrunt?color=brightgreen&label=Last%20commit&style=flat-square&logo=github)
+](https://github.com/christophshyper/docker-terragrunt "shields.io")
+[![Push to master](https://img.shields.io/github/workflow/status/christophshyper/docker-terragrunt/Push%20to%20master?color=brightgreen&label=Master%20branch&logo=github&style=flat-square)
+](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22Push+to+master%22)
+[![Push to other](https://img.shields.io/github/workflow/status/christophshyper/docker-terragrunt/Push%20to%20other?color=brightgreen&label=Pull%20requests&logo=github&style=flat-square)
+](https://github.com/ChristophShyper/docker-terragrunt/actions?query=workflow%3A%22Push+to+other%22)
 <br>
-Some changes have been applied to add more software to the image - list below.
+[
+![DockerHub](https://img.shields.io/badge/docker-christophshyper%2Fdocker--terragrunt-blue.svg?style=flat-square&logo=docker)
+![Image size](https://img.shields.io/docker/image-size/christophshyper/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)
+![Dockerfile size](https://img.shields.io/github/size/christophshyper/docker-terragrunt/Dockerfile?label=Dockerfile%20size&style=flat-square&logo=docker)
+![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt?color=blue&label=Pulls&logo=docker&style=flat-square)
+](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
+<br>
+[
+![DockerHub](https://img.shields.io/badge/docker-christophshyper%2Fdocker--terragrunt:latest-blue.svg?style=flat-square&logo=docker)
+![Docker version](https://img.shields.io/docker/v/christophshyper/docker-terragrunt/latest?color=blue&label=Version&logo=docker&style=flat-square)
+![Image size](https://img.shields.io/docker/image-size/christophshyper/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)
+![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt?color=blue&label=Pulls&logo=docker&style=flat-square)
+](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
+<br>
+[
+![DockerHub](https://img.shields.io/badge/docker-christophshyper%2Fdocker--terragrunt:aws--latest-blue.svg?style=flat-square&logo=docker)
+![Docker version](https://img.shields.io/docker/v/christophshyper/docker-terragrunt/aws-latest?color=blue&label=Version&logo=docker&style=flat-square)
+![Image size](https://img.shields.io/docker/image-size/christophshyper/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)
+](https://hub.docker.com/r/christophshyper/docker-terragrunt "shields.io")
+<!-- ![Docker Pulls](https://img.shields.io/docker/pulls/christophshyper/docker-terragrunt/aws-latest?color=blue&label=Pulls&logo=docker&style=flat-square) -->
+
+-----
 
 -----
 # Summary
