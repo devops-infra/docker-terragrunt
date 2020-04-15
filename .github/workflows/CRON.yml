@@ -3,7 +3,7 @@ name: Check for updates
 on:
   schedule:
     # Run every day at 5.00 AM UTC
-    - cron: "45 8 * * *"
+    - cron: "0 5 * * *"
 
 jobs:
   check:
@@ -32,7 +32,7 @@ jobs:
         uses: ChristophShyper/action-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          title: "${{ github.event.commits[0].message }}"
+          title: "[AUTO] Bump for ${{ env.VERSION_TAG }}"
           assignee: "${{ github.actor }}"
           label: "auto,version-update"
           template: ".github/PULL_REQUEST_TEMPLATE.md"
