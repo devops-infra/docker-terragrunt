@@ -56,7 +56,7 @@ check: ## Check TF and TG versions
 		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g"; \
 		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TF_VERSION)/$(TF_LATEST)/g"; \
 	else \
-		echo "::set-env name=VERSION_TAG::n/a"; \
+		echo "::set-env name=VERSION_TAG::null"; \
 		echo -e "\n$(TXT_YELLOW) == NO CHANGES NEEDED ==$(TXT_RESET)"; \
 	fi
 
