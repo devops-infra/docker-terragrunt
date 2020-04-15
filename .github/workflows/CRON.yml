@@ -3,7 +3,7 @@ name: Check for updates
 on:
   schedule:
     # Run every day at 5.00 AM UTC
-    - cron: "30 8 * * *"
+    - cron: "45 8 * * *"
 
 jobs:
   check:
@@ -24,8 +24,8 @@ jobs:
         uses: ChristophShyper/action-commit-push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch_name: version-update/${VERSION_TAG}
-          commit_prefix: "[AUTO-COMMIT] Bump for ${VERSION_TAG}."
+          branch_name: version-update/${{ env.VERSION_TAG }}
+          commit_prefix: "[AUTO] Bump for ${{ env.VERSION_TAG }}."
 
       - name: Create pull request (conditional)
         if: env.VERSION_TAG != 'null'
