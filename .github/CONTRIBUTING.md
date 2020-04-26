@@ -5,8 +5,8 @@ Rules for contribution are very simple.
 
 
 ### Branching
-* Bug fixes should be pushed to branches starting with `bug/...`.
-* New features should be pushed to branches starting with `enhancement/...`.
+* Bug fixes should be pushed to branches starting with `bugfix/...`.
+* New features should be pushed to branches starting with `feature/...`.
 * Updates to documentation should be pushed to branches starting with `documentation/...`.
 * If the changes apply to more than one category any other name best fitting should be used.
 
@@ -31,5 +31,8 @@ Rules for contribution are very simple.
 * Any applicable label should be selected.
 
 
-### Code of Conduct
-* Refer to [CODE_OF_CONDUCT.md](../blob/master/.github/CODE_OF_CONDUCT.md)
+### Links
+* [Issues](../../issues)
+* [Pull Requests](../../pulls)
+* [README](./README.md)
+* [Code of Conduct](../blob/master/.github/CODE_OF_CONDUCT.md)

@@ -2,9 +2,25 @@ name: Push to other
 
 on:
   push:
-    branches-ignore: master
+    branches-ignore:
+      - master
+      - release/*
 
 jobs:
+  labels:
+    name: Update repo labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Update labels - dry run
+        uses: crazy-max/ghaction-github-labeler@v1
+        with:
+          dry_run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   lint:
     name: Run linters
     runs-on: ubuntu-latest
@@ -35,72 +51,69 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v1 # Needs to be in v1 version otherwise will not work with pull-request@v2
+        uses: actions/checkout@master
 
-      - name: Read the template - bug (conditional)
-        if: startsWith(github.ref, 'refs/heads/bug')
-        id: pr-template-bug
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.github/PULL_REQUEST_TEMPLATE/BUG.md
-
-      - name: Read the template - enhancement (conditional)
-        if: startsWith(github.ref, 'refs/heads/enhancement')
-        id: pr-template-enhancement
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.github/PULL_REQUEST_TEMPLATE/ENHANCEMENT.md
-
-      - name: Read the template - documentation (conditional)
-        if: startsWith(github.ref, 'refs/heads/documentation')
-        id: pr-template-documentation
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.github/PULL_REQUEST_TEMPLATE/DOCUMENTATION.md
-
-      - name: Read the template - other (conditional)
-        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement') && startsWith(github.ref, '!refs/heads/bug')
-        id: pr-template-other
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.github/PULL_REQUEST_TEMPLATE/ENHANCEMENT.md
-
-      - name: Create pull request - bug (conditional)
-        if: startsWith(github.ref, 'refs/heads/bug')
-        uses: repo-sync/pull-request@v2
+      - name: Create pull request - dependency (conditional)
+        if: startsWith(github.ref, 'refs/heads/dependency')
+        uses: devops-infra/action-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_label: "auto,bug"
-          pr_body: "{{ steps.pr-template-bug.outputs.content }}"
-          pr_title: "${{ github.event.commits[0].message }}"
-          pr_assignee: "${{ github.actor }}"
+          title: "${{ github.event.commits[0].message }}"
+          assignee: "${{ github.actor }}"
+          label: automatic,dependency
+          template: .github/PULL_REQUEST_TEMPLATE/DEPENDENCY.md
+          old_string: "<!-- Write you description here -->"
+          new_string: "${{ github.event.commits[0].message }}"
+          get_diff: true
 
-      - name: Create pull request - enhancement (conditional)
-        if: startsWith(github.ref, 'refs/heads/enhancement')
-        uses: repo-sync/pull-request@v2
+      - name: Create pull request - bugfix (conditional)
+        if: startsWith(github.ref, 'refs/heads/bugfix')
+        uses: devops-infra/action-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_label: "auto,enhancement"
-          pr_body: "${{ steps.pr-template-enhancement.outputs.content }}"
-          pr_title: "${{ github.event.commits[0].message }}"
-          pr_assignee: "${{ github.actor }}"
+          title: "${{ github.event.commits[0].message }}"
+          assignee: "${{ github.actor }}"
+          label: automatic,bugfix
+          template: .github/PULL_REQUEST_TEMPLATE/BUGFIX.md
+          old_string: "<!-- Write you description here -->"
+          new_string: "${{ github.event.commits[0].message }}"
+          get_diff: true
+
+      - name: Create pull request - feature (conditional)
+        if: startsWith(github.ref, 'refs/heads/feature')
+        uses: devops-infra/action-pull-request@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          title: "${{ github.event.commits[0].message }}"
+          assignee: "${{ github.actor }}"
+          label: automatic,feature
+          template: .github/PULL_REQUEST_TEMPLATE/FEATURE.md
+          old_string: "<!-- Write you description here -->"
+          new_string: "${{ github.event.commits[0].message }}"
+          get_diff: true
 
       - name: Create pull request - documentation (conditional)
         if: startsWith(github.ref, 'refs/heads/documentation')
-        uses: repo-sync/pull-request@v2
+        uses: devops-infra/action-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_label: "auto,documentation"
-          pr_body: "${{ steps.pr-template-documentation.outputs.content }}"
-          pr_title: "${{ github.event.commits[0].message }}"
-          pr_assignee: "${{ github.actor }}"
+          title: "${{ github.event.commits[0].message }}"
+          assignee: "${{ github.actor }}"
+          label: automatic,documentation
+          template: .github/PULL_REQUEST_TEMPLATE/DOCUMENTATION.md
+          old_string: "<!-- Write you description here -->"
+          new_string: "${{ github.event.commits[0].message }}"
+          get_diff: true
 
       - name: Create pull request - other (conditional)
-        if: startsWith(github.ref, '!refs/heads/documentation') && startsWith(github.ref, '!refs/heads/enhancement') && startsWith(github.ref, '!refs/heads/bug')
-        uses: repo-sync/pull-request@v2
+        if: startsWith(github.ref, '!refs/heads/dependency') && startsWith(github.ref, '!refs/heads/bugfix') && startsWith(github.ref, '!refs/heads/feature') && startsWith(github.ref, '!refs/heads/documentation')
+        uses: devops-infra/action-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_label: "auto,enhancement"
-          pr_body: "${{ steps.pr-template-other.outputs.content }}"
-          pr_title: "${{ github.event.commits[0].message }}"
-          pr_assignee: "${{ github.actor }}"
+          title: "${{ github.event.commits[0].message }}"
+          assignee: "${{ github.actor }}"
+          label: automatic,feature
+          template: .github/PULL_REQUEST_TEMPLATE/FEATURE.md
+          old_string: "<!-- Write you description here -->"
+          new_string: "${{ github.event.commits[0].message }}"
+          get_diff: true

@@ -5,6 +5,18 @@ on:
     branches: master
 
 jobs:
+  labels:
+    name: Update repo labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@master
+
+      - name: Update labels
+        uses: crazy-max/ghaction-github-labeler@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   lint:
     name: Run linters
     runs-on: ubuntu-latest

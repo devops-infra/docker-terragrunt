@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v1 # Needs to be in v1 version otherwise will not work with pull-request@v2
+        uses: actions/checkout@v2
 
       - name: Check for new tags
         env:
@@ -20,19 +20,10 @@ jobs:
         run: make check
 
       - name: Commit and push changes (conditional)
+        # env.VERSION_TAG is set by 'Check for new tags' step
         if: env.VERSION_TAG != 'null'
-        uses: ChristophShyper/action-commit-push@master
+        uses: devops-infra/action-commit-push@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch_name: version-update/${{ env.VERSION_TAG }}
-          commit_prefix: "[AUTO] Bump for ${{ env.VERSION_TAG }}."
-
-      - name: Create pull request (conditional)
-        if: env.VERSION_TAG != 'null'
-        uses: ChristophShyper/action-pull-request@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          title: "[AUTO] Bump for ${{ env.VERSION_TAG }}"
-          assignee: "${{ github.actor }}"
-          label: "auto,version-update"
-          template: ".github/PULL_REQUEST_TEMPLATE.md"
+          commit_prefix: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}."
