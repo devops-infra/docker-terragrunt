@@ -2,16 +2,16 @@
 name: Bug report
 about: Report any bugs for this project
 title: 'TITLE'
-labels: 'bug'
-assignees: 'ChristophShyper'
+labels: 'bugfix'
+assignees: 'devops-infra/christophshyper'
 
 ---
 ### Brief description
-<!-- Write here... >>> -->
 
-*Write you description here*
 
-<!-- <<< ...write here -->
+<!-- Write you description here -->
+
+
 ### Additional information
 * [ ] Provided a clear and concise description of what the bug is.
 * [ ] Given a clear and concise description of what was expected to happen.

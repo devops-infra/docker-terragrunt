@@ -1,0 +1,23 @@
+- name: bugfix
+  color: "e02c1f"
+  description: Bug needing a fix
+
+- name: feature
+  color: "16cc1c"
+  description: Adding a new feature
+
+- name: documentation
+  color: "f9f14d"
+  description: Change in the documentation
+
+- name: automatic
+  color: "244296"
+  description: Automatic action
+
+- name: dependency
+  color: "a53df4"
+  description: Dependency update
+
+- name: rejected
+  color: "000000"
+  description: Idea rejected
