@@ -3,7 +3,7 @@ name: Check for updates
 on:
   schedule:
     # Run every day at 5.00 AM UTC
-    - cron: "0 8 * * *"
+    - cron: "0 5 * * *"
 
 jobs:
   check:
@@ -34,7 +34,7 @@ jobs:
 #        uses: luke142367/Docker-Lint-Action@v1.0.0
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#
+
 #      - name: Build Docker image
 #        if: env.VERSION_TAG != 'null'
 #        env:
