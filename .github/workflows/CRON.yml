@@ -3,7 +3,7 @@ name: Check for updates
 on:
   schedule:
     # Run every day at 5.00 AM UTC
-    - cron: "45 6 * * *"
+    - cron: "5 7 * * *"
 
 jobs:
   check:
@@ -29,17 +29,17 @@ jobs:
           target_branch: dependency/${{ env.VERSION_TAG }}
           commit_prefix: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}."
 
-      - name: Docker Lint
-        if: env.VERSION_TAG != 'null'
-        uses: luke142367/Docker-Lint-Action@v1.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build Docker image
-        if: env.VERSION_TAG != 'null'
-        env:
-          TERM: xterm-256color
-        run: make build
+#      - name: Docker Lint
+#        if: env.VERSION_TAG != 'null'
+#        uses: luke142367/Docker-Lint-Action@v1.0.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: Build Docker image
+#        if: env.VERSION_TAG != 'null'
+#        env:
+#          TERM: xterm-256color
+#        run: make build
 
       - name: Create pull request
         if: env.VERSION_TAG != 'null'
