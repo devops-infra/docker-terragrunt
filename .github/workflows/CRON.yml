@@ -3,7 +3,7 @@ name: Check for updates
 on:
   schedule:
     # Run every day at 5.00 AM UTC
-    - cron: "5 7 * * *"
+    - cron: "20 7 * * *"
 
 jobs:
   check:
