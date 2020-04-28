@@ -19,7 +19,7 @@ jobs:
           TERM: xterm-256color
         run: make check
 
-        # env.VERSION_TAG is set by 'Check for new tags' step
+      # env.VERSION_TAG is set by 'Check for new tags' step
 
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
@@ -27,7 +27,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_TAG }}
-          commit_prefix: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}."
+          commit_message: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}"
 
 #      - name: Docker Lint
 #        if: env.VERSION_TAG != 'null'
@@ -46,11 +46,10 @@ jobs:
         uses: devops-infra/action-pull-request@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-#          source_branch: dependency/${{ env.VERSION_TAG }}
-          title: ${{ github.event.commits[0].message }}
+          title: Bump for ${{ env.VERSION_TAG }}
           assignee: ${{ github.actor }}
           label: automatic,dependency
           template: .github/PULL_REQUEST_TEMPLATE/DEPENDENCY.md
           old_string: "<!-- Write you description here -->"
-          new_string: ${{ github.event.commits[0].message }}
+          new_string: Bump for ${{ env.VERSION_TAG }}
           get_diff: true
