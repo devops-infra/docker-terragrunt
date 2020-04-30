@@ -120,6 +120,10 @@ RUN set -eux \
 	&& apk add --no-cache openssl \
 	&& apk add --no-cache python3 \
 	&& apk add --no-cache zip \
+	&& apk add --no-cache ruby-bundler \
+	&& apk add --no-cache ruby-json \
+	&& apk add --no-cache diffutils \
+	&& gem install --no-document --no-ri terraform_landscape \
   && if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi \
   && python3 -m ensurepip \
   && rm -r /usr/lib/python*/ensurepip \
