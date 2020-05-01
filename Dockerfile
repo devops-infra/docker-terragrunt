@@ -38,14 +38,6 @@ RUN set -eux \
 		https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 \
 		-o /usr/bin/terragrunt \
 	&& chmod +x /usr/bin/terragrunt \
-# Get the latest Scenery
-	&& git clone https://github.com/dmlittle/scenery /scenery \
-	&& cd /scenery \
-	&& VERSION="$( git describe --abbrev=0 --tags )" \
-	&& curl -sS -L \
-		https://github.com/dmlittle/scenery/releases/download/${VERSION}/scenery-${VERSION}-linux-amd64 \
-		-o /usr/bin/scenery \
-	&& chmod +x /usr/bin/scenery \
 # Get latest TFLint
 	&& curl -L "$( curl -Ls https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" \
     -o tflint.zip \
@@ -102,7 +94,7 @@ ARG AZURE=no
 
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
-COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/scenery /usr/bin/tflint /usr/bin/
+COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/tflint /usr/bin/
 
 # This part has some additions
 RUN set -eux \
@@ -120,10 +112,6 @@ RUN set -eux \
 	&& apk add --no-cache openssl \
 	&& apk add --no-cache python3 \
 	&& apk add --no-cache zip \
-	&& apk add --no-cache ruby-bundler \
-	&& apk add --no-cache ruby-json \
-	&& apk add --no-cache diffutils \
-	&& gem install --no-document --no-document terraform_landscape \
   && if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi \
   && python3 -m ensurepip \
   && rm -r /usr/lib/python*/ensurepip \
