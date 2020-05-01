@@ -143,9 +143,7 @@ openssl | Binary | For calculating BASE64SHA256 hash of Lambda packages. Assures
 ply | Python library | Dependency for [pyhcl](https://github.com/virtuald/pyhcl). | https://github.com/dabeaz/ply
 pyhcl | Python library | For easily parsing of any files in HCL format, whether it's `.hcl`, `.tfvars` or `.tf`. | https://github.com/virtuald/pyhcl
 python3 | Binary | For running more complex scripts during deployment process. | https://www.python.org/
-scenery | Binary | For better coloring and visualization of `terraform plan` outputs. | https://github.com/dmlittle/scenery
 terraform | Binary | For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt). | https://github.com/hashicorp/terraform
-terraform_landscape | Binary | Better visibility for `terraform plan` output. | https://github.com/coinbase/terraform-landscape
 terragrunt | Binary | For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform). | https://github.com/gruntwork-io/terragrunt
 tflint | Binary | For linting Terraform files. | https://github.com/terraform-linters/tflint
 zip | Binary |  For creating packages for Lambdas. | http://infozip.sourceforge.net/
