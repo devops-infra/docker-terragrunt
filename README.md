@@ -32,7 +32,6 @@ This project grew much bigger than the original ones and is intended to be a fra
 <br>
 [
 ![DockerHub](https://img.shields.io/badge/docker-devopsinfra%2Fdocker--terragrunt-blue.svg?style=flat-square&logo=docker)
-![Image size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)
 ![Dockerfile size](https://img.shields.io/github/size/devops-infra/docker-terragrunt/Dockerfile?label=Dockerfile%20size&style=flat-square&logo=docker)
 ![Docker Pulls](https://img.shields.io/docker/pulls/devopsinfra/docker-terragrunt?color=blue&label=Pulls&logo=docker&style=flat-square)
 ](https://hub.docker.com/r/devopsinfra/docker-terragrunt "shields.io")
