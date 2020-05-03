@@ -17,7 +17,7 @@ print_help() {
   echo "       format-hcl --help"
   echo
   echo "       Used for checking canonical form and style of HCL configuration files."
-  echo "       And formatting them to such for if requested."
+  echo "       And formatting them to such if requested."
   echo
   echo "       When DIR is not specified current working directory is used."
 	echo
