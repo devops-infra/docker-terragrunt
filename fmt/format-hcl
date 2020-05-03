@@ -1,16 +1,81 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-# Formats all HCL-format files under working directory including subdirectories
-# Runs `terraform fmt` for all .tf files
-# Run `terragrunt-fmt.sh` for all .hcl files
-# Using cytopia's terragrunt-fmt.sh script (https://github.com/cytopia/docker-terragrunt-fmt) for .hcl files
-# Using terraform for .tf and .tfvars
+# Simple wrapper script for both:
+# - cytopia's terragrunt-fmt.sh script (https://github.com/cytopia/docker-terragrunt-fmt) for .hcl files
+# - Terraform fmt for .tf and .tfvars
+
+# Used for checking canonical form and style of HCL configuration files.
+# And formatting them to such for if requested.
+
 # Default action is to search recursively and modify all files.
+RECURSIVE="-recursive"
+WRITE="-write=true"
+
+print_help() {
+  echo
+  echo "Usage: format-hcl [options] [DIR]"
+  echo "       format-hcl --help"
+  echo
+  echo "       Used for checking canonical form and style of HCL configuration files."
+  echo "       And formatting them to such for if requested."
+  echo
+  echo "       When DIR is not specified current working directory is used."
+	echo
+	echo "Options:"
+	echo
+	echo "  -list=true     List files containing formatting inconsistencies."
+	echo
+	echo "  -write=true    Overwrite input files. Disabled if using -check."
+	echo
+	echo "  -diff          Display diffs of formatting changes"
+	echo
+	echo "  -check         Check if the input is formatted. Exit status will be 0 if all"
+	echo "                 input is properly formatted and non-zero otherwise."
+	echo
+	echo "  -recursive     Also process files in subdirectories. By default, only the"
+	echo "                 given directory (or current directory) is processed."
+	echo
+	echo "  -ignore=a,b    Comma separated list of paths to ignore. Only for .hcl files."
+	echo "                 The wildcard character '*' is supported."
+}
+
+for arg in "$@"; do
+  case $arg in
+    -help)
+      print_help
+      exit 0
+	    ;;
+    -list=*)
+      LIST="${arg#*}"
+      shift
+      ;;
+    -write=*)
+      WRITE="${arg#*}"
+      shift
+      ;;
+    -ignore=*)
+      IGNORE="${arg#*}"
+      shift
+      ;;
+    -diff)
+      DIFF="-diff"
+      shift
+      ;;
+    -check)
+      CHECK="-check"
+      shift
+      ;;
+    -recursive)
+      RECURSIVE="-recursive"
+      shift
+      ;;
+  esac
+done
 
 echo " "
 echo "=> Searching for .hcl files"
-terragrunt-fmt.sh -recursive -write=true
+echo terragrunt-fmt.sh "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} ${IGNORE}" "$@"
 
 echo " "
 echo "=> Searching for .tf and .tfvars files"
-terraform fmt -recursive -write=true
+echo terraform fmt "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE}" "$@"
