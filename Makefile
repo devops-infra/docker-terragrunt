@@ -60,7 +60,7 @@ check: ## Check TF and TG versions
 		echo -e "\n$(TXT_YELLOW) == NO CHANGES NEEDED ==$(TXT_RESET)"; \
 	fi
 
-build: check build-plain build-aws ## Build Docker image
+build: check build-plain build-aws ## Build Docker images
 
 build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))

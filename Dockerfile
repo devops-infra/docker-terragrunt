@@ -51,7 +51,7 @@ FROM alpine:3.11
 # Labels for http://label-schema.org/rc1/#build-time-labels
 # And for https://github.com/opencontainers/image-spec/blob/master/annotations.md
 # And for https://help.github.com/en/actions/building-actions/metadata-syntax-for-github-actions
-ARG NAME="IaaC dockerized framework for Terragrunt/Terragrunt"
+ARG NAME="IaaC dockerized framework for Terraform/Terragrunt"
 ARG DESCRIPTION="Docker image with Terraform v${TF_VERSION}, Terragrunt v${TG_VERSION} and all needed components to easily manage cloud infrastructure."
 ARG REPO_URL="https://github.com/devops-infra/docker-terragrunt"
 ARG AUTHOR="Krzysztof Szyper <biotyk@mail.com>"
@@ -82,10 +82,7 @@ LABEL \
   org.opencontainers.image.title="${NAME}" \
   org.opencontainers.image.description="${DESCRIPTION}" \
   maintainer="${AUTHOR}" \
-  repository="${REPO_URL}" \
-  aws_enabled="${AWS}" \
-  gcp_enabled="${GCP}" \
-  azure_enabled="${AZURE}"
+  repository="${REPO_URL}"
 
 # Switch for enabling cloud CLIs
 ARG AWS=no
