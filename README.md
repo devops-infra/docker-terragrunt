@@ -7,8 +7,8 @@ Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all need
 Tag of Docker image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's bundled with or not (see below).
 <br>
 For example:
- * `devopsinfra/docker-terragrunt:tf-0.12.24-tg-0.23.16` means it's Terraform v0.12.24 and Terragrunt v0.23.16 without additional CLI.
- * `devopsinfra/docker-terragrunt:aws-tf-0.12.24-tg-0.23.16` means it's Terraform v0.12.24 and Terragrunt v0.23.16 with AWS CLI.
+ * `devopsinfra/docker-terragrunt:tf-0.12.24-tg-0.23.17` means it's Terraform v0.12.24 and Terragrunt v0.23.17 without additional CLI.
+ * `devopsinfra/docker-terragrunt:aws-tf-0.12.24-tg-0.23.17` means it's Terraform v0.12.24 and Terragrunt v0.23.17 with AWS CLI.
 
 **Source code is available at [devopsinfra/docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt).**
 
@@ -61,8 +61,8 @@ Furthermore, versioning labels of images contain versions of said software to em
 ### Available flavours
 Docker image | Terraform version | Terragrunt version | Additional software
 :--- | :--- | :--- | :---
-`devopsinfra/docker-terragrunt:latest`<br>`devopsinfra/docker-terragrunt:tf-0.12.24-tg-0.23.16` |  v0.12.24 | v0.23.16 | N/A
-`devopsinfra/docker-terragrunt:aws-latest`<br>`devopsinfra/docker-terragrunt:aws-tf-0.12.24-tg-0.23.16` |  v0.12.24 | v0.23.16 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
+`devopsinfra/docker-terragrunt:latest`<br>`devopsinfra/docker-terragrunt:tf-0.12.24-tg-0.23.17` |  v0.12.24 | v0.23.17 | N/A
+`devopsinfra/docker-terragrunt:aws-latest`<br>`devopsinfra/docker-terragrunt:aws-tf-0.12.24-tg-0.23.17` |  v0.12.24 | v0.23.17 | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts.
 
 **Without public cloud provider CLIs**<br>
 Use for example `devopsinfra/docker-terragrunt:latest`.
