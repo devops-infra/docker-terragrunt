@@ -2,7 +2,7 @@
 phony: help
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-TF_VERSION := 0.12.24
+TF_VERSION := 0.12.25
 TG_VERSION := 0.23.17
 
 # GitHub Actions bogus variables
