@@ -43,7 +43,11 @@ RUN set -eux \
     -o tflint.zip \
 	&& unzip tflint.zip \
 	&& mv tflint /usr/bin/tflint \
-  && chmod +x /usr/bin/tflint
+  && chmod +x /usr/bin/tflint \
+# Get latest sops
+	&& curl -L "$( curl -Ls https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" \
+    -o /usr/bin/sops \
+  && chmod +x /usr/bin/sops
 
 # Use a clean tiny image to store artifacts in
 FROM alpine:3.11
@@ -91,7 +95,7 @@ ARG AZURE=no
 
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
-COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/tflint /usr/bin/
+COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/tflint /usr/bin/sops /usr/bin/
 
 # This part has some additions
 RUN set -eux \
