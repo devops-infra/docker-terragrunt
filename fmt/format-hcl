@@ -73,7 +73,7 @@ for arg in "$@"; do
 done
 
 echo -e "\n=> Searching for .hcl files"
-terragrunt-fmt.sh "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "${IGNORE}" "$@"
+terragrunt-fmt.sh ${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} ${IGNORE} "$@"
 
 echo -e "\n=> Searching for .tf and .tfvars files"
-terraform fmt "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "$@"
+terraform fmt ${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} "$@"
