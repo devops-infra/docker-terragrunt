@@ -72,10 +72,8 @@ for arg in "$@"; do
   esac
 done
 
-echo " "
-echo "=> Searching for .hcl files"
-echo terragrunt-fmt.sh "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} ${IGNORE}" "$@"
+echo -e "\n=> Searching for .hcl files"
+terragrunt-fmt.sh "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} ${IGNORE}" "$@"
 
-echo " "
-echo "=> Searching for .tf and .tfvars files"
-echo terraform fmt "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE}" "$@"
+echo -e "\n=> Searching for .tf and .tfvars files"
+terraform fmt "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE}" "$@"
