@@ -20,23 +20,23 @@ print_help() {
   echo "       And formatting them to such if requested."
   echo
   echo "       When DIR is not specified current working directory is used."
-	echo
-	echo "Options:"
-	echo
-	echo "  -list=true     List files containing formatting inconsistencies."
-	echo
-	echo "  -write=true    Overwrite input files. Disabled if using -check."
-	echo
-	echo "  -diff          Display diffs of formatting changes"
-	echo
-	echo "  -check         Check if the input is formatted. Exit status will be 0 if all"
-	echo "                 input is properly formatted and non-zero otherwise."
-	echo
-	echo "  -recursive     Also process files in subdirectories. By default, only the"
-	echo "                 given directory (or current directory) is processed."
-	echo
-	echo "  -ignore=a,b    Comma separated list of paths to ignore. Only for .hcl files."
-	echo "                 The wildcard character '*' is supported."
+  echo
+  echo "Options:"
+  echo
+  echo "  -list=true     List files containing formatting inconsistencies."
+  echo
+  echo "  -write=true    Overwrite input files. Disabled if using -check."
+  echo
+  echo "  -diff          Display diffs of formatting changes"
+  echo
+  echo "  -check         Check if the input is formatted. Exit status will be 0 if all"
+  echo "                 input is properly formatted and non-zero otherwise."
+  echo
+  echo "  -recursive     Also process files in subdirectories. By default, only the"
+  echo "                 given directory (or current directory) is processed."
+  echo
+  echo "  -ignore=a,b    Comma separated list of paths to ignore. Only for .hcl files."
+  echo "                 The wildcard character '*' is supported."
 }
 
 for arg in "$@"; do
@@ -73,7 +73,7 @@ for arg in "$@"; do
 done
 
 echo -e "\n=> Searching for .hcl files"
-terragrunt-fmt.sh "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} ${IGNORE}" "$@"
+terragrunt-fmt.sh "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "${IGNORE}" "$@"
 
 echo -e "\n=> Searching for .tf and .tfvars files"
-terraform fmt "${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE}" "$@"
+terraform fmt "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "$@"
