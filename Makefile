@@ -52,11 +52,11 @@ check: ## Check TF and TG versions
   		echo -e "$(TXT_GREEN)Latest Terraform:$(TXT_YELLOW)     $(TF_LATEST)$(TXT_RESET)"; \
   		echo -e "$(TXT_GREEN)Latest Terragrunt:$(TXT_YELLOW)    $(TG_LATEST)$(TXT_RESET)"; \
   		echo -e "$(TXT_GREEN)Latest tag:$(TXT_YELLOW)           $(VERSION_LATEST)$(TXT_RESET)"; \
-  		echo "::set-env name=VERSION_TAG::$(VERSION_LATEST)"; \
+  		echo "VERSION_TAG=$(VERSION_LATEST)" >> $GITHUB_ENV ; \
 		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g"; \
 		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TF_VERSION)/$(TF_LATEST)/g"; \
 	else \
-		echo "::set-env name=VERSION_TAG::null"; \
+		echo "VERSION_TAG=null" >> $GITHUB_ENV ; \
 		echo -e "\n$(TXT_YELLOW) == NO CHANGES NEEDED ==$(TXT_RESET)"; \
 	fi
 
