@@ -44,10 +44,10 @@ help: ## Display help prompt
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(TXT_YELLOW)%-25s $(TXT_RESET) %s\n", $$1, $$2}'
 
 check: ## Check TF and TG versions
-	$(info $(NL)$(TXT_GREEN) == CHECKING VERSIONS ==$(TXT_RESET))
-	$(info $(TXT_GREEN)Requested Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Requested Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Requested tag:$(TXT_YELLOW)        $(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN) == CURRENT VERSIONS ==$(TXT_RESET))
+	$(info $(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
+	$(info $(TXT_GREEN)Current tag:$(TXT_YELLOW)        $(VERSION)$(TXT_RESET))
 	@if [[ $(VERSION) != $(VERSION_LATEST) ]]; then \
   		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)"; \
   		echo -e "$(TXT_GREEN)Latest Terraform:$(TXT_YELLOW)     $(TF_LATEST)$(TXT_RESET)"; \
