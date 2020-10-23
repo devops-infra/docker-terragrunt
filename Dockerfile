@@ -44,6 +44,12 @@ RUN set -eux \
 	&& unzip tflint.zip \
 	&& mv tflint /usr/bin/tflint \
   && chmod +x /usr/bin/tflint \
+# Get latest hcledit
+	&& curl -L "$( curl -Ls https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz" )" \
+    -o hcledit.tar.gz \
+	&& tar -xf hcledit.tar.gz \
+	&& mv hcledit /usr/bin/hcledit \
+  && chmod +x /usr/bin/hcledit \
 # Get latest sops
 	&& curl -L "$( curl -Ls https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" \
     -o /usr/bin/sops \
@@ -95,7 +101,7 @@ ARG AZURE=no
 
 # Combines scripts from docker-terragrunt-fmt with docker-terragrunt
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
-COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/tflint /usr/bin/sops /usr/bin/
+COPY --from=builder /usr/bin/terraform /usr/bin/terragrunt /usr/bin/tflint /usr/bin/sops /usr/bin/hcledit /usr/bin/
 
 # This part has some additions
 RUN set -eux \
