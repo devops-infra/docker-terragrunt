@@ -50,6 +50,7 @@ RUN set -eux \
 	&& tar -xf hcledit.tar.gz \
 	&& mv hcledit /usr/bin/hcledit \
   && chmod +x /usr/bin/hcledit \
+  && chmown $(id -u):$(id -g) /usr/bin/hcledit \
 # Get latest sops
 	&& curl -L "$( curl -Ls https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" \
     -o /usr/bin/sops \
