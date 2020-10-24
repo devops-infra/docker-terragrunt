@@ -119,7 +119,8 @@ docker run --rm \
 ```
 
 
-| # Additional software available in all images |                     |                                                                                                                                    |                                                                                                |
+# Additional software available in all images
+
 | --------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | Script name                                   | Is included in PATH | Purpose                                                                                                                            | Source/Documentation                                                                           |
 | :---                                          | :---:               | :---                                                                                                                               | :---                                                                                           |
@@ -127,7 +128,8 @@ docker run --rm \
 | `terragrunt-fmt.sh`                           | No                  | Dependency for `format-hcl`                                                                                                        | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) |
 
 
-| ### Binaries and Python libraries |                |                                                                                                                                                                |                                                    |
+### Binaries and Python libraries
+
 | --------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | :---:                             | :---:          | :---                                                                                                                                                           | :---                                               |
 | bash                              | Binary         | For color output from `terraform` and`terragrunt`. Assures also access to some builtins.                                                                       | https://www.gnu.org/software/bash/                 |
