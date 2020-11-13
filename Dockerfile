@@ -127,6 +127,7 @@ RUN set -eux \
   && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \
   && python3 -m pip install ply --no-cache-dir \
 	&& python3 -m pip install pyhcl --no-cache-dir \
+	&& python3 -m pip install requests --no-cache-dir \
   && if [ "${AWS}" == "yes" ]; then python3 -m pip install boto3 --no-cache-dir; python3 -m pip install awscli --no-cache-dir; fi \
 #  && if [ "${GCP}" == "yes" ]; then echo GCP; fi \
 #  && if [ "${AZURE}" == "yes" ]; then echo AZURE; fi \
