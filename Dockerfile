@@ -129,7 +129,7 @@ RUN set -eux \
 	&& python3 -m pip install pyhcl --no-cache-dir \
 	&& python3 -m pip install requests --no-cache-dir \
   && if [ "${AWS}" == "yes" ]; then python3 -m pip install boto3 --no-cache-dir; python3 -m pip install awscli --no-cache-dir; fi \
-#  && if [ "${GCP}" == "yes" ]; then echo GCP; fi \
+  && if [ "${GCP}" == "yes" ]; then  python3 -m pip install pip install --upgrade gcloud --no-cache-dir; fi \
 #  && if [ "${AZURE}" == "yes" ]; then echo AZURE; fi \
   && mkdir -m 700 /root/.ssh \
   && touch -m 600 /root/.ssh/known_hosts \
