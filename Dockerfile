@@ -15,7 +15,7 @@ RUN set -eux \
 		unzip \
 # Get Terraform by a specific version
 	; if [ "${TF_VERSION}" = "latest" ]; then \
-		VERSION="$( curl -sS https://releases.hashicorp.com/terraform/ | cat \
+		VERSION="$( curl -sS -L https://releases.hashicorp.com/terraform/ | cat \
 			| grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
 			| sort -V | tail -1 )" \
 	else \
