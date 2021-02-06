@@ -87,9 +87,13 @@ RUN  curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/
 ARG AWS=no
 ARG GCP=no
 ARG AZURE=no
-COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh /usr/bin/
+COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh show-versions.sh /usr/bin/
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN chmod +x /usr/bin/format-hcl /usr/bin/fmt.sh /usr/bin/terragrunt-fmt.sh ;\
+RUN chmod +x \
+    /usr/bin/format-hcl \
+    /usr/bin/fmt.sh \
+    /usr/bin/terragrunt-fmt.sh \
+    /usr/bin/show-versions.sh ;\
   # Github
   mkdir -m 700 /root/.ssh ;\
   touch -m 600 /root/.ssh/known_hosts ;\
@@ -144,4 +148,4 @@ LABEL \
   repository="${REPO_URL}"
 
 WORKDIR /data
-CMD ["terraform", "--version", "&&", "terragrunt", "--version"]
+CMD ["show-versions.sh"]
