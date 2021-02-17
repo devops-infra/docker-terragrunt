@@ -19,7 +19,7 @@ Original README files are included in this repository: [docker-terragrunt](https
 This project grew much bigger than the original ones and is intended to be a framework for cloud Infrastructure-as-a-Code. 
 
 
-## Badge swag
+# Badge swag
 [
 ![GitHub](https://img.shields.io/badge/github-devops--infra%2Fdocker--terragrunt-brightgreen.svg?style=flat-square&logo=github)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/devops-infra/docker-terragrunt?color=brightgreen&label=Code%20size&style=flat-square&logo=github)
@@ -58,7 +58,7 @@ Hence, images are updated when new version of Terraform or Terragrunt is release
 Furthermore, versioning labels of images contain versions of said software to emphasize it. See below.
 
 
-### Available flavours
+# Available flavours
 
 | Image name                                                                                            | Terraform version | Terragrunt version | Cloud API/SDK                                                                                                                                                                                                                                 |
 | ----------------------------------------------------------------------------------------------------- | ----------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -82,17 +82,30 @@ _Microsoft Azure - TO BE ADDED_<br>
 * Mount working directory under `/data`, e.g. `--volume $(pwd):/data`.
 * Pass cloud provider's credentials as additional file or environment variables, e.g. `--env AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}` or `--volume ~/.aws/credentials:/root/.aws/credentials`.
 * Run different Docker container inside this one by sharing the socket, e.g. `--volume /var/run/docker.sock:/var/run/docker.sock`.
-* Access private GitHub repos by SSH (`git::git@github.com:my/private-repo.git`) by sharing private key, e.g. `--volume ~/.ssh/id_rsa_github_key:/root/.ssh/id_rsa`.
+* Access private GitHub repos with PAT saved in `~/.gitconfig` as follows, and mount it with `--volume ~/.gitconfig:/root/.gitconfig`:
+```
+[url "https://{GITHUB_TOKEN}@github.com/"]
+	insteadOf = https://github.com/
+[url "https://{GITHUB_TOKEN}@github.com/"]
+	insteadOf = git+ssh://github.com/
+[url "https://{GITHUB_TOKEN}@github.com/"]
+	insteadOf = git@github.com:
+```  
+Here example with overwriting SSH and Git access to HTTPS. By default, image will include [.gitconfig](https://github.com/devops-infra/docker-terragrunt/blob/master/.gitconfig).
 
-For example:
+
+# Examples:
+
+* Format all HCL files in the current directory. Including subdirectories.
 ```bash
-# Format all HCL files in current directory. Including subdirectories.
 docker run --rm \
     --user $(id -u):$(id -g) \
     --volume $(pwd):/data \
     devopsinfra/docker-terragrunt:latest format-hcl
+```
 
-# Plan terraform deployment in AWS for files in current directory.
+* Plan terraform deployment in AWS for files in current directory.
+```bash
 docker run --rm \
     --tty --interactive \
     --env AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION} \
@@ -102,16 +115,20 @@ docker run --rm \
     --user $(id -u):$(id -g) \
     --volume $(pwd):/data \
     devopsinfra/docker-terragrunt:aws-latest terraform plan
+```
 
-# Apply terragrunt deployment in subdirectory. With SSH access to GitHub using a private key.
+* Apply terragrunt deployment in subdirectory. With GitHub using a `~/.gitconfig` file with PAT.
+```bash
 docker run --rm \
     --tty --interactive \
     --user $(id -u):$(id -g) \
     --volume $(pwd):/data \
-    --volume ~/.ssh/id_rsa_github_integration:/root/.ssh/id_rsa \
+    --volume ~/.gitconfig:/root/.gitconfig \
     devopsinfra/docker-terragrunt:aws-latest terragrunt apply --terragrunt-working-dir some/module
+```
 
-# Run a Makefile target as orchestration script.
+* Run a Makefile target as orchestration script.
+```bash
 docker run --rm \
     --tty --interactive \
     --user $(id -u):$(id -g) \
@@ -128,6 +145,7 @@ docker run --rm \
 | ------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `format-hcl`        | Yes                 | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/fmt/format-hcl)   |
 | `terragrunt-fmt.sh` | No                  | Dependency for `format-hcl`                                                                                                        | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) |
+| `show-versions.sh`  | Yes                 | Main CMD target for Docker image, just to show all installed binaries versions.                                                    | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/show-versions.sh) |
 
 
 ### Binaries and Python libraries
