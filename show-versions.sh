@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if command -v aws &> /dev/null; then
+  aws --version ; echo
+fi
+
 terraform --version ; echo
 terragrunt --version ; echo
 python3 --version

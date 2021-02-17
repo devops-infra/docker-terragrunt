@@ -84,28 +84,28 @@ RUN  curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/
     -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
 
+# Cloud CLIs
 ARG AWS=no
 ARG GCP=no
 ARG AZURE=no
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+RUN if [ "${AWS}" = "yes" ]; then \
+    pip3 install --no-cache-dir \
+      awscli \
+      boto3 ;\
+  fi ;\
+  if [ "${GCP}" = "yes" ]; then echo GCP NOT READY; fi ;\
+  if [ "${AZURE}" = "yes" ]; then echo AZURE NOT READY; fi
+
+# Scripts, configs and cleanup
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh show-versions.sh /usr/bin/
+COPY .gitconfig /root/
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN chmod +x \
     /usr/bin/format-hcl \
     /usr/bin/fmt.sh \
     /usr/bin/terragrunt-fmt.sh \
     /usr/bin/show-versions.sh ;\
-  # Github
-  mkdir -m 700 /root/.ssh ;\
-  touch -m 600 /root/.ssh/known_hosts ;\
-  ssh-keyscan -t rsa github.com > /root/.ssh/known_hosts ;\
-  # Cloud CLIs
-  if [ "${AWS}" = "yes" ]; then \
-    pip3 install --no-cache-dir \
-      awscli \
-      boto3 ;\
-  fi ;\
-#  if [ "${GCP}" = "yes" ]; then echo GCP; fi ;\
-#  if [ "${AZURE}" = "yes" ]; then echo AZURE; fi ;\
   # Cleanup
   rm -rf /var/cache/* ;\
   rm -rf /root/.cache/* ;\
