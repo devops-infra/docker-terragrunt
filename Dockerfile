@@ -5,6 +5,7 @@ SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk update --no-cache ;\
   apk add --no-cache \
     bash \
+    bc \
     ca-certificates \
     curl \
     docker \
