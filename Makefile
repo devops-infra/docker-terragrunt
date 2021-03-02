@@ -135,18 +135,18 @@ push-github: ## Push to GitHub Container Registry
 	$(info $(NL)$(TXT_GREEN)Logging to GitHub$(TXT_RESET))
 	@echo $(GITHUB_TOKEN) | docker login https://docker.pkg.github.com -u $(GITHUB_USER_ID) --password-stdin
 	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):$(VERSION)$(TXT_RESET))
-	@docker tag $(GITHUB_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):latest
+	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):latest
 	@docker push docker.pkg.github.com/$(GITHUB_NAME):$(VERSION)
 	@docker push docker.pkg.github.com/$(GITHUB_NAME):latest
 	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):aws-$(VERSION)$(TXT_RESET))
-	@docker tag $(GITHUB_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):aws-latest
+	@docker tag $(DOCKER_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):aws-latest
 	@docker push docker.pkg.github.com/$(GITHUB_NAME):aws-$(VERSION)
 	@docker push docker.pkg.github.com/$(GITHUB_NAME):aws-latest
 #	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):gcp-$(VERSION)$(TXT_RESET))
-#	@docker tag $(GITHUB_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):gcp-latest
+#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):gcp-latest
 #	@docker push docker.pkg.github.com/$(GITHUB_NAME):gcp-$(VERSION)
 #	@docker push docker.pkg.github.com/$(GITHUB_NAME):gcp-latest
 #	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):azure-$(VERSION)$(TXT_RESET))
-#	@docker tag $(GITHUB_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):azure-latest
+#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):azure-latest
 #	@docker push docker.pkg.github.com/$(GITHUB_NAME):azure-$(VERSION)
 #	@docker push docker.pkg.github.com/$(GITHUB_NAME):azure-latest
