@@ -134,23 +134,23 @@ push-github: ## Push to GitHub Container Registry
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO GITHUB == $(TXT_RESET))
 	$(info $(NL)$(TXT_GREEN)Logging to GitHub$(TXT_RESET))
 	@echo $(GITHUB_TOKEN) | docker login https://docker.pkg.github.com -u $(GITHUB_USER_ID) --password-stdin
-	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):$(VERSION)$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):latest
-	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):$(VERSION)
-	@docker push docker.pkg.github.com/$(GITHUB_NAME):latest
-	@docker push docker.pkg.github.com/$(GITHUB_NAME):$(VERSION)
-	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):aws-$(VERSION)$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):aws-latest
-	@docker tag $(DOCKER_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):aws-$(VERSION)
-	@docker push docker.pkg.github.com/$(GITHUB_NAME):aws-latest
-	@docker push docker.pkg.github.com/$(GITHUB_NAME):aws-$(VERSION)
-#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):gcp-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):gcp-latest
-#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):gcp-$(VERSION)
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME):gcp-latest
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME):gcp-$(VERSION)
-#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(GITHUB_NAME):azure-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):azure-latest
-#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME):azure-$(VERSION)
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME):azure-latest
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME):azure-$(VERSION)
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION)$(TXT_RESET))
+	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):latest
+	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION)
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):latest
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION)
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-$(VERSION)$(TXT_RESET))
+	@docker tag $(DOCKER_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-latest
+	@docker tag $(DOCKER_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-$(VERSION)
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-latest
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-$(VERSION)
+#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)$(TXT_RESET))
+#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
+#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
+#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
+#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
+#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE)/$(DOCKER_IMAGE):azure-$(VERSION)$(TXT_RESET))
+#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
+#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
+#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
+#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
