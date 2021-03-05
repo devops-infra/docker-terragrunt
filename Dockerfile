@@ -82,9 +82,17 @@ RUN curl -LsS "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/rele
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN  curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" \
+RUN curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" \
     -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
+
+# Get latest GitHub's hub binary
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+RUN HUB_VERSION=$(curl -LsS https://api.github.com/repos/github/hub/releases/latest | jq -r '.name' | sed 's|hub ||') ;\
+  curl -LsS "$(curl -LsS https://api.github.com/repos/github/hub/releases/latest | \
+    jq -r '.assets[].browser_download_url' | grep -o -E "https:\/\/.*\/hub-linux-amd64-${HUB_VERSION}.tgz")" -o /tmp/hub-linux-amd64.tgz ;\
+  tar zxf /tmp/hub-linux-amd64.tgz -C /tmp ;\
+  env PREFIX=/usr/local /tmp/hub-linux-amd64-"${HUB_VERSION}"/install
 
 # Cloud CLIs
 ARG AWS=no
