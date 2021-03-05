@@ -92,7 +92,7 @@ RUN HUB_VERSION=$(curl -LsS https://api.github.com/repos/github/hub/releases/lat
   curl -LsS "$(curl -LsS https://api.github.com/repos/github/hub/releases/latest | \
     jq -r '.assets[].browser_download_url' | grep -o -E "https:\/\/.*\/hub-linux-amd64-${HUB_VERSION}.tgz")" -o /tmp/hub-linux-amd64.tgz ;\
   tar zxf /tmp/hub-linux-amd64.tgz -C /tmp ;\
-  env PREFIX=/usr/local /tmp/hub-linux-amd64-"${HUB_VERSION}"/install
+  ./tmp/hub-linux-amd64-${HUB_VERSION}/install
 
 # Cloud CLIs
 ARG AWS=no
