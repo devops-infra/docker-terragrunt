@@ -11,7 +11,7 @@ pip freeze ; echo
 bash --version ; echo
 curl --version ; echo
 docker --version ; echo
-git --version ; echo
+hub --version ; echo
 jq --version ; echo
 echo hcledit `hcledit version` ; echo
 make --version ; echo

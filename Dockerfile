@@ -24,7 +24,6 @@ RUN apk update --no-cache ;\
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN pip3 install --no-cache-dir \
-    ansi2html \
     cloudflare \
     ply \
     pyhcl \
