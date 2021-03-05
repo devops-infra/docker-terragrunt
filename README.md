@@ -158,6 +158,7 @@ docker run --rm \
 
 | Name       | Type           | Description                                                                                                                                                    | Source/Documentation                               |
 | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| ansi2html  | Python library | For making formatted content for GitHub.                                                                                                                       | https://github.com/pycontribs/ansi2html            |
 | bash       | Binary         | For color output from `terraform` and`terragrunt`. Assures also access to some builtins.                                                                       | https://www.gnu.org/software/bash/                 |
 | bc         | Binary         | For numeric operations.                                                                                                                                        | https://www.gnu.org/software/bc/bc.html            |
 | cloudflare | Python library | For Cloudflare API operations                                                                                                                                  | https://github.com/cloudflare/python-cloudflare    |
