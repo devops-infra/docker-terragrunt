@@ -11,8 +11,8 @@ Tag of Docker image tells which version of Terraform and Terragrunt it contains 
 
 
 For example:
- * `docker-terragrunt:tf-0.14.7-tg-0.28.7` means it's Terraform v0.14.7 and Terragrunt v0.28.7 without additional CLI.
- * `docker-terragrunt:aws-tf-0.14.7-tg-0.28.7` means it's Terraform v0.14.7 and Terragrunt v0.28.7 with AWS CLI.
+ * `docker-terragrunt:tf-0.14.7-tg-0.28.8` means it's Terraform v0.14.7 and Terragrunt v0.28.8 without additional CLI.
+ * `docker-terragrunt:aws-tf-0.14.7-tg-0.28.8` means it's Terraform v0.14.7 and Terragrunt v0.28.8 with AWS CLI.
 
 **Source code is available at [devopsinfra/docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt).**
 
@@ -66,10 +66,10 @@ Furthermore, versioning labels of images contain versions of said software to em
 
 | Image name                                                                                       | Registry | Terraform version | Terragrunt version | Cloud API/SDK                                                                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------ | -------- | ----------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `devopsinfra/docker-terragrunt:tf-0.14.7-tg-0.28.7`                                              | Docker   | v0.14.7           | v0.28.7            | N/A                                                                                                                                                                                                                                           |
-| `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:tf-0.14.7-tg-0.28.7`     | GitHub   | v0.14.7           | v0.28.7            | N/A                                                                                                                                                                                                                                           |
-| `devopsinfra/docker-terragrunt:aws-tf-0.14.7-tg-0.28.7`                                          | Docker   | v0.14.7           | v0.28.7            | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts. |
-| `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:aws-tf-0.14.7-tg-0.28.7` | GitHub   | v0.14.7           | v0.28.7            | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts. |
+| `devopsinfra/docker-terragrunt:tf-0.14.7-tg-0.28.8`                                              | Docker   | v0.14.7           | v0.28.8            | N/A                                                                                                                                                                                                                                           |
+| `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:tf-0.14.7-tg-0.28.8`     | GitHub   | v0.14.7           | v0.28.8            | N/A                                                                                                                                                                                                                                           |
+| `devopsinfra/docker-terragrunt:aws-tf-0.14.7-tg-0.28.8`                                          | Docker   | v0.14.7           | v0.28.8            | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts. |
+| `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:aws-tf-0.14.7-tg-0.28.8` | GitHub   | v0.14.7           | v0.28.8            | [awscli](https://github.com/aws/aws-cli) - For interacting with AWS infrastructure, e.g. for publishing Lambda packages to S3.<br>[boto3](https://github.com/boto/boto3) - Python library for interacting with AWS infrastructure in scripts. |
 
 **Without public cloud provider CLIs**<br>
 Use for example `devopsinfra/docker-terragrunt:latest`.
