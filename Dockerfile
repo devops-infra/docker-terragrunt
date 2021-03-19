@@ -2,6 +2,7 @@ FROM alpine:3.13
 
 # Install prerequisits
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3018
 RUN apk update --no-cache ;\
   apk add --no-cache \
     bash \
@@ -23,6 +24,7 @@ RUN apk update --no-cache ;\
 
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013
 RUN pip3 install --no-cache-dir \
     cloudflare \
     ply \
@@ -73,6 +75,7 @@ RUN curl -LsS "$( curl -LsS https://api.github.com/repos/terraform-linters/tflin
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2046
 RUN curl -LsS "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz" )" \
     -o hcledit.tar.gz ;\
   tar -xf hcledit.tar.gz ;\
@@ -92,6 +95,7 @@ ARG AWS=no
 ARG GCP=no
 ARG AZURE=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
     pip3 install --no-cache-dir \
       awscli \
