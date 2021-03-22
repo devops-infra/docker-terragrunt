@@ -14,7 +14,7 @@ For example:
  * `docker-terragrunt:tf-0.14.8-tg-0.28.15` means it's Terraform v0.14.8 and Terragrunt v0.28.15 without additional CLI.
  * `docker-terragrunt:aws-tf-0.14.8-tg-0.28.15` means it's Terraform v0.14.8 and Terragrunt v0.28.15 with AWS CLI.
 
-**Source code is available at [devopsinfra/docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt).**
+**Source code is available at [devops-infra/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt).**
 
 Dockerfile is based on two images made by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f) and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7).
 <br>
