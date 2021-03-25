@@ -125,10 +125,10 @@ push-docker: ## Push to DockerHub
 #	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
 #	@docker push $(DOCKER_NAME):gcp-$(VERSION)
 #	@docker push $(DOCKER_NAME):gcp-latest
-#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
-#	@docker push $(DOCKER_NAME):azure-$(VERSION)
-#	@docker push $(DOCKER_NAME):azure-latest
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
+	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
+	@docker push $(DOCKER_NAME):azure-$(VERSION)
+	@docker push $(DOCKER_NAME):azure-latest
 
 push-github: ## Push to GitHub Container Registry
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO GITHUB == $(TXT_RESET))
@@ -149,8 +149,8 @@ push-github: ## Push to GitHub Container Registry
 #	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
 #	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
 #	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
-#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE)/$(DOCKER_IMAGE):azure-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
-#	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE)/$(DOCKER_IMAGE):azure-$(VERSION)$(TXT_RESET))
+	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
+	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
