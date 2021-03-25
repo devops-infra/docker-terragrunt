@@ -64,7 +64,7 @@ check: ## Check TF and TG versions
 		echo -e "\n$(TXT_YELLOW) == NO CHANGES NEEDED ==$(TXT_RESET)"; \
 	fi
 
-build: check build-plain build-aws ## Build Docker images
+build: check build-plain build-aws build-azure ## Build Docker images
 
 build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
@@ -87,17 +87,6 @@ build-aws: ## Build image with AWS CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):aws-$(VERSION) .
 
-build-gcp: ## Build image with GCP CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
-	@docker build \
-		--build-arg GCP=yes \
-		--build-arg TF_VERSION=$(TF_VERSION) \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
-		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
-
 build-azure: ## Build image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 	@docker build \
@@ -108,6 +97,17 @@ build-azure: ## Build image with Azure CLI
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):azure-$(VERSION) .
+
+build-gcp: ## Build image with GCP CLI
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
+	@docker build \
+		--build-arg GCP=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=Dockerfile \
+		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
 
 push-docker: ## Push to DockerHub
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO DOCKERHUB == $(TXT_RESET))
@@ -121,14 +121,14 @@ push-docker: ## Push to DockerHub
 	@docker tag $(DOCKER_NAME):aws-$(VERSION) $(DOCKER_NAME):aws-latest
 	@docker push $(DOCKER_NAME):aws-$(VERSION)
 	@docker push $(DOCKER_NAME):aws-latest
-#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
-#	@docker push $(DOCKER_NAME):gcp-$(VERSION)
-#	@docker push $(DOCKER_NAME):gcp-latest
 	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):azure-$(VERSION) $(DOCKER_NAME):azure-latest
 	@docker push $(DOCKER_NAME):azure-$(VERSION)
 	@docker push $(DOCKER_NAME):azure-latest
+#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
+#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) $(DOCKER_NAME):gcp-latest
+#	@docker push $(DOCKER_NAME):gcp-$(VERSION)
+#	@docker push $(DOCKER_NAME):gcp-latest
 
 push-github: ## Push to GitHub Container Registry
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO GITHUB == $(TXT_RESET))
@@ -144,13 +144,13 @@ push-github: ## Push to GitHub Container Registry
 	@docker tag $(DOCKER_NAME):aws-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-latest
 	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-$(VERSION)
 	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):aws-latest
-#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)$(TXT_RESET))
-#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
-#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
-#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
 	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE)/$(DOCKER_IMAGE):azure-$(VERSION)$(TXT_RESET))
 	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
 	@docker tag $(DOCKER_NAME):azure-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
 	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-$(VERSION)
 	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):azure-latest
+#	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)$(TXT_RESET))
+#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
+#	@docker tag $(DOCKER_NAME):gcp-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
+#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-$(VERSION)
+#	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):gcp-latest
