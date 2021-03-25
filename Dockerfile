@@ -101,7 +101,11 @@ RUN if [ "${AWS}" = "yes" ]; then \
       boto3 ;\
   fi ;\
   if [ "${GCP}" = "yes" ]; then echo GCP NOT READY; fi ;\
-  if [ "${AZURE}" = "yes" ]; then echo AZURE NOT READY; fi
+  if [ "${AZURE}" = "yes" ]; then \
+    apk add --no-cache --virtual .build-deps gcc python3-dev libffi-dev musl-dev openssl-dev \
+    && pip install --no-cache-dir azure-cli \
+    && apk del .build-deps; \
+  fi
 
 # Scripts, configs and cleanup
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh show-versions.sh /usr/bin/
