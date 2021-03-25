@@ -93,18 +93,23 @@ RUN curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/l
 ARG AWS=no
 ARG GCP=no
 ARG AZURE=no
+
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    pip3 install --no-cache-dir \
-      awscli \
-      boto3 ;\
-  fi ;\
-  if [ "${GCP}" = "yes" ]; then echo GCP NOT READY; fi ;\
-  if [ "${AZURE}" = "yes" ]; then \
-    apk add --no-cache --virtual .build-deps gcc python3-dev libffi-dev musl-dev openssl-dev \
-    && pip install --no-cache-dir azure-cli \
-    && apk del .build-deps; \
+    pip3 install --no-cache-dir awscli boto3 ;\
+  fi
+
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013
+RUN  if [ "${GCP}" = "yes" ]; then echo GCP NOT READY; fi
+
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013,DL3018
+RUN if [ "${AZURE}" = "yes" ]; then \
+    apk add --no-cache --virtual .build-deps gcc python3-dev libffi-dev musl-dev openssl-dev ;\
+    pip install --no-cache-dir azure-cli ;\
+    apk del .build-deps; \
   fi
 
 # Scripts, configs and cleanup
