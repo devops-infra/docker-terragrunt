@@ -16,7 +16,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/45788587?v=4",
       "profile": "https://shyper.pro/",
       "contributions": [
-        "code"
+        "code",
+        "platform",
+        "maintenance"
       ]
     },
     {
@@ -25,6 +27,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/12533999?v=4",
       "profile": "https://www.everythingcli.org/",
       "contributions": [
+        "ideas",
         "code"
       ]
     },
@@ -43,7 +46,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/47661139?v=4",
       "profile": "https://github.com/clushie",
       "contributions": [
-        "code"
+        "ideas"
       ]
     }
   ],
