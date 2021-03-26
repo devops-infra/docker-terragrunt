@@ -1,6 +1,6 @@
 # IaaC dockerized framework for Terraform and Terragrunt
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud infrastructure.
@@ -206,6 +206,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.everythingcli.org/"><img src="https://avatars.githubusercontent.com/u/12533999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cytopia</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=cytopia" title="Code">💻</a></td>
     <td align="center"><a href="https://evaate.com/"><img src="https://avatars.githubusercontent.com/u/12538173?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Djukic</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=markodjukic" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/clushie"><img src="https://avatars.githubusercontent.com/u/47661139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phileas Lebada</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=clushie" title="Code">💻</a></td>
+    <td align="center"><a href="https://shyper.pro/"><img src="https://avatars.githubusercontent.com/u/45788587?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Krzysztof Szyper</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=ChristophShyper" title="Code">💻</a></td>
   </tr>
 </table>
 
