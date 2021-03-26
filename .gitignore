@@ -1,3 +1,7 @@
 # Intellij
 .idea/
 *.iml
+
+# all-contributors-cli
+package.json
+yarn.lock

@@ -29,18 +29,6 @@ jobs:
           target_branch: dependency/${{ env.VERSION_TAG }}
           commit_message: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}"
 
-#      - name: Docker Lint
-#        if: env.VERSION_TAG != 'null'
-#        uses: luke142367/Docker-Lint-Action@v1.0.0
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-#      - name: Build Docker image
-#        if: env.VERSION_TAG != 'null'
-#        env:
-#          TERM: xterm-256color
-#        run: make build
-
       - name: Create pull request
         if: env.VERSION_TAG != 'null'
         uses: devops-infra/action-pull-request@master
@@ -49,7 +37,5 @@ jobs:
           title: Bump for ${{ env.VERSION_TAG }}
           assignee: ${{ github.actor }}
           label: automatic,dependency
-          template: .github/PULL_REQUEST_TEMPLATE/DEPENDENCY.md
-          old_string: "<!-- Write you description here -->"
-          new_string: Bump for ${{ env.VERSION_TAG }}
+          template: .github/PULL_REQUEST_TEMPLATE.md
           get_diff: true

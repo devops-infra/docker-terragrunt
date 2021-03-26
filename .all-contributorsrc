@@ -1,0 +1,54 @@
+{
+  "projectName": "docker-terragrunt",
+  "projectOwner": "devops-infra",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "gitmoji",
+  "contributors": [
+    {
+      "login": "ChristophShyper",
+      "name": "Krzysztof Szyper",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45788587?v=4",
+      "profile": "https://shyper.pro/",
+      "contributions": [
+        "code",
+        "platform",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "cytopia",
+      "name": "cytopia",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12533999?v=4",
+      "profile": "https://www.everythingcli.org/",
+      "contributions": [
+        "ideas",
+        "code"
+      ]
+    },
+    {
+      "login": "markodjukic",
+      "name": "Marko Djukic",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12538173?v=4",
+      "profile": "https://evaate.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "clushie",
+      "name": "Phileas Lebada",
+      "avatar_url": "https://avatars.githubusercontent.com/u/47661139?v=4",
+      "profile": "https://github.com/clushie",
+      "contributions": [
+        "ideas"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

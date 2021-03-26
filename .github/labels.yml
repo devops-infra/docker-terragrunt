@@ -1,23 +1,35 @@
-- name: bugfix
-  color: "e02c1f"
-  description: Bug needing a fix
-
-- name: feature
-  color: "16cc1c"
-  description: Adding a new feature
-
-- name: documentation
-  color: "f9f14d"
-  description: Change in the documentation
-
 - name: automatic
-  color: "244296"
+  color: "FFFFFF"
   description: Automatic action
 
+- name: bugfix
+  color: "B60205"
+  description: Fix for a bug
+
 - name: dependency
-  color: "a53df4"
-  description: Dependency update
+  color: "1D76DB"
+  description: Update for a dependency
+
+- name: documentation
+  color: "006B75"
+  description: Change in the documentation
+
+- name: drift
+  color: "5319E7"
+  description: Drift detection
+
+- name: feature
+  color: "D93F0B"
+  description: Adding a new feature
 
 - name: rejected
   color: "000000"
   description: Idea rejected
+
+- name: request
+  color: "0E8A16"
+  description: External request
+
+- name: test
+  color: "FBCA04"
+  description: Temporary test only
