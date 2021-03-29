@@ -91,15 +91,13 @@ RUN curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/l
 
 # Cloud CLIs
 ARG AWS=no
-ARG GCP=no
-ARG AZURE=no
-
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
     pip3 install --no-cache-dir awscli boto3 ;\
   fi
 
+ARG GCP=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3018,SC1091
 RUN if [ "${GCP}" = "yes" ]; then \
@@ -120,6 +118,7 @@ RUN if [ "${GCP}" = "yes" ]; then \
     rm -f /tmp/install.sh ;\
   fi
 
+ARG AZURE=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013,DL3018
 RUN if [ "${AZURE}" = "yes" ]; then \
