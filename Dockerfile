@@ -102,7 +102,22 @@ RUN if [ "${AWS}" = "yes" ]; then \
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
-RUN  if [ "${GCP}" = "yes" ]; then echo GCP NOT READY; fi
+RUN if [ "${GCP}" = "yes" ]; then \
+    apk --no-cache add \
+        py3-crcmod \
+        py3-openssl \
+        libc6-compat \
+        gnupg ;\
+    curl https://sdk.cloud.google.com > install.sh ;\
+    bash install.sh --disable-prompts --install-dir=/ ;\
+    echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
+    echo ". /google-cloud-sdk/path.bash.inc" >> /root/.profile ;\
+    source /root/.profile ;\
+    gcloud config set core/disable_usage_reporting true && \
+    gcloud config set component_manager/disable_update_check true && \
+    gcloud config set metrics/environment github_docker_image && \
+    git config --system credential.'https://source.developers.google.com'.helper gcloud.sh ;\
+  fi
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013,DL3018
