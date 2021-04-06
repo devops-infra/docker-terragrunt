@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Docker Lint
-        uses: luke142367/Docker-Lint-Action@v1.0.0
+        uses: luke142367/Docker-Lint-Action@v1.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
