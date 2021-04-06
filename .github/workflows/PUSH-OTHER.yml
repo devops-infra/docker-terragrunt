@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Update labels - dry run
-        uses: crazy-max/ghaction-github-labeler@v1
+        uses: crazy-max/ghaction-github-labeler@v3.1.1
         with:
           dry_run: true
         env:
