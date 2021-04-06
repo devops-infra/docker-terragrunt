@@ -6,3 +6,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
