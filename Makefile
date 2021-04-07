@@ -245,14 +245,17 @@ push-parallel: ## Push all images in parallel
 		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION) &\
 		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)latest &\
 		wait
-	@for FL in $(FLAVOURS); do \
-  		echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION)`tput sgr0`" ;\
-  		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest ;\
-		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) ;\
-		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest ;\
-		docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) &\
-		docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest &\
-		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) &\
-		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest &\
-		wait ;\
-	done
+	@function tag_push() { \
+			echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION)`tput sgr0`" ;\
+			docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest ;\
+			docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) ;\
+			docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest ;\
+			docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) &\
+			docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest &\
+			docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) &\
+			docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest &\
+		} ;\
+		for FL in $(FLAVOURS); do \
+			tag_push & \
+			wait ;\
+		done
