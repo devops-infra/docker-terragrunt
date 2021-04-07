@@ -49,7 +49,7 @@ jobs:
       - name: Build Docker image
         env:
           TERM: xterm-256color
-        run: make build
+        run: make build-parallel
 
   pull_request:
     name: Create Pull Request

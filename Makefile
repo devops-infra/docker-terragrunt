@@ -71,6 +71,19 @@ check: ## Check TF and TG versions
 build: check build-plain build-aws build-azure build-aws-azure build-gcp build-aws-gcp build-azure-gcp build-aws-azure-gcp ## Build all Docker images
 
 
+.PHONY: build-parallel
+build-parallel: check ## Build all image in parallel
+	@make -s build-plain & \
+		make -s build-aws & \
+		make -s build-azure & \
+		make -s build-aws-azure & \
+		make -s build-gcp & \
+		make -s build-aws-gcp & \
+		make -s build-azure-gcp & \
+		make -s build-aws-azure-gcp & \
+		wait
+
+
 .PHONY: build-plain
 build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
