@@ -17,9 +17,8 @@ jobs:
       - name: Update labels - dry run
         uses: crazy-max/ghaction-github-labeler@v3.1.1
         with:
-          dry_run: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          dry-run: true
 
   lint:
     name: Run linters
@@ -39,7 +38,7 @@ jobs:
           dockerfile: Dockerfile
 
   build:
-    name: Build image
+    name: Build image and push with prefix 'test-'
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -48,8 +47,10 @@ jobs:
 
       - name: Build Docker image
         env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make build-parallel
+        run: make build-parallel push-parallel VERSION_PREFIX=test-
 
   pull_request:
     name: Create Pull Request

@@ -8,6 +8,7 @@ TG_VERSION := 0.28.18
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
 GITHUB_SHA ?= aabbccddeeff
+VERSION_PREFIX ?=
 
 # Set version tags
 TF_LATEST := $(shell curl -s 'https://api.github.com/repos/hashicorp/terraform/releases/latest' | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/^v//')
@@ -48,7 +49,7 @@ help: ## Display help prompt
 
 
 .PHONY: check
-check: ## Check TF and TG versions
+check: ## Update TF and TG versions to the newest ones
 	$(info $(NL)$(TXT_GREEN) == CURRENT VERSIONS ==$(TXT_RESET))
 	$(info $(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
 	$(info $(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
@@ -68,37 +69,37 @@ check: ## Check TF and TG versions
 
 
 .PHONY: build
-build: check build-plain build-aws build-azure build-aws-azure build-gcp build-aws-gcp build-azure-gcp build-aws-azure-gcp ## Build all Docker images
+build: build-plain build-aws build-azure build-aws-azure build-gcp build-aws-gcp build-azure-gcp build-aws-azure-gcp ## Build all Docker images
 
 
 .PHONY: build-parallel
-build-parallel: check ## Build all image in parallel
-	@make -s build-plain & \
-		make -s build-aws & \
-		make -s build-azure & \
-		make -s build-aws-azure & \
-		make -s build-gcp & \
-		make -s build-aws-gcp & \
-		make -s build-azure-gcp & \
-		make -s build-aws-azure-gcp & \
+build-parallel: ## Build all image in parallel
+	@make -s build-plain VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-aws VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-azure VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-aws-azure VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-gcp VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-aws-gcp VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-azure-gcp VERSION_PREFIX=$(VERSION_PREFIX) &\
+		make -s build-aws-azure-gcp VERSION_PREFIX=$(VERSION_PREFIX) &\
 		wait
 
 
 .PHONY: build-plain
 build-plain: ## Build image without cloud CLIs
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) .
 
 
 .PHONY: build-aws
 build-aws: ## Build image with AWS CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -106,12 +107,12 @@ build-aws: ## Build image with AWS CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):aws-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION) .
 
 
 .PHONY: build-azure
 build-azure: ## Build image with Azure CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -119,12 +120,12 @@ build-azure: ## Build image with Azure CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):azure-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION) .
 
 
 .PHONY: build-aws-azure
 build-aws-azure: ## Build image with AWS and Azure CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-azure-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
@@ -133,12 +134,12 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):aws-azure-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION) .
 
 
 .PHONY: build-gcp
 build-gcp: ## Build image with GCP CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):gcp-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -146,12 +147,12 @@ build-gcp: ## Build image with GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION) .
 
 
 .PHONY: build-aws-gcp
 build-aws-gcp: ## Build image with AWS and GCP CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-gcp-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
@@ -160,12 +161,12 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):aws-gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION) .
 
 
 .PHONY: build-azure-gcp
 build-azure-gcp: ## Build image with Azure and GCP CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):azure-gcp-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
@@ -174,12 +175,12 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):azure-gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION) .
 
 
 .PHONY: build-aws-azure-gcp
 build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
-	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):aws-azure-gcp-$(VERSION)$(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET))
 	@docker build \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
@@ -189,7 +190,7 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):aws-azure-gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION) .
 
 
 .PHONY: push-docker
@@ -197,15 +198,15 @@ push-docker: ## Push to DockerHub
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO DOCKERHUB == $(TXT_RESET))
 	$(info $(NL)$(TXT_GREEN)Logging to DockerHub$(TXT_RESET))
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
-	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION)$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) $(DOCKER_NAME):latest
-	@docker push $(DOCKER_NAME):$(VERSION)
-	@docker push $(DOCKER_NAME):latest
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION)$(TXT_RESET))
+	@docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) $(DOCKER_NAME):$(VERSION_PREFIX)latest
+	@docker push $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION)
+	@docker push $(DOCKER_NAME):$(VERSION_PREFIX)latest
 	@for FL in $(FLAVOURS); do \
-		echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`$(DOCKER_NAME):$$FL-$(VERSION)`tput sgr0`" ;\
-		docker tag $(DOCKER_NAME):$$FL-$(VERSION) $(DOCKER_NAME):$$FL-latest ;\
-		docker push $(DOCKER_NAME):$$FL-$(VERSION) ;\
-		docker push $(DOCKER_NAME):$$FL-latest ;\
+		echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`$(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION)`tput sgr0`" ;\
+		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest ;\
+		docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) ;\
+		docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest ;\
 	done
 
 
@@ -214,15 +215,44 @@ push-github: ## Push to GitHub Container Registry
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO GITHUB == $(TXT_RESET))
 	$(info $(NL)$(TXT_GREEN)Logging to GitHub$(TXT_RESET))
 	@echo $(GITHUB_TOKEN) | docker login https://docker.pkg.github.com -u $(GITHUB_USER_ID) --password-stdin
-	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION)$(TXT_RESET))
-	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION)
-	@docker tag $(DOCKER_NAME):$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):latest
-	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION)
-	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):latest
+	$(info $(NL)$(TXT_GREEN)Pushing image:$(TXT_YELLOW) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION)$(TXT_RESET))
+	@docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION)
+	@docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)latest
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION)
+	@docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)latest
 	@for FL in $(FLAVOURS); do \
-		echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$$FL-$(VERSION)`tput sgr0`" ;\
-		docker tag $(DOCKER_NAME):$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$$FL-$(VERSION) ;\
-		docker tag $(DOCKER_NAME):$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$$FL-latest ;\
-		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$$FL-$(VERSION) ;\
-		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$$FL-latest ;\
+		echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION)`tput sgr0`" ;\
+		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) ;\
+		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest ;\
+		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) ;\
+		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest ;\
+	done
+
+
+.PHONY: push-parallel
+push-parallel: ## Push all images in parallel
+	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT TO ALL REGISTRIES == $(TXT_RESET))
+	$(info $(NL)$(TXT_GREEN)Logging to DockerHub$(TXT_RESET))
+	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
+	$(info $(NL)$(TXT_GREEN)Logging to GitHub$(TXT_RESET))
+	@echo $(GITHUB_TOKEN) | docker login https://docker.pkg.github.com -u $(GITHUB_USER_ID) --password-stdin
+	@echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION)`tput sgr0`"
+	@docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) $(DOCKER_NAME):$(VERSION_PREFIX)latest
+	@docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION)
+	@docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)latest
+	@docker push $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) &\
+		docker push $(DOCKER_NAME):$(VERSION_PREFIX)latest &\
+		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION) &\
+		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)latest &\
+		wait
+	@for FL in $(FLAVOURS); do \
+  		echo -e "\n`tput setaf 2`Pushing image: `tput setaf 3`$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION)`tput sgr0`" ;\
+  		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest ;\
+		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) ;\
+		docker tag $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest ;\
+		docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-$(VERSION) &\
+		docker push $(DOCKER_NAME):$(VERSION_PREFIX)$$FL-latest &\
+		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-$(VERSION) &\
+		docker push docker.pkg.github.com/$(GITHUB_NAME)/$(DOCKER_IMAGE):$(VERSION_PREFIX)$$FL-latest &\
+		wait ;\
 	done
