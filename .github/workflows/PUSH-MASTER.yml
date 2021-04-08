@@ -39,8 +39,8 @@ jobs:
 
       - name: Build Docker image and push to registry
         env:
+          DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-          DOCKER_BUILDKIT: 1
         run: make build-parallel push-parallel
