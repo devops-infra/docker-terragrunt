@@ -1,4 +1,4 @@
-name: Push to other
+name: Push to other branches
 
 on:
   push:
@@ -17,9 +17,8 @@ jobs:
       - name: Update labels - dry run
         uses: crazy-max/ghaction-github-labeler@v3.1.1
         with:
-          dry_run: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          dry-run: true
 
   lint:
     name: Run linters
@@ -38,18 +37,20 @@ jobs:
         with:
           dockerfile: Dockerfile
 
-  build:
-    name: Build image
+  build_and_push:
+    name: Build and push images
     needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Build Docker image
+      - name: Build Docker image and push to registry
         env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make build
+        run: make build-parallel push-parallel VERSION_PREFIX=test-
 
   pull_request:
     name: Create Pull Request

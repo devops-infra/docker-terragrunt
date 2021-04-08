@@ -5,7 +5,7 @@ if command -v aws &> /dev/null; then
 fi
 
 if command -v az &> /dev/null; then
-  az version --output table
+  az version --output table ; echo
 fi
 
 if command -v gcloud &> /dev/null; then
