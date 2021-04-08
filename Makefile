@@ -232,6 +232,6 @@ push-parallel: ## Push all images in parallel
 	@make -s login
 	@make -s push-plain
 	@for FL in $(FLAVOURS); do \
-			@make -s push-target TARGET=$$FL &\
+			make -s push-target TARGET=$$FL &\
 			wait ;\
 		done
