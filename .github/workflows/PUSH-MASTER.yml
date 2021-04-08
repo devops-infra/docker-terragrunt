@@ -14,8 +14,8 @@ jobs:
 
       - name: Update labels
         uses: crazy-max/ghaction-github-labeler@v3.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
     name: Run linters
@@ -30,7 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build_and_push:
-    name: Build and push image
+    name: Build and push images
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -42,4 +42,4 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make build push-docker push-github
+        run: make build-parallel push-parallel

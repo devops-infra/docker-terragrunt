@@ -13,13 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Check for new tags
+      - name: Check for new TF and TG
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           TERM: xterm-256color
-        run: make check
+        run: make update-versions
 
-      # env.VERSION_TAG is set by 'Check for new tags' step
+      # env.VERSION_TAG is set by 'Check for new TF and TG' step
 
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
