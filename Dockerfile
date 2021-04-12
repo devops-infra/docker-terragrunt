@@ -27,6 +27,7 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN pip3 install --no-cache-dir \
     cloudflare \
+    PyGithub \
     python-hcl2 \
     requests \
     slack_sdk
