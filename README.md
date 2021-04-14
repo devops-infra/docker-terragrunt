@@ -94,14 +94,17 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 
 # Usage
 
-* Mount working directory under `/data`, e.g. `--volume $(pwd):/data`.
-* Pass cloud provider's credentials as additional file or environment variables,  
+* For working with local files - mount working directory under `/data`, e.g. `--volume $(pwd):/data`.
+* For working with cloud providers - pass their credentials as additional file or environment variables,  
   e.g. `--env AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}` or `--volume ~/.aws/credentials:/root/.aws/credentials`.
-* Run different Docker container inside this one by sharing the socket,  
+* For running other Docker images - by sharing the socket,  
   e.g. `--privileged --volume /var/run/docker.sock:/var/run/docker.sock`.
-* Access private GitHub repos with PAT saved in `~/.gitconfig` as follows, and mount it
-  with `--volume ~/.gitconfig:/root/.gitconfig`:
+* For configuring git - mount desired `.gitconfig` and/or SSH key (if needed),  
+  e.g. `--volume ~/.gitconfig:/root/.gitconfig --volume ~/.ssh/id_rsa_github:/root/.ssh/id_rsa`
 
+### Examples of `.gitconfig` to mount
+
+* Use https with Personal Access Token:
 ```
 [url "https://{GITHUB_TOKEN}@github.com/"]
 	insteadOf = https://github.com/
@@ -109,10 +112,23 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 	insteadOf = git+ssh://github.com/
 [url "https://{GITHUB_TOKEN}@github.com/"]
 	insteadOf = git@github.com:
-```  
+```
 
-By default, image will include
-following [.gitconfig](https://github.com/devops-infra/docker-terragrunt/blob/master/.gitconfig).
+* Use https instead of git/ssh:
+```
+[url "https://github.com/"]
+	insteadOf = git+ssh://github.com/
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+```
+
+* Use ssh instead of https:
+```
+[url "ssh://git@github.com/"]
+  insteadOf = https://github.com/
+[url "ssh://git@github.com/"]
+	insteadOf = git@github.com:
+```
 
 
 # Examples
