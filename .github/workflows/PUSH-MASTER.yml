@@ -29,6 +29,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Haskell Dockerfile Linter (Hadolint)
+        uses: brpaz/hadolint-action@v1.5.0
+        with:
+          dockerfile: Dockerfile
+
   build_and_push:
     name: Build and push images
     needs: lint
