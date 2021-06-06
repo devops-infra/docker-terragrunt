@@ -74,7 +74,7 @@ build-all: build-plain build-aws build-azure build-aws-azure build-gcp build-aws
 
 .PHONY: build-parallel
 build-parallel: ## Build all image in parallel
-	# build plain image first so uncoditional layers can be reused
+	# build plain image first so unconditional layers can be reused
 	@make -s build-plain VERSION_PREFIX=$(VERSION_PREFIX)
 	@for FL in $(FLAVOURS); do \
 			make -s build-$$FL VERSION_PREFIX=$(VERSION_PREFIX) &\

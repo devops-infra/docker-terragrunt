@@ -2,49 +2,55 @@ FROM alpine:3.13
 
 # Install prerequisits
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3018
 RUN apk update --no-cache ;\
   apk add --no-cache \
-    bash \
-    bc \
-    ca-certificates \
-    curl \
-    docker \
-    git \
-    jq \
-    make \
-    ncurses \
-    openssh \
-    openssl \
-    python3 \
-    py3-pip \
-    unzip \
-    zip ;\
-  apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub
+    bash=5.1.0-r0 \
+    bc=1.07.1-r1 \
+    ca-certificates=20191127-r5 \
+    curl=7.77.0-r0 \
+    docker=20.10.3-r1 \
+    git=2.30.2-r0 \
+    jq=1.6-r1 \
+    make=4.3-r0 \
+    ncurses=6.2_p20210109-r0 \
+    openssh=8.4_p1-r3 \
+    openssl=1.1.1k-r0 \
+    python3=3.8.10-r0 \
+    py3-pip=20.3.4-r0 \
+    unzip=6.0-r8 \
+    zip=3.0-r9
+
+# Install hub gh cli and build dependencies
+SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub=2.14.2-r1 ;\
+    apk add --no-cache --virtual .build-deps \
+      gcc=10.2.1_pre1-r3 \
+      python3-dev=3.8.10-r0 \
+      libffi-dev=3.3-r2 \
+      musl-dev=1.2.2-r0 \
+      openssl-dev=1.1.1k-r0
 
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013
 RUN pip3 install --no-cache-dir \
-    cloudflare \
-    PyGithub \
-    python-hcl2 \
-    requests \
-    slack_sdk
+    cloudflare==2.8.15 \
+    PyGithub==1.55 \
+    python-hcl2==2.0.3 \
+    requests==2.25.1 \
+    slack_sdk==3.5.1
 
 # Get Terraform by a specific version or search for the latest one
 ARG TF_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TF_VERSION}" = "latest" ]; then \
-    VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ \
-      | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
-      | sort -V | tail -1 )" ;\
+  VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ \
+    | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
+    | sort -V | tail -1 )" ;\
   else \
     VERSION="${TF_VERSION}" ;\
   fi ;\
   curl -LsS \
-    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
-    -o ./terraform.zip ;\
+    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip -o ./terraform.zip ;\
   unzip ./terraform.zip ;\
   rm -f ./terraform.zip ;\
   chmod +x ./terraform ;\
@@ -54,20 +60,19 @@ RUN if [ "${TF_VERSION}" = "latest" ]; then \
 ARG TG_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TG_VERSION}" = "latest" ]; then \
-    VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest \
+  VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest \
     | jq -r .name  | sed 's|v||' )" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
   curl -LsS \
-    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 \
-    -o /usr/bin/terragrunt ;\
+    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 -o /usr/bin/terragrunt ;\
   chmod +x /usr/bin/terragrunt
 
 # Get latest TFLint
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN curl -LsS "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" \
-    -o tflint.zip ;\
+RUN curl -LsS \
+    "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" -o tflint.zip ;\
   unzip tflint.zip ;\
   rm -f tflint.zip ;\
   chmod +x tflint ;\
@@ -75,38 +80,38 @@ RUN curl -LsS "$( curl -LsS https://api.github.com/repos/terraform-linters/tflin
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2046
-RUN curl -LsS "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz" )" \
-    -o hcledit.tar.gz ;\
+RUN curl -LsS \
+    "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz" )" -o hcledit.tar.gz ;\
   tar -xf hcledit.tar.gz ;\
   rm -f hcledit.tar.gz ;\
   chmod +x hcledit ;\
-  chown $(id -u):$(id -g) hcledit ;\
+  chown "$(id -u):$(id -g)" hcledit ;\
   mv hcledit /usr/bin/hcledit
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN curl -LsS "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" \
-    -o /usr/bin/sops ;\
+RUN curl -LsS \
+    "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
 
 # Cloud CLIs
 ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    pip3 install --no-cache-dir awscli boto3 ;\
+    pip3 install --no-cache-dir \
+      awscli==1.19.88 \
+      boto3==1.17.88 ;\
   fi
 
 ARG GCP=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3018,SC1091
+# hadolint ignore=SC1091
 RUN if [ "${GCP}" = "yes" ]; then \
     apk --no-cache add \
-        py3-crcmod \
-        py3-openssl \
-        libc6-compat \
-        gnupg ;\
+      py3-crcmod=1.7-r4 \
+      py3-openssl=20.0.1-r0 \
+      libc6-compat=1.2.2-r0 \
+      gnupg=2.2.27-r0 ;\
     curl https://sdk.cloud.google.com > /tmp/install.sh ;\
     bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
     echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
@@ -121,11 +126,8 @@ RUN if [ "${GCP}" = "yes" ]; then \
 
 ARG AZURE=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,DL3018
 RUN if [ "${AZURE}" = "yes" ]; then \
-    apk add --no-cache --virtual .build-deps gcc python3-dev libffi-dev musl-dev openssl-dev ;\
-    pip install --no-cache-dir azure-cli ;\
-    apk del .build-deps; \
+    pip install --no-cache-dir azure-cli==2.24.2 ;\
   fi
 
 # Scripts, configs and cleanup
@@ -137,6 +139,7 @@ RUN chmod +x \
     /usr/bin/terragrunt-fmt.sh \
     /usr/bin/show-versions.sh ;\
   # Cleanup
+  apk del .build-deps ;\
   rm -rf /var/cache/* ;\
   rm -rf /root/.cache/* ;\
   rm -rf /tmp/*
