@@ -22,12 +22,12 @@ RUN apk update --no-cache ;\
 
 # Install hub gh cli and build dependencies
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub=2.14.2-r1 ;\
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub=2.14.2-r2 ;\
     apk add --no-cache --virtual .build-deps \
       gcc=10.2.1_pre1-r3 \
       python3-dev=3.8.10-r0 \
       libffi-dev=3.3-r2 \
-      musl-dev=1.2.2-r0 \
+      musl-dev=1.2.2-r1 \
       openssl-dev=1.1.1k-r0
 
 # Python packages
