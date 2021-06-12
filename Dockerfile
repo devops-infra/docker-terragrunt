@@ -4,31 +4,35 @@ FROM alpine:3.13
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk update --no-cache ;\
   apk add --no-cache \
-    bash=5.1.0-r0 \
-    bc=1.07.1-r1 \
-    ca-certificates=20191127-r5 \
-    curl=7.77.0-r0 \
-    docker=20.10.3-r1 \
-    git=2.30.2-r0 \
-    jq=1.6-r1 \
-    make=4.3-r0 \
-    ncurses=6.2_p20210109-r0 \
-    openssh=8.4_p1-r3 \
-    openssl=1.1.1k-r0 \
-    python3=3.8.10-r0 \
-    py3-pip=20.3.4-r0 \
-    unzip=6.0-r8 \
-    zip=3.0-r9
+    bash~=5.1.0 \
+    bc~=1.07.1 \
+    ca-certificates~=20191127 \
+    curl~=7.77.0 \
+    docker~=20.10.3 \
+    git~=2.30.2 \
+    jq~=1.6 \
+    make~=4.3 \
+    ncurses~=6.2 \
+    openssh~=8.4 \
+    openssl~=1.1.1 \
+    python3~=3.8.10 \
+    py3-pip~=20.3.4 \
+    unzip~=6.0 \
+    zip~=3.0
 
-# Install hub gh cli and build dependencies
+# Install hub github cli
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub=2.14.2-r2 ;\
-    apk add --no-cache --virtual .build-deps \
-      gcc=10.2.1_pre1-r3 \
-      python3-dev=3.8.10-r0 \
-      libffi-dev=3.3-r2 \
-      musl-dev=1.2.2-r1 \
-      openssl-dev=1.1.1k-r0
+# hadolint ignore=DL3018
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub~=2.14.2
+
+# Install build dependencies
+SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
+RUN apk add --no-cache --virtual .build-deps \
+      gcc~=10.2.1 \
+      python3-dev~=3.8.10 \
+      libffi-dev~=3.3 \
+      musl-dev~=1.2.2 \
+      openssl-dev~=1.1.1
 
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -108,10 +112,10 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC1091
 RUN if [ "${GCP}" = "yes" ]; then \
     apk --no-cache add \
-      py3-crcmod=1.7-r4 \
-      py3-openssl=20.0.1-r0 \
-      libc6-compat=1.2.2-r0 \
-      gnupg=2.2.27-r0 ;\
+      py3-crcmod~=1.7 \
+      py3-openssl~=20.0.1 \
+      libc6-compat~=1.2.2 \
+      gnupg~=2.2.27 ;\
     curl https://sdk.cloud.google.com > /tmp/install.sh ;\
     bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
     echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
