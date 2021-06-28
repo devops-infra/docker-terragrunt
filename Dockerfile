@@ -1,21 +1,21 @@
-FROM alpine:3.13
+FROM alpine:3.14
 
 # Install prerequisits
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk update --no-cache ;\
   apk add --no-cache \
-    bash~=5.1.0 \
+    bash~=5.1.4 \
     bc~=1.07.1 \
     ca-certificates~=20191127 \
     curl~=7.77.0 \
-    docker~=20.10.3 \
-    git~=2.30.2 \
+    docker~=20.10.7 \
+    git~=2.32.0 \
     jq~=1.6 \
     make~=4.3 \
     ncurses~=6.2 \
-    openssh~=8.4 \
+    openssh~=8.6 \
     openssl~=1.1.1 \
-    python3~=3.8.10 \
+    python3~=3.9.5 \
     py3-pip~=20.3.4 \
     unzip~=6.0 \
     zip~=3.0
@@ -28,8 +28,8 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub~
 # Install build dependencies
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk add --no-cache --virtual .build-deps \
-      gcc~=10.2.1 \
-      python3-dev~=3.8.10 \
+      gcc~=10.3.1 \
+      python3-dev~=3.9.5 \
       libffi-dev~=3.3 \
       musl-dev~=1.2.2 \
       openssl-dev~=1.1.1
@@ -41,7 +41,7 @@ RUN pip3 install --no-cache-dir \
     PyGithub==1.55 \
     python-hcl2==2.0.3 \
     requests==2.25.1 \
-    slack_sdk==3.5.1
+    slack_sdk==3.7.0
 
 # Get Terraform by a specific version or search for the latest one
 ARG TF_VERSION=latest
@@ -103,8 +103,8 @@ ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AWS}" = "yes" ]; then \
     pip3 install --no-cache-dir \
-      awscli==1.19.88 \
-      boto3==1.17.88 ;\
+      awscli==1.19.101 \
+      boto3==1.17.101 ;\
   fi
 
 ARG GCP=no
@@ -131,7 +131,7 @@ RUN if [ "${GCP}" = "yes" ]; then \
 ARG AZURE=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AZURE}" = "yes" ]; then \
-    pip install --no-cache-dir azure-cli==2.24.2 ;\
+    pip install --no-cache-dir azure-cli==2.25.0 ;\
   fi
 
 # Scripts, configs and cleanup
