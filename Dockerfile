@@ -34,14 +34,12 @@ RUN apk add --no-cache --virtual .build-deps \
       musl-dev~=1.2.2 \
       openssl-dev~=1.1.1
 
+# List of Python packages
+COPY pip/common/requirements.txt /tmp/common_requirements.txt
+
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN pip3 install --no-cache-dir \
-    cloudflare==2.8.15 \
-    PyGithub==1.55 \
-    python-hcl2==2.0.3 \
-    requests==2.25.1 \
-    slack_sdk==3.7.0
+RUN pip3 install --no-cache-dir -r /tmp/common_requirements.txt
 
 # Get Terraform by a specific version or search for the latest one
 ARG TF_VERSION=latest
@@ -98,13 +96,14 @@ RUN curl -LsS \
     "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
 
+# List of Python packages
+COPY pip/aws/requirements.txt /tmp/aws_requirements.txt
+
 # Cloud CLIs
 ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AWS}" = "yes" ]; then \
-    pip3 install --no-cache-dir \
-      awscli==1.19.101 \
-      boto3==1.17.101 ;\
+    pip3 install --no-cache-dir -r /tmp/aws_requirements.txt ;\
   fi
 
 ARG GCP=no
