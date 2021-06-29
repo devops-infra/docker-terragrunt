@@ -8,11 +8,25 @@ updates:
       interval: "daily"
     assignees:
       - "ChristophShyper"
+    labels:
+      - automatic
 
   # Enable version updates for Docker
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     assignees:
       - "ChristophShyper"
+    labels:
+      - automatic
+
+  # Enable version updates for pip
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "ChristophShyper"
+    labels:
+      - automatic

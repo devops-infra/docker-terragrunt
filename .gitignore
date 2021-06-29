@@ -1,7 +1,9 @@
 # Intellij
 .idea/
 *.iml
+.tmp/
 
 # all-contributors-cli
 package.json
 yarn.lock
+node_modules/
