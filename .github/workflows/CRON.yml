@@ -23,19 +23,25 @@ jobs:
 
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-commit-push@master
+        uses: devops-infra/action-commit-push@0.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_TAG }}
           commit_message: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}"
 
+      - name: Download Pull Request template
+        shell: bash
+        run: |
+          mkdir -p .tmp
+          curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
+
       - name: Create pull request
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           title: Bump for ${{ env.VERSION_TAG }}
           assignee: ${{ github.actor }}
           label: automatic,dependency
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true

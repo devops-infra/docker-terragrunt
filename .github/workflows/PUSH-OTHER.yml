@@ -14,10 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2.3.4
 
+      - name: Download labels' config
+        shell: bash
+        run: |
+          mkdir -p .tmp
+          curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/.github/labels.yml -o .tmp/labels.yml
+
       - name: Update labels - dry run
         uses: crazy-max/ghaction-github-labeler@v3.1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          yaml-file: .tmp/labels.yml
           dry-run: true
 
   lint:
@@ -62,64 +69,70 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Download Pull Request template
+        shell: bash
+        run: |
+          mkdir -p .tmp
+          curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
+
       - name: Create pull request - bugfix (conditional)
         if: startsWith(github.ref, 'refs/heads/bugfix')
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           label: bugfix
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
       - name: Create pull request - dependency (conditional)
         if: startsWith(github.ref, 'refs/heads/dependency')
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           label: dependency
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
       - name: Create pull request - documentation (conditional)
         if: startsWith(github.ref, 'refs/heads/documentation')
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           label: documentation
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
       - name: Create pull request - feature (conditional)
         if: startsWith(github.ref, 'refs/heads/feature')
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           label: feature
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
       - name: Create pull request - test (conditional)
         if: startsWith(github.ref, 'refs/heads/test')
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           reviewer: ${{ github.actor }}
           label: test
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           draft: true
           get_diff: true
 
       - name: Create pull request - other (conditional)
         if: "!startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
-        uses: devops-infra/action-pull-request@master
+        uses: devops-infra/action-pull-request@0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           label: feature
-          template: .github/PULL_REQUEST_TEMPLATE.md
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
