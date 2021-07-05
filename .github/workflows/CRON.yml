@@ -30,6 +30,7 @@ jobs:
           commit_message: "[AUTOMATIC] Bump for ${{ env.VERSION_TAG }}"
 
       - name: Download Pull Request template
+        if: env.VERSION_TAG != 'null'
         shell: bash
         run: |
           mkdir -p .tmp
