@@ -38,7 +38,7 @@ jobs:
 
       - name: Create pull request
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-pull-request@0.4
+        uses: devops-infra/action-pull-request@v0.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           title: Bump for ${{ env.VERSION_TAG }}
