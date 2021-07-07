@@ -29,6 +29,7 @@ jobs:
 
   lint:
     name: Run linters
+    if: "!startsWith(github.ref, 'refs/heads/dependabot/pip')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
