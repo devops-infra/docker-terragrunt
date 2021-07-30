@@ -191,7 +191,7 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 
 
 .PHONY: login
-login: ## Log into all registires
+login: ## Log into all registries
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)Docker Hub$(TXT_RESET)"
 	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)GitHub Packages$(TXT_RESET)"

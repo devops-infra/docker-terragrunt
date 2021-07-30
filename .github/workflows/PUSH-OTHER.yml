@@ -47,18 +47,35 @@ jobs:
 
   build_and_push:
     name: Build and push images
+    if: "!startsWith(github.ref, 'refs/heads/dependabot/pip')"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.3.4
 
-      - name: Build Docker image and push to registry
+      - name: Build Docker images and push to registry
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: make build-parallel push-parallel VERSION_PREFIX=test-
+
+  build:
+    name: Build images
+    if: "startsWith(github.ref, 'refs/heads/dependabot/pip')"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Build Docker images
+        env:
+          DOCKER_BUILDKIT: 1
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERM: xterm-256color
+        run: make build-parallel VERSION_PREFIX=test-
 
   pull_request:
     name: Create Pull Request
