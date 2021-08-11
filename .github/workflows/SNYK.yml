@@ -3,7 +3,8 @@ name: Snyk Check
 on:
   schedule:
     # Run every week at 6.00 AM UTC
-    - cron: "0 6 */7 * *"
+    - cron: "0 5 * * *" # temp
+    # - cron: "0 6 */7 * *"
 
 jobs:
   snyk:
