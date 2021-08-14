@@ -91,7 +91,8 @@ build-plain: ## Build image without cloud CLIs
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)-latest .
 
 
 .PHONY: build-aws
@@ -104,7 +105,8 @@ build-aws: ## Build image with AWS CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-latest .
 
 
 .PHONY: build-azure
@@ -117,7 +119,8 @@ build-azure: ## Build image with Azure CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-latest .
 
 
 .PHONY: build-aws-azure
@@ -131,7 +134,8 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-latest .
 
 
 .PHONY: build-gcp
@@ -144,7 +148,8 @@ build-gcp: ## Build image with GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-latest .
 
 
 .PHONY: build-aws-gcp
@@ -158,7 +163,8 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-latest .
 
 
 .PHONY: build-azure-gcp
@@ -172,7 +178,8 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-latest .
 
 
 .PHONY: build-aws-azure-gcp
@@ -187,7 +194,8 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION) .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest .
 
 
 .PHONY: login
