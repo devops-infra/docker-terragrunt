@@ -92,7 +92,7 @@ build-plain: ## Build image without cloud CLIs
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)-latest .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest .
 
 
 .PHONY: build-aws
