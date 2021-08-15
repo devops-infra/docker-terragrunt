@@ -3,7 +3,7 @@ name: Snyk Check
 on:
   schedule:
     # Run every week at 6.00 AM UTC
-    - cron: "0 5 * * *" # temp
+    - cron: "0 8 * * *" # temp
     # - cron: "0 6 */7 * *"
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        image: docker-terragrunt:aws-azure-gcp-latest
+        image: devopsinfra/docker-terragrunt:aws-azure-gcp-latest
         args: --file=Dockerfile
 
     - name: Upload result to GitHub Code Scanning
