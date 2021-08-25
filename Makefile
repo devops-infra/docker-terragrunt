@@ -81,6 +81,7 @@ build-parallel: ## Build all image in parallel
 		done ;\
 		wait
 
+# just testing
 
 .PHONY: build-plain
 build-plain: ## Build image without cloud CLIs
