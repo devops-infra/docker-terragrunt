@@ -4,7 +4,7 @@ updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
     directory: "/"
-    target_branch: dependency/dependabot
+    target-branch: dependency/dependabot
     schedule:
       interval: daily
     assignees:
@@ -15,7 +15,7 @@ updates:
   # Enable version updates for Docker
   - package-ecosystem: docker
     directory: "/"
-    target_branch: dependency/dependabot
+    target-branch: dependency/dependabot
     schedule:
       interval: daily
     assignees:
@@ -26,7 +26,7 @@ updates:
   # Enable version updates for pip
   - package-ecosystem: pip
     directory: "/pip/common/"
-    target_branch: dependency/dependabot
+    target-branch: dependency/dependabot
     schedule:
       interval: daily
     assignees:
@@ -37,7 +37,7 @@ updates:
   # Enable version updates for pip
   - package-ecosystem: pip
     directory: "/pip/aws/"
-    target_branch: dependency/dependabot
+    target-branch: dependency/dependabot
     schedule:
       interval: daily
     assignees:
