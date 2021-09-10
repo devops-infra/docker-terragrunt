@@ -72,8 +72,8 @@ bundled with or not (see second table below).
 
 | Registry                                                                                                          | Example full image name                                                                       | Image name          | Image version          | Terraform version | Terragrunt version |
 | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------- | ---------------------- | ----------------- | ------------------ |
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt)                              | `devopsinfra/docker-terragrunt:tf-1.0.6-tg-0.31.8`                                          | `docker-terragrunt` | `tf-1.0.6-tg-0.31.8` | `1.0.6`          | `0.31.8`          |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)                                     | `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.0.6-tg-0.31.8` | `docker-terragrunt` | `tf-1.0.6-tg-0.31.8` | `1.0.6`          | `0.31.8`          |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt)                              | `devopsinfra/docker-terragrunt:tf-1.0.6-tg-0.31.10`                                          | `docker-terragrunt` | `tf-1.0.6-tg-0.31.10` | `1.0.6`          | `0.31.10`          |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)                                     | `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.0.6-tg-0.31.10` | `docker-terragrunt` | `tf-1.0.6-tg-0.31.10` | `1.0.6`          | `0.31.10`          |
 
 
 # Available flavours
@@ -82,14 +82,14 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 
 | Image name                                             | AWS | Azure | GCP | Size                                                                                                                                                         |
 | ------------------------------------------------------ | --- | ----- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `docker-terragrunt:tf-1.0.6-tg-0.31.8`               | ❌  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)               |
-| `docker-terragrunt:aws-tf-1.0.6-tg-0.31.8`           | ✅  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)           |
-| `docker-terragrunt:azure-tf-1.0.6-tg-0.31.8`         | ❌  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)         |
-| `docker-terragrunt:aws-azure-tf-1.0.6-tg-0.31.8`     | ✅  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-latest?label=Image%20size&style=flat-square&logo=docker)     |
-| `docker-terragrunt:gcp-tf-1.0.6-tg-0.31.8`           | ❌  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)           |
-| `docker-terragrunt:aws-gcp-tf-1.0.6-tg-0.31.8`       | ✅  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
-| `docker-terragrunt:azure-gcp-tf-1.0.6-tg-0.31.8`     | ❌  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
-| `docker-terragrunt:aws-azure-gcp-tf-1.0.6-tg-0.31.8` | ✅  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
+| `docker-terragrunt:tf-1.0.6-tg-0.31.10`               | ❌  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)               |
+| `docker-terragrunt:aws-tf-1.0.6-tg-0.31.10`           | ✅  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)           |
+| `docker-terragrunt:azure-tf-1.0.6-tg-0.31.10`         | ❌  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)         |
+| `docker-terragrunt:aws-azure-tf-1.0.6-tg-0.31.10`     | ✅  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-latest?label=Image%20size&style=flat-square&logo=docker)     |
+| `docker-terragrunt:gcp-tf-1.0.6-tg-0.31.10`           | ❌  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)           |
+| `docker-terragrunt:aws-gcp-tf-1.0.6-tg-0.31.10`       | ✅  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
+| `docker-terragrunt:azure-gcp-tf-1.0.6-tg-0.31.10`     | ❌  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
+| `docker-terragrunt:aws-azure-gcp-tf-1.0.6-tg-0.31.10` | ✅  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
 
 
 # Usage
