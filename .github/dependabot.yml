@@ -4,43 +4,47 @@ updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
     directory: "/"
-    target-branch: dependency/dependabot
+    target-branch: automatic
     schedule:
       interval: daily
     assignees:
       - ChristophShyper
     labels:
       - automatic
+      - dependency
 
   # Enable version updates for Docker
   - package-ecosystem: docker
     directory: "/"
-    target-branch: dependency/dependabot
+    target-branch: automatic
     schedule:
       interval: daily
     assignees:
       - ChristophShyper
     labels:
       - automatic
+      - dependency
 
   # Enable version updates for pip
   - package-ecosystem: pip
     directory: "/pip/common/"
-    target-branch: dependency/dependabot
+    target-branch: automatic
     schedule:
       interval: daily
     assignees:
       - ChristophShyper
     labels:
       - automatic
+      - dependency
 
   # Enable version updates for pip
   - package-ecosystem: pip
     directory: "/pip/aws/"
-    target-branch: dependency/dependabot
+    target-branch: automatic
     schedule:
       interval: daily
     assignees:
       - ChristophShyper
     labels:
       - automatic
+      - dependency
