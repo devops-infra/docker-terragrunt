@@ -114,7 +114,7 @@ RUN if [ "${GCP}" = "yes" ]; then \
       py3-crcmod~=1.7 \
       py3-openssl~=20.0.1 \
       libc6-compat~=1.2.2 \
-      gnupg~=2.2.27 ;\
+      gnupg~=2.2.31 ;\
     curl https://sdk.cloud.google.com > /tmp/install.sh ;\
     bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
     echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
