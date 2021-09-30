@@ -61,7 +61,7 @@ they always contain the latest stable version as shown below.
 | `0.12-0.21`  | latest stable `0.12.x` | latest stable `0.21.x` |
 | `0.12-0.20`  | latest stable `0.12.x` | latest stable `0.20.x` |
 | `0.12-0.19`  | latest stable `0.12.x` | latest stable `0.19.x` |
-| `0.11.0.78`  | latest stable `0.11.x` | latest stable `0.18.x` |
+| `0.11.0.88`  | latest stable `0.11.x` | latest stable `0.18.x` |
 
 
 ### Point in time releases
@@ -75,7 +75,7 @@ you will have to take care yourself and update your CI tools every time a new ta
 | `0.12-0.21-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.21.x` during tag creation |
 | `0.12-0.20-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.20.x` during tag creation |
 | `0.12-0.19-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.19.x` during tag creation |
-| `0.11.0.78-<tag>` | Tag: `<tag>`      | latest stable `0.11.x` during tag creation | latest stable `0.18.x` during tag creation |
+| `0.11.0.88-<tag>` | Tag: `<tag>`      | latest stable `0.11.x` during tag creation | latest stable `0.18.x` during tag creation |
 
 Where `<tag>` refers to the chosen git tag from this repository.
 
