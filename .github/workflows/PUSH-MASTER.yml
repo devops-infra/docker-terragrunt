@@ -57,3 +57,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: make build-parallel push-parallel
+
+  update_automatic:
+    name: Update branch - automatic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Commit and push changes
+        uses: devops-infra/action-commit-push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branch: master
+          commit_message: "[AUTOMATIC] Bump for ${{ github.event.commits[0].message }}"
+          force: true
