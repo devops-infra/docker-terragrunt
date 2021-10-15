@@ -59,13 +59,14 @@ jobs:
         run: make build-parallel push-parallel
 
   sync_develop:
+    name: Sync develop branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.3.4
 
       - name: Merge master -> develop
-        uses: devmasx/merge-branch@v1.4.0
+        uses: devmasx/merge-branch@1.4.0
         with:
           type: now
           from_branch: master
