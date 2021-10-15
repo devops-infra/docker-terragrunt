@@ -96,20 +96,20 @@ jobs:
           mkdir -p .tmp
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
 
-      - name: Create pull request - dependabot (conditional)
-        if: ${{ github.ref == 'refs/heads/automatic' }}
-        uses: devops-infra/action-pull-request@v0.4
+      - name: Create pull request - develop (conditional)
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
           label: automatic,dependency
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          title: Dependabot updates for ${{ steps.date.outputs.date }}
+          title: Updates for ${{ steps.date.outputs.date }}
 
       - name: Create pull request - bugfix (conditional)
         if: startsWith(github.ref, 'refs/heads/bugfix')
-        uses: devops-infra/action-pull-request@v0.4
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -119,7 +119,7 @@ jobs:
 
       - name: Create pull request - dependency (conditional)
         if: startsWith(github.ref, 'refs/heads/dependency')
-        uses: devops-infra/action-pull-request@v0.4
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -129,7 +129,7 @@ jobs:
 
       - name: Create pull request - documentation (conditional)
         if: startsWith(github.ref, 'refs/heads/documentation')
-        uses: devops-infra/action-pull-request@v0.4
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -139,7 +139,7 @@ jobs:
 
       - name: Create pull request - feature (conditional)
         if: startsWith(github.ref, 'refs/heads/feature')
-        uses: devops-infra/action-pull-request@v0.4
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -149,7 +149,7 @@ jobs:
 
       - name: Create pull request - test (conditional)
         if: startsWith(github.ref, 'refs/heads/test')
-        uses: devops-infra/action-pull-request@v0.4
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -160,8 +160,8 @@ jobs:
           get_diff: true
 
       - name: Create pull request - other (conditional)
-        if: "!startsWith(github.ref, 'refs/heads/automatic') && !startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
-        uses: devops-infra/action-pull-request@v0.4
+        if: "!startsWith(github.ref, 'refs/heads/develop') && !startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
