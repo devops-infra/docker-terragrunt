@@ -40,7 +40,7 @@ jobs:
 
       - name: Create pull request
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-pull-request@v0.4
+        uses: devops-infra/action-pull-request@v0.4.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           title: Bump for ${{ env.VERSION_TAG }}
@@ -48,3 +48,4 @@ jobs:
           label: automatic,dependency
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
+          target_branch: develop
