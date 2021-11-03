@@ -117,9 +117,10 @@ RUN if [ "${GCP}" = "yes" ]; then \
       gnupg~=2.2.31 ;\
     curl https://sdk.cloud.google.com > /tmp/install.sh ;\
     bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
-    echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
-    echo ". /google-cloud-sdk/path.bash.inc" >> /root/.profile ;\
-    source /root/.profile ;\
+    echo -e "\n# set gcloud binaries" >> /etc/profile ;\
+    echo "source /google-cloud-sdk/completion.bash.inc" >> /etc/profile ;\
+    echo "source /google-cloud-sdk/path.bash.inc" >> /etc/profile ;\
+    source /google-cloud-sdk/path.bash.inc ;\
     gcloud config set core/disable_usage_reporting true ;\
     gcloud config set component_manager/disable_update_check true ;\
     gcloud config set metrics/environment github_docker_image ;\
