@@ -117,8 +117,7 @@ RUN if [ "${GCP}" = "yes" ]; then \
       gnupg~=2.2.31 ;\
     curl https://sdk.cloud.google.com > /tmp/install.sh ;\
     bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
-    for f in $(find /google-cloud-sdk/bin -maxdepth 1 -executable -type f); do \
-      ln -s $f /usr/local/bin/$(basename $f); done ;\
+    find /google-cloud-sdk/bin -maxdepth 1 -executable -type f -exec sh -c 'ln -s "$1" /usr/local/bin/$(basename "$1")' sh {} \;\
     echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
     echo ". /google-cloud-sdk/path.bash.inc" >> /root/.profile ;\
     gcloud config set core/disable_usage_reporting true ;\

@@ -61,7 +61,7 @@ they always contain the latest stable version as shown below.
 | `0.12-0.21`  | latest stable `0.12.x` | latest stable `0.21.x` |
 | `0.12-0.20`  | latest stable `0.12.x` | latest stable `0.20.x` |
 | `0.12-0.19`  | latest stable `0.12.x` | latest stable `0.19.x` |
-| `0.11.0.108`  | latest stable `0.11.x` | latest stable `0.18.x` |
+| `0.11-0.18`  | latest stable `0.11.x` | latest stable `0.18.x` |
 
 
 ### Point in time releases
@@ -75,7 +75,7 @@ you will have to take care yourself and update your CI tools every time a new ta
 | `0.12-0.21-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.21.x` during tag creation |
 | `0.12-0.20-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.20.x` during tag creation |
 | `0.12-0.19-<tag>` | Tag: `<tag>`      | latest stable `0.12.x` during tag creation | latest stable `0.19.x` during tag creation |
-| `0.11.0.108-<tag>` | Tag: `<tag>`      | latest stable `0.11.x` during tag creation | latest stable `0.18.x` during tag creation |
+| `0.11-0.18-<tag>` | Tag: `<tag>`      | latest stable `0.11.x` during tag creation | latest stable `0.18.x` during tag creation |
 
 Where `<tag>` refers to the chosen git tag from this repository.
 
@@ -333,7 +333,7 @@ linter below for reproducible local or remote CI tests:
 [pylint-hub-img]: https://img.shields.io/docker/pulls/cytopia/pylint.svg
 [pylint-hub-lnk]: https://hub.docker.com/r/cytopia/pylint
 
-[tfdocs-git-lnk]: https://github.com/cytopia/docker-terragrunt-docs
+[tfdocs-git-lnk]: https://github.com/cytopia/docker-terraform-docs
 [tfdocs-hub-img]: https://img.shields.io/docker/pulls/cytopia/terraform-docs.svg
 [tfdocs-hub-lnk]: https://hub.docker.com/r/cytopia/terraform-docs
 

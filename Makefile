@@ -60,8 +60,8 @@ update-versions: ## Check TF and TG versions and update if there's new
   		echo -e "$(TXT_GREEN)Latest Terragrunt:$(TXT_YELLOW)    $(TG_LATEST)$(TXT_RESET)"; \
   		echo -e "$(TXT_GREEN)Latest tag:$(TXT_YELLOW)           $(VERSION_LATEST)$(TXT_RESET)"; \
   		echo "VERSION_TAG=$(VERSION_LATEST)" >> $(GITHUB_ENV) ; \
-		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g"; \
-		find . -type f -name "*" -print0 | xargs -0 sed -i "s/$(TF_VERSION)/$(TF_LATEST)/g"; \
+  		sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g; s/$(TF_VERSION)/$(TF_LATEST)/g" Makefile; \
+  		sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g; s/$(TF_VERSION)/$(TF_LATEST)/g" README.md; \
 	else \
 		echo "VERSION_TAG=null" >> $(GITHUB_ENV) ; \
 		echo -e "\n$(TXT_YELLOW) == NO CHANGES NEEDED ==$(TXT_RESET)"; \
