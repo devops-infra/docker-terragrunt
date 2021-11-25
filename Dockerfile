@@ -4,18 +4,18 @@ FROM alpine:3.14
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk update --no-cache ;\
   apk add --no-cache \
-    bash~=5.1.4 \
+    bash~=5.1.8 \
     bc~=1.07.1 \
     ca-certificates~=20191127 \
-    curl~=7.79.1 \
+    curl~=7.80.0 \
     docker~=20.10.11 \
-    git~=2.32.0 \
+    git~=2.34.0 \
     jq~=1.6 \
     make~=4.3 \
-    ncurses~=6.2 \
-    openssh~=8.6 \
+    ncurses~=6.3 \
+    openssh~=8.8 \
     openssl~=1.1.1 \
-    python3~=3.9.5 \
+    python3~=3.9.7 \
     py3-pip~=20.3.4 \
     unzip~=6.0 \
     zip~=3.0
