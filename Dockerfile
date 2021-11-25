@@ -29,8 +29,8 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub~
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk add --no-cache --virtual .build-deps \
       gcc~=10.3.1 \
-      python3-dev~=3.9.5 \
-      libffi-dev~=3.3 \
+      python3-dev~=3.9.7 \
+      libffi-dev~=3.4.2 \
       musl-dev~=1.2.2 \
       openssl-dev~=1.1.1
 
