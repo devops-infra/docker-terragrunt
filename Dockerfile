@@ -9,7 +9,7 @@ RUN apk update --no-cache ;\
     ca-certificates~=20191127 \
     curl~=7.80.0 \
     docker~=20.10.11 \
-    git~=2.34.0 \
+    git~=2.34.1 \
     jq~=1.6 \
     make~=4.3 \
     ncurses~=6.3 \
