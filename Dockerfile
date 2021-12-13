@@ -63,7 +63,7 @@ ARG TG_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TG_VERSION}" = "latest" ]; then \
   VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest \
-    | jq -r .name  | sed 's|v||' )" ;\
+    | jq -r .name )" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
