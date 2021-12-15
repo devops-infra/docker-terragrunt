@@ -112,7 +112,7 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${GCP}" = "yes" ]; then \
     apk --no-cache add \
       py3-crcmod~=1.7 \
-      py3-openssl~=20.0.1 \
+      py3-openssl~=21.0.0 \
       libc6-compat~=1.2.2 \
       gnupg~=2.2.31 ;\
     curl https://sdk.cloud.google.com > /tmp/install.sh ;\
