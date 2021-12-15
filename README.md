@@ -25,7 +25,7 @@ Infrastructure-as-a-Code.
 
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Push to master](https://img.shields.io/github/workflow/status/devops-infra/docker-terragrunt/Push%20to%20master?color=brightgreen&label=Master%20branch&logo=github&style=flat-square)
 ](https://github.com/devops-infra/docker-terragrunt/actions?query=workflow%3A%22Push+to+master%22)
@@ -238,6 +238,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://evaate.com/"><img src="https://avatars.githubusercontent.com/u/12538173?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Djukic</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=markodjukic" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/clushie"><img src="https://avatars.githubusercontent.com/u/47661139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phileas Lebada</b></sub></a><br /><a href="#ideas-clushie" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/SmedbergM"><img src="https://avatars.githubusercontent.com/u/3883154?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Smedberg</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=SmedbergM" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/dsoudakov"><img src="https://avatars.githubusercontent.com/u/14098629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmitri</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/issues?q=author%3Adsoudakov" title="Bug reports">🐛</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=dsoudakov" title="Code">💻</a></td>
   </tr>
 </table>
 
