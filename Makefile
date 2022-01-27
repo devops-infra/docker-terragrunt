@@ -90,9 +90,17 @@ build-plain: ## Build image without cloud CLIs
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest-arm64 .
 
 
 .PHONY: build-aws
@@ -104,9 +112,18 @@ build-aws: ## Build image with AWS CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg AWS=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-latest-arm64 .
 
 
 .PHONY: build-azure
@@ -118,9 +135,18 @@ build-azure: ## Build image with Azure CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg AZURE=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-latest-arm64 .
 
 
 .PHONY: build-aws-azure
@@ -133,9 +159,19 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg AWS=yes \
+		--build-arg AZURE=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-latest-arm64 .
 
 
 .PHONY: build-gcp
@@ -147,9 +183,18 @@ build-gcp: ## Build image with GCP CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg GCP=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-latest-arm64 .
 
 
 .PHONY: build-aws-gcp
@@ -162,9 +207,19 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg AWS=yes \
+		--build-arg GCP=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-latest-arm64 .
 
 
 .PHONY: build-azure-gcp
@@ -177,9 +232,19 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg AZURE=yes \
+		--build-arg GCP=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-latest-arm64 .
 
 
 .PHONY: build-aws-azure-gcp
@@ -193,9 +258,20 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
-		--file=Dockerfile \
+		--file=amd64/Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest .
+	@docker build --platform linux/arm64/v8 \
+		--build-arg AWS=yes \
+		--build-arg AZURE=yes \
+		--build-arg GCP=yes \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--file=aarch64/Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)-arm64 \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest-arm64 .
 
 
 .PHONY: login

@@ -32,15 +32,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2.4.0
 
-      - name: Docker Lint
+      - name: Docker Lint (amd64)
         uses: luke142367/Docker-Lint-Action@v1.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Haskell Dockerfile Linter (Hadolint)
-        uses: brpaz/hadolint-action@v1.5.0
         with:
-          dockerfile: Dockerfile
+          target: amd64/Dockerfile
+
+      - name: Docker Lint (aarch64)
+        uses: luke142367/Docker-Lint-Action@v1.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          target: aarch64/Dockerfile
+
+#      - name: Haskell Dockerfile Linter (Hadolint)
+#        uses: brpaz/hadolint-action@v1.5.0
+#        with:
+#          recursive: true
 
   build_and_push:
     name: Build and push images
@@ -49,6 +58,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.4.0
+
+      - uses: docker/setup-buildx-action@v1.6.0
+        with:
+          install: true
 
       - name: Build Docker image and push to registry
         env:

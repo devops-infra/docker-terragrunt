@@ -17,8 +17,17 @@ RUN apk update --no-cache ;\
     openssl~=1.1.1 \
     python3~=3.9.7 \
     py3-pip~=20.3.4 \
+    py3-wheel~=0.36.2 \
     unzip~=6.0 \
     zip~=3.0
+
+# Install buildx plugin for docker
+SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
+RUN LATEST=$(wget -qO- "https://api.github.com/repos/docker/buildx/releases/latest" | jq -r .name);\
+    wget https://github.com/docker/buildx/releases/download/$LATEST/buildx-$LATEST.linux-arm64 ;\
+    chmod a+x buildx-$LATEST.linux-arm64 ;\
+    mkdir -p /.docker/cli-plugins ;\
+    mv buildx-$LATEST.linux-arm64 /.docker/cli-plugins/docker-buildx
 
 # Install hub github cli
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
@@ -52,7 +61,7 @@ RUN if [ "${TF_VERSION}" = "latest" ]; then \
     VERSION="${TF_VERSION}" ;\
   fi ;\
   curl -LsS \
-    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip -o ./terraform.zip ;\
+    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_arm64.zip -o ./terraform.zip ;\
   unzip ./terraform.zip ;\
   rm -f ./terraform.zip ;\
   chmod +x ./terraform ;\
@@ -68,13 +77,13 @@ RUN if [ "${TG_VERSION}" = "latest" ]; then \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
   curl -LsS \
-    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 -o /usr/bin/terragrunt ;\
+    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_arm64 -o /usr/bin/terragrunt ;\
   chmod +x /usr/bin/terragrunt
 
 # Get latest TFLint
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" -o tflint.zip ;\
+    "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_arm64.zip" )" -o tflint.zip ;\
   unzip tflint.zip ;\
   rm -f tflint.zip ;\
   chmod +x tflint ;\
@@ -83,7 +92,7 @@ RUN curl -LsS \
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz" )" -o hcledit.tar.gz ;\
+    "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_arm64.tar.gz" )" -o hcledit.tar.gz ;\
   tar -xf hcledit.tar.gz ;\
   rm -f hcledit.tar.gz ;\
   chmod +x hcledit ;\
