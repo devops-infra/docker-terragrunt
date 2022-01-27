@@ -1,5 +1,7 @@
 # Dockerized IaC framework for Terraform and Terragrunt
 
+# Now supporting `amd64 and `aarch64/arm64` images!
+
 Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud
 infrastructure.  
 Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure and Google Cloud Platform**.
