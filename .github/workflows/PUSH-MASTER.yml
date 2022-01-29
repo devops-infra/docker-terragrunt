@@ -50,10 +50,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2.4.0
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1.6.0
+        with:
+          install: true
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: amd64,arm64
+
       - name: Build Docker image and push to registry
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make build-parallel push-parallel
+        run: make push-parallel

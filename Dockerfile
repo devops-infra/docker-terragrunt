@@ -1,5 +1,8 @@
 FROM alpine:3.15.0
 
+# Multi-architecture from buildx
+ARG TARGETPLATFORM
+
 # Install prerequisits
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 RUN apk update --no-cache ;\
@@ -17,6 +20,7 @@ RUN apk update --no-cache ;\
     openssl~=1.1.1 \
     python3~=3.9.7 \
     py3-pip~=20.3.4 \
+    py3-wheel~=0.36.2 \
     unzip~=6.0 \
     zip~=3.0
 
@@ -44,7 +48,8 @@ RUN pip3 install --no-cache-dir -r /tmp/common_requirements.txt
 # Get Terraform by a specific version or search for the latest one
 ARG TF_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN if [ "${TF_VERSION}" = "latest" ]; then \
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+  if [ "${TF_VERSION}" = "latest" ]; then \
   VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ \
     | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
     | sort -V | tail -1 )" ;\
@@ -52,7 +57,7 @@ RUN if [ "${TF_VERSION}" = "latest" ]; then \
     VERSION="${TF_VERSION}" ;\
   fi ;\
   curl -LsS \
-    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip -o ./terraform.zip ;\
+    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip ;\
   unzip ./terraform.zip ;\
   rm -f ./terraform.zip ;\
   chmod +x ./terraform ;\
@@ -61,20 +66,22 @@ RUN if [ "${TF_VERSION}" = "latest" ]; then \
 # Get Terragrunt by a specific version or search for the latest one
 ARG TG_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN if [ "${TG_VERSION}" = "latest" ]; then \
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+  if [ "${TG_VERSION}" = "latest" ]; then \
   VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest \
     | jq -r .name )" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
   curl -LsS \
-    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_amd64 -o /usr/bin/terragrunt ;\
+    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE} -o /usr/bin/terragrunt ;\
   chmod +x /usr/bin/terragrunt
 
 # Get latest TFLint
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip" )" -o tflint.zip ;\
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+  curl -LsS \
+    "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" -o tflint.zip ;\
   unzip tflint.zip ;\
   rm -f tflint.zip ;\
   chmod +x tflint ;\
@@ -82,8 +89,9 @@ RUN curl -LsS \
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_amd64.tar.gz" )" -o hcledit.tar.gz ;\
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+  curl -LsS \
+    "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" -o hcledit.tar.gz ;\
   tar -xf hcledit.tar.gz ;\
   rm -f hcledit.tar.gz ;\
   chmod +x hcledit ;\
