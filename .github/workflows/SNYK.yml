@@ -10,22 +10,37 @@ jobs:
     name: Snyk check
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2.4.0
+      - name: Checkout repository
+        uses: actions/checkout@v2.4.0
 
-    - name: Build a full image
-      run: make build-aws-azure-gcp
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1.6.0
+        with:
+          install: true
 
-    - name: Run Snyk
-      continue-on-error: true
-      uses: snyk/actions/docker@0.3.0
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        image: devopsinfra/docker-terragrunt:aws-azure-gcp-latest
-        args: --file=Dockerfile
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: amd64,arm64
 
-    - name: Upload result to GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v1
-      with:
-        sarif_file: snyk.sarif
+      - name: Build a full image
+        env:
+          DOCKER_BUILDKIT: 1
+          TERM: xterm-256color
+        run: make build-aws-azure-gcp
+
+      - name: Run Snyk
+        continue-on-error: true
+        uses: snyk/actions/docker@0.3.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: devopsinfra/docker-terragrunt:aws-azure-gcp-latest
+          args: --file=Dockerfile
+          sarif: true
+
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
