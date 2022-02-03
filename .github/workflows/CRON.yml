@@ -25,7 +25,7 @@ jobs:
 
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-commit-push@v0.4
+        uses: devops-infra/action-commit-push@v0.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_TAG }}
