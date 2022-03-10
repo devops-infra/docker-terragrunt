@@ -101,7 +101,7 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" )" -o /usr/bin/sops ;\
+    "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" | head -1 )" -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
 
 # List of Python packages
