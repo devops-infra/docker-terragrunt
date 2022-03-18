@@ -29,6 +29,14 @@ GITHUB_NAME := docker.pkg.github.com/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
 
+# Recognize whether docker buildx is installed or not
+DOCKER_CHECK := $(shell docker buildx version 1>&2 2>/dev/null; echo $$?)
+ifeq ($(DOCKER_CHECK),0)
+DOCKER_COMMAND := docker buildx build --platform linux/amd64,linux/arm64
+else
+DOCKER_COMMAND := docker build
+endif
+
 # Some cosmetics
 SHELL := bash
 TXT_RED := $(shell tput setaf 1)
@@ -85,7 +93,7 @@ build-parallel: ## Build all image in parallel
 .PHONY: build-plain
 build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
@@ -98,7 +106,7 @@ build-plain: ## Build image without cloud CLIs
 .PHONY: build-aws
 build-aws: ## Build image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -112,7 +120,7 @@ build-aws: ## Build image with AWS CLI
 .PHONY: build-azure
 build-azure: ## Build image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -126,7 +134,7 @@ build-azure: ## Build image with Azure CLI
 .PHONY: build-aws-azure
 build-aws-azure: ## Build image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -141,7 +149,7 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 .PHONY: build-gcp
 build-gcp: ## Build image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -155,7 +163,7 @@ build-gcp: ## Build image with GCP CLI
 .PHONY: build-aws-gcp
 build-aws-gcp: ## Build image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -170,7 +178,7 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 .PHONY: build-azure-gcp
 build-azure-gcp: ## Build image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -185,7 +193,7 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 .PHONY: build-aws-azure-gcp
 build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
@@ -219,7 +227,7 @@ push-parallel: login ## Push all images in parallel
 .PHONY: push-plain
 push-plain: login ## Push only plain image
 	@echo -e "\n$(TXT_GREEN)Pushing image: $(TXT_YELLOW)$(DOCKER_IMAGE):$(VERSION_PREFIX)$(VERSION)$(TXT_RESET)"
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
@@ -233,7 +241,7 @@ push-plain: login ## Push only plain image
 .PHONY: push-aws
 push-aws: ## Push image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -248,7 +256,7 @@ push-aws: ## Push image with AWS CLI
 .PHONY: push-azure
 push-azure: ## Push image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -263,7 +271,7 @@ push-azure: ## Push image with Azure CLI
 .PHONY: push-aws-azure
 push-aws-azure: ## Push image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -279,7 +287,7 @@ push-aws-azure: ## Push image with AWS and Azure CLI
 .PHONY: push-gcp
 push-gcp: ## Push image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -294,7 +302,7 @@ push-gcp: ## Push image with GCP CLI
 .PHONY: push-aws-gcp
 push-aws-gcp: ## Push image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -310,7 +318,7 @@ push-aws-gcp: ## Push image with AWS and GCP CLI
 .PHONY: push-azure-gcp
 push-azure-gcp: ## Push image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -326,7 +334,7 @@ push-azure-gcp: ## Push image with Azure and GCP CLI
 .PHONY: push-aws-azure-gcp
 push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@docker buildx build --push --platform linux/amd64,linux/arm64 \
+	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
