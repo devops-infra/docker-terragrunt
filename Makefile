@@ -250,12 +250,12 @@ push-aws: ## Push image with AWS CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET)"
 
 
 .PHONY: push-azure
 push-azure: ## Push image with Azure CLI
-	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET)$(NL))
+	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -265,12 +265,12 @@ push-azure: ## Push image with Azure CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(VERSION)$(TXT_RESET)"
 
 
 .PHONY: push-aws-azure
 push-aws-azure: ## Push image with AWS and Azure CLI
-	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)$(NL))
+	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
@@ -281,12 +281,12 @@ push-aws-azure: ## Push image with AWS and Azure CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)"
 
 
 .PHONY: push-gcp
 push-gcp: ## Push image with GCP CLI
-	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
+	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -296,12 +296,12 @@ push-gcp: ## Push image with GCP CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)"
 
 
 .PHONY: push-aws-gcp
 push-aws-gcp: ## Push image with AWS and GCP CLI
-	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
+	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
@@ -312,12 +312,12 @@ push-aws-gcp: ## Push image with AWS and GCP CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)"
 
 
 .PHONY: push-azure-gcp
 push-azure-gcp: ## Push image with Azure and GCP CLI
-	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
+	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
@@ -328,12 +328,12 @@ push-azure-gcp: ## Push image with Azure and GCP CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)"
 
 
 .PHONY: push-aws-azure-gcp
 push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
-	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
+	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
@@ -345,4 +345,4 @@ push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
 		--file=Dockerfile \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)"
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)"

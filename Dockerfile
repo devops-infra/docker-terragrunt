@@ -1,7 +1,7 @@
 FROM alpine:3.15.1
 
 # Multi-architecture from buildx
-ARG TARGETPLATFORM
+ARG TARGETPLATFORM=linux/amd64
 
 # Install prerequisits
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
