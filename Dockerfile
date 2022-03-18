@@ -14,7 +14,6 @@ RUN apk update --no-cache ;\
     docker~=20.10.11 \
     git~=2.34.1 \
     jq~=1.6 \
-    libc6-compat~=1.2.2 \
     make~=4.3 \
     ncurses~=6.3 \
     openssh~=8.8 \
