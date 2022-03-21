@@ -27,6 +27,8 @@ jobs:
       - name: Build a full image
         env:
           DOCKER_BUILDKIT: 1
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: make push-aws-azure-gcp VERSION_PREFIX=test-
 

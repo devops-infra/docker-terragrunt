@@ -7,45 +7,51 @@ ARG TARGETPLATFORM=linux/amd64
 
 # Install prerequisits
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3018
 RUN apk update --no-cache ;\
   apk add --no-cache \
-    bash~=5.1.16 \
-    bc~=1.07.1 \
-    ca-certificates~=20211220 \
-    curl~=7.80.0 \
-    docker~=20.10.11 \
-    git~=2.34.1 \
-    jq~=1.6 \
-    make~=4.3 \
-    ncurses~=6.3 \
-    openssh~=8.8 \
-    openssl~=1.1.1 \
-    python3~=3.9.7 \
-    py3-pip~=20.3.4 \
-    py3-wheel~=0.36.2 \
-    unzip~=6.0 \
-    zip~=3.0
+    bash \
+    bc \
+    ca-certificates \
+    curl \
+    docker \
+    git \
+    jq \
+    make \
+    ncurses \
+    openssh \
+    openssl \
+    python3 \
+    py3-pip \
+    py3-wheel \
+    unzip \
+    zip
 
 # Install hub github cli
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3018
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub~=2.14.2
+RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub
 
 # Install build dependencies
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3018
 RUN apk add --no-cache --virtual .build-deps \
-      gcc~=10.3.1 \
-      python3-dev~=3.9.7 \
-      libffi-dev~=3.4.2 \
-      musl-dev~=1.2.2 \
-      openssl-dev~=1.1.1
+      gcc \
+      python3-dev \
+      libffi-dev \
+      musl-dev \
+      openssl-dev
 
 # List of Python packages
 COPY pip/common/requirements.txt /tmp/common_requirements.txt
+COPY pip/aws/requirements.txt /tmp/aws_requirements.txt
+COPY pip/azure/requirements.txt /tmp/azure_requirements.txt
 
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN pip3 install --no-cache-dir -r /tmp/common_requirements.txt
+# hadolint ignore=DL3013
+RUN pip3 install --no-cache-dir --upgrade pip;\
+    pip3 install --no-cache-dir -r /tmp/common_requirements.txt
 
 # Get Terraform by a specific version or search for the latest one
 ARG TF_VERSION=latest
@@ -106,13 +112,12 @@ RUN curl -LsS \
     "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" | head -1 )" -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
 
-# List of Python packages
-COPY pip/aws/requirements.txt /tmp/aws_requirements.txt
-
 # Cloud CLIs
 ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
+    pip3 install --no-cache-dir --upgrade pip ;\
     pip3 install --no-cache-dir -r /tmp/aws_requirements.txt ;\
   fi
 
@@ -140,8 +145,10 @@ RUN if [ "${AWS}" = "yes" ]; then \
 
 ARG AZURE=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013
 RUN if [ "${AZURE}" = "yes" ]; then \
-    pip install --no-cache-dir azure-cli==2.25.0 ;\
+    pip3 install --no-cache-dir --upgrade pip ;\
+    pip3 install --no-cache-dir -r /tmp/azure_requirements.txt ;\
   fi
 
 # Scripts, configs and cleanup

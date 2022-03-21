@@ -47,6 +47,7 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         flavour: [plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
     steps:
