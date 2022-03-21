@@ -150,6 +150,8 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 build-gcp: ## Build image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -164,6 +166,8 @@ build-gcp: ## Build image with GCP CLI
 build-aws-gcp: ## Build image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -179,6 +183,8 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 build-azure-gcp: ## Build image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -194,6 +200,8 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building Docker image:$(TXT_YELLOW) $(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
@@ -288,6 +296,8 @@ push-aws-azure: ## Push image with AWS and Azure CLI
 push-gcp: ## Push image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -303,6 +313,8 @@ push-gcp: ## Push image with GCP CLI
 push-aws-gcp: ## Push image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -318,7 +330,8 @@ push-aws-gcp: ## Push image with AWS and GCP CLI
 .PHONY: push-azure-gcp
 push-azure-gcp: ## Push image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
-	@$(DOCKER_COMMAND) --push \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -335,6 +348,8 @@ push-azure-gcp: ## Push image with Azure and GCP CLI
 push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Pushing Docker image:$(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
+		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE_TAG=alpine \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \

@@ -46,9 +46,12 @@ jobs:
           dockerfile: Dockerfile
 
   build_and_push:
-    name: Build and push images
+    name: Build and push images in parallel
     if: "!startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flavour: [plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -70,10 +73,10 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make push-parallel VERSION_PREFIX=test-
+        run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
 
-  build:
-    name: Build images for Dependabot
+  build_dependabot:
+    name: Build full image for Dependabot
     if: "startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
     steps:
@@ -97,7 +100,7 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make build-parallel VERSION_PREFIX=test-
+        run: make build-aws-azure-gcp VERSION_PREFIX=test-
 
   pull_request:
     name: Create Pull Request

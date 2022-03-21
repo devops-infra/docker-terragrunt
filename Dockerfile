@@ -1,4 +1,6 @@
-FROM alpine:3.15.1
+ARG BUILD_IMAGE=alpine
+ARG BUILD_IMAGE_TAG=3.15.1
+FROM ${BUILD_IMAGE}:${BUILD_IMAGE_TAG}
 
 # Multi-architecture from buildx
 ARG TARGETPLATFORM=linux/amd64
@@ -114,26 +116,27 @@ RUN if [ "${AWS}" = "yes" ]; then \
     pip3 install --no-cache-dir -r /tmp/aws_requirements.txt ;\
   fi
 
-ARG GCP=no
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC1091
-RUN if [ "${GCP}" = "yes" ]; then \
-    apk --no-cache add \
-      py3-crcmod~=1.7 \
-      py3-openssl~=21.0.0 \
-      libc6-compat~=1.2.2 \
-      gnupg~=2.2.31 ;\
-    curl https://sdk.cloud.google.com > /tmp/install.sh ;\
-    bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
-    find /google-cloud-sdk/bin -maxdepth 1 -executable -type f -exec sh -c 'ln -s "$1" /usr/local/bin/$(basename "$1")' sh {} \; ;\
-    echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
-    echo ". /google-cloud-sdk/path.bash.inc" >> /root/.profile ;\
-    gcloud config set core/disable_usage_reporting true ;\
-    gcloud config set component_manager/disable_update_check true ;\
-    gcloud config set metrics/environment github_docker_image ;\
-    git config --system credential.'https://source.developers.google.com'.helper gcloud.sh ;\
-    rm -f /tmp/install.sh ;\
-  fi
+# Disabled due to ld-linux-x86-64.so.2 errors in Alpine
+#ARG GCP=no
+#SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+## hadolint ignore=SC1091
+#RUN if [ "${GCP}" = "yes" ]; then \
+#    apk --no-cache add \
+#      py3-crcmod~=1.7 \
+#      py3-openssl~=21.0.0 \
+#      libc6-compat~=1.2.2 \
+#      gnupg~=2.2.31 ;\
+#    curl https://sdk.cloud.google.com > /tmp/install.sh ;\
+#    bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
+#    find /google-cloud-sdk/bin -maxdepth 1 -executable -type f -exec sh -c 'ln -s "$1" /usr/local/bin/$(basename "$1")' sh {} \; ;\
+#    echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
+#    echo ". /google-cloud-sdk/path.bash.inc" >> /root/.profile ;\
+#    gcloud config set core/disable_usage_reporting true ;\
+#    gcloud config set component_manager/disable_update_check true ;\
+#    gcloud config set metrics/environment github_docker_image ;\
+#    git config --system credential.'https://source.developers.google.com'.helper gcloud.sh ;\
+#    rm -f /tmp/install.sh ;\
+#  fi
 
 ARG AZURE=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]

@@ -28,7 +28,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
           TERM: xterm-256color
-        run: make build-aws-azure-gcp
+        run: make push-aws-azure-gcp VERSION_PREFIX=test-
 
       - name: Run Snyk
         continue-on-error: true
@@ -36,7 +36,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          image: devopsinfra/docker-terragrunt:aws-azure-gcp-latest
+          image: devopsinfra/docker-terragrunt:test-aws-azure-gcp-latest
           args: --file=Dockerfile
           sarif: true
 
