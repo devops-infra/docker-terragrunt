@@ -43,9 +43,13 @@ jobs:
           dockerfile: Dockerfile
 
   build_and_push:
-    name: Build and push images
+    name: Build and push images in parallel
     needs: lint
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: [plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -67,4 +71,4 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make push-parallel
+        run: make push-${{ matrix.flavour }}
