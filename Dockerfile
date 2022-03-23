@@ -50,8 +50,7 @@ COPY pip/azure/requirements.txt /tmp/azure_requirements.txt
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
-RUN pip3 install --no-cache-dir --upgrade pip;\
-    pip3 install --no-cache-dir -r /tmp/common_requirements.txt
+RUN pip3 install --no-cache-dir -r /tmp/common_requirements.txt
 
 # Get Terraform by a specific version or search for the latest one
 ARG TF_VERSION=latest
@@ -117,7 +116,6 @@ ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    pip3 install --no-cache-dir --upgrade pip ;\
     pip3 install --no-cache-dir -r /tmp/aws_requirements.txt ;\
   fi
 
