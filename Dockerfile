@@ -36,11 +36,11 @@ RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub
 SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3018
 RUN apk add --no-cache --virtual .build-deps \
-      gcc \
-      python3-dev \
-      libffi-dev \
-      musl-dev \
-      openssl-dev
+    gcc \
+    python3-dev \
+    libffi-dev \
+    musl-dev \
+    openssl-dev
 
 # List of Python packages
 COPY pip/common/requirements.txt /tmp/common_requirements.txt
@@ -107,8 +107,9 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux" | head -1 )" -o /usr/bin/sops ;\
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+  curl -LsS \
+    "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" -o /usr/bin/sops ;\
   chmod +x /usr/bin/sops
 
 # Cloud CLIs
