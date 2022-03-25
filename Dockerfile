@@ -116,7 +116,7 @@ ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    cat /tmp/aws_requirements.txt | xargs -n 1 pip3 install --no-cache-dir ;\
+    xargs -n 1 -a /tmp/aws_requirements.txt pip3 install --no-cache-dir ;\
   fi
 
 # Disabled due to ld-linux-x86-64.so.2 errors in Alpine
