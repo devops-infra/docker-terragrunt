@@ -116,10 +116,11 @@ ARG AWS=no
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    pip3 install --no-cache-dir -r /tmp/aws_requirements.txt ;\
+    cat /tmp/aws_requirements.txt | xargs -n 1 pip3 install --no-cache-dir ;\
   fi
 
 # Disabled due to ld-linux-x86-64.so.2 errors in Alpine
+# Using google/cloud-sdk image as base as a workaround
 #ARG GCP=no
 #SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 ## hadolint ignore=SC1091
