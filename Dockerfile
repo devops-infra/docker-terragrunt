@@ -113,10 +113,25 @@ RUN curl -LsS \
 
 # Cloud CLIs
 ARG AWS=no
+ARG AWS_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013
+# hadolint ignore=DL3013,DL3018
 RUN if [ "${AWS}" = "yes" ]; then \
     xargs -n 1 -a /tmp/aws_requirements.txt pip3 install --no-cache-dir ;\
+    if [ "${AWS_VERSION}" = "latest" ]; then \
+      VERSION="" ;\
+    else \
+      VERSION="-${AWS_VERSION}" ;\
+    fi ;\
+    apk add --no-cache  \
+      gcompat \
+      groff \
+      libc6-compat ;\
+    curl -s "https://awscli.amazonaws.com/awscli-exe-linux-x86_64${VERSION}.zip" -o /tmp/awscli.zip ;\
+    mkdir -p /usr/local/aws ;\
+    unzip -q /tmp/awscli.zip -d /usr/local/aws ;\
+    rm -f /tmp/awscli.zip ;\
+    /usr/local/aws/aws/install ;\
   fi
 
 # Disabled due to ld-linux-x86-64.so.2 errors in Alpine

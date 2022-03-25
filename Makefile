@@ -5,6 +5,8 @@ phony: help
 TF_VERSION := 1.1.7
 TG_VERSION := 0.36.6
 GCLOUD_VERSION := 377.0.0
+# Minus in AWS_VERSION is needed, when arg not set latest version will be used
+AWS_VERSION := 2.4.28
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
@@ -111,6 +113,7 @@ build-aws: ## Build image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
@@ -143,6 +146,7 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -180,6 +184,7 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 		--build-arg BUILD_IMAGE=google/cloud-sdk \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -218,6 +223,7 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--build-arg BUILD_IMAGE=google/cloud-sdk \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -270,6 +276,7 @@ push-aws: login ## Push image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
 		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
@@ -304,6 +311,7 @@ push-aws-azure: login ## Push image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -343,6 +351,7 @@ push-aws-gcp: login ## Push image with AWS and GCP CLI
 		--build-arg BUILD_IMAGE=google/cloud-sdk \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg TG_VERSION=$(TG_VERSION) \
@@ -383,6 +392,7 @@ push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 		--build-arg BUILD_IMAGE=google/cloud-sdk \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
+		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
