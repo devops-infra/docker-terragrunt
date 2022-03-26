@@ -37,9 +37,21 @@ updates:
       - automatic
       - dependency
 
-  # Enable version updates for pip
+  # Enable version updates for aws
   - package-ecosystem: pip
     directory: "/pip/aws/"
+    target-branch: develop
+    schedule:
+      interval: daily
+    assignees:
+      - ChristophShyper
+    labels:
+      - automatic
+      - dependency
+
+  # Enable version updates for azure
+  - package-ecosystem: pip
+    directory: "/pip/azure/"
     target-branch: develop
     schedule:
       interval: daily

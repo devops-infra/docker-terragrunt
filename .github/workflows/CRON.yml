@@ -21,7 +21,7 @@ jobs:
           TERM: xterm-256color
         run: make update-versions
 
-      # env.VERSION_TAG is set by 'Check for new TF and TG' step
+      # env.VERSION_TAG is set by 'make update-versions'
 
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
