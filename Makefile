@@ -4,6 +4,7 @@ phony: help
 # Provide versions of Terraform and Terragrunt to use with this Docker image
 TF_VERSION := 1.1.7
 TG_VERSION := 0.36.6
+GCLOUD_IMAGE := google/cloud-sdk
 GCLOUD_VERSION := 377.0.0
 
 # GitHub Actions bogus variables
@@ -159,7 +160,7 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 build-gcp: ## Build image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -177,7 +178,7 @@ build-gcp: ## Build image with GCP CLI
 build-aws-gcp: ## Build image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
@@ -196,7 +197,7 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 build-azure-gcp: ## Build image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
@@ -215,7 +216,7 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
@@ -321,7 +322,7 @@ push-aws-azure: login ## Push image with AWS and Azure CLI
 push-gcp: login ## Push image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg GCP=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -340,7 +341,7 @@ push-gcp: login ## Push image with GCP CLI
 push-aws-gcp: login ## Push image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
 		--build-arg GCP=yes \
@@ -360,7 +361,7 @@ push-aws-gcp: login ## Push image with AWS and GCP CLI
 push-azure-gcp: login ## Push image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AZURE=yes \
 		--build-arg GCP=yes \
@@ -380,7 +381,7 @@ push-azure-gcp: login ## Push image with Azure and GCP CLI
 push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
-		--build-arg BUILD_IMAGE=google/cloud-sdk \
+		--build-arg BUILD_IMAGE=$(GCLOUD_IMAGE) \
 		--build-arg BUILD_IMAGE_TAG=$(GCLOUD_VERSION)-alpine \
 		--build-arg AWS=yes \
 		--build-arg AZURE=yes \
