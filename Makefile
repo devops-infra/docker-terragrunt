@@ -2,7 +2,7 @@
 phony: help
 
 # Provide versions of Terraform and Terragrunt to use with this Docker image
-TF_VERSION := 1.1.7
+TF_VERSION := 1.1.8
 TG_VERSION := 0.36.6
 GCLOUD_IMAGE := google/cloud-sdk
 GCLOUD_VERSION := 377.0.0
