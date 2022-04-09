@@ -1,6 +1,9 @@
 # Dockerized IaC framework for Terraform and Terragrunt
 
 # Now supporting `amd64` and `aarch64/arm64` images!
+# And supporting `slim-latest` version having only Terraform, Terragrunt and TFlint
+# Base operating system changed from Alpine to Ubuntu starting from the release `tf-1.1.8-tg-0.36.6`
+
 
 Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud
 infrastructure.  
@@ -8,7 +11,7 @@ Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure and Goo
 
 **Best used as runner image for CI/CD in automation, as well as a local environment.**
 
-Please note focus of those images is to maintain availability of cutting edge versions of **Terraform and Terragrunt**,
+Please note focus of those images is to maintain availability of current versions of **Terraform and Terragrunt**,
 not CLIs or other dependencies.  
 Hence, images are updated when new version of Terraform or Terragrunt is released. Furthermore, versioning labels of
 images contain versions of said software to emphasize it.
@@ -74,8 +77,8 @@ bundled with or not (see second table below).
 
 | Registry                                                                             | Example full image name                                                                     | Image name          | Image version        | Terraform version | Terragrunt version |
 |--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------|----------------------|-------------------|--------------------|
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.1.7-tg-0.36.6`                                          | `docker-terragrunt` | `tf-1.1.7-tg-0.36.6` | `1.1.7`           | `0.36.6`           |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `docker.pkg.github.com/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.1.7-tg-0.36.6` | `docker-terragrunt` | `tf-1.1.7-tg-0.36.6` | `1.1.7`           | `0.36.6`           |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.1.8-tg-0.36.6`                                          | `docker-terragrunt` | `tf-1.1.8-tg-0.36.6` | `1.1.8`           | `0.36.6`           |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.1.8-tg-0.36.6` | `docker-terragrunt` | `tf-1.1.8-tg-0.36.6` | `1.1.8`           | `0.36.6`           |
 
 
 # Available flavours
@@ -83,15 +86,16 @@ bundled with or not (see second table below).
 Tag of the image tells also which cloud API/SDK is included in the image.
 
 | Image name                                           | AWS | Azure | GCP | Size                                                                                                                                                         |
-|------------------------------------------------------|-----|-------|-----|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `docker-terragrunt:tf-1.1.7-tg-0.36.6`               | ❌   | ❌     | ❌   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)               |
-| `docker-terragrunt:aws-tf-1.1.7-tg-0.36.6`           | ✅   | ❌     | ❌   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)           |
-| `docker-terragrunt:azure-tf-1.1.7-tg-0.36.6`         | ❌   | ✅     | ❌   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)         |
-| `docker-terragrunt:aws-azure-tf-1.1.7-tg-0.36.6`     | ✅   | ✅     | ❌   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-latest?label=Image%20size&style=flat-square&logo=docker)     |
-| `docker-terragrunt:gcp-tf-1.1.7-tg-0.36.6`           | ❌   | ❌     | ✅   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)           |
-| `docker-terragrunt:aws-gcp-tf-1.1.7-tg-0.36.6`       | ✅   | ❌     | ✅   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
-| `docker-terragrunt:azure-gcp-tf-1.1.7-tg-0.36.6`     | ❌   | ✅     | ✅   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
-| `docker-terragrunt:aws-azure-gcp-tf-1.1.7-tg-0.36.6` | ✅   | ✅     | ✅   | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
+| ---------------------------------------------------- | --- | ----- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `docker-terragrunt:slim-tf-1.1.8-tg-0.36.6`          | ❌  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/slim-latest?label=Image%20size&style=flat-square&logo=docker)          |
+| `docker-terragrunt:tf-1.1.8-tg-0.36.6`               | ❌  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)               |
+| `docker-terragrunt:aws-tf-1.1.8-tg-0.36.6`           | ✅  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)           |
+| `docker-terragrunt:azure-tf-1.1.8-tg-0.36.6`         | ❌  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)         |
+| `docker-terragrunt:aws-azure-tf-1.1.8-tg-0.36.6`     | ✅  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-latest?label=Image%20size&style=flat-square&logo=docker)     |
+| `docker-terragrunt:gcp-tf-1.1.8-tg-0.36.6`           | ❌  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)           |
+| `docker-terragrunt:aws-gcp-tf-1.1.8-tg-0.36.6`       | ✅  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
+| `docker-terragrunt:azure-gcp-tf-1.1.8-tg-0.36.6`     | ❌  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
+| `docker-terragrunt:aws-azure-gcp-tf-1.1.8-tg-0.36.6` | ✅  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
 
 
 # Usage
@@ -103,6 +107,7 @@ Tag of the image tells also which cloud API/SDK is included in the image.
   e.g. `--privileged --volume /var/run/docker.sock:/var/run/docker.sock`.
 * For configuring git - mount desired `.gitconfig` and/or SSH key (if needed),  
   e.g. `--volume ~/.gitconfig:/root/.gitconfig --volume ~/.ssh/id_rsa_github:/root/.ssh/id_rsa`
+
 
 ### Examples of `.gitconfig` to mount
 
@@ -199,7 +204,6 @@ Some are conditional, depending on the selected flavour, marked with `*`
 |---------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
 | *awscli**           | Binary         | For interacting with AWS via terminal.                                                                                                                         | https://github.com/aws/aws-cli                     |
 | *azure-cli**        | Binary         | For interacting with Azure via terminal.                                                                                                                       | https://github.com/Azure/azure-cli                 |
-| bash                | Binary         | For color output from `terraform` and`terragrunt`. Assures also access to some builtins.                                                                       | https://www.gnu.org/software/bash/                 |
 | bc                  | Binary         | For numeric operations.                                                                                                                                        | https://www.gnu.org/software/bc/bc.html            |
 | *boto3**            | Python library | For interacting with AWS via Python.                                                                                                                           | https://github.com/boto/boto3                      |
 | cloudflare          | Python library | For Cloudflare API operations                                                                                                                                  | https://github.com/cloudflare/python-cloudflare    |
@@ -225,6 +229,7 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | tflint              | Binary         | For linting Terraform files.                                                                                                                                   | https://github.com/terraform-linters/tflint        |
 | unzip               | Binary         | For extracting packages.                                                                                                                                       | http://infozip.sourceforge.net/                    |
 | zip                 | Binary         | For creating packages for Lambdas.                                                                                                                             | http://infozip.sourceforge.net/                    |
+
 
 ## Contributors ✨
 

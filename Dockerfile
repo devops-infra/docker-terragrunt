@@ -1,65 +1,69 @@
-ARG BUILD_IMAGE=alpine
-ARG BUILD_IMAGE_TAG=3.15.1
-FROM ${BUILD_IMAGE}:${BUILD_IMAGE_TAG}
+FROM ubuntu:jammy-20220315
+
+# Which flavour of image to build
+ARG SLIM=no
+ARG AZURE=no
+ARG AWS=no
+ARG GCP=no
 
 # Multi-architecture from buildx
 ARG TARGETPLATFORM=linux/amd64
 
-# Install prerequisits
-SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3018
-RUN apk update --no-cache ;\
-  apk add --no-cache \
-    bash \
-    bc \
-    ca-certificates \
-    curl \
-    docker \
-    git \
-    jq \
-    make \
-    ncurses \
-    openssh \
-    openssl \
-    python3 \
-    py3-pip \
-    py3-wheel \
-    unzip \
-    zip
-
-# Install hub github cli
-SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3018
-RUN apk add --no-cache -X http://dl-cdn.alpinelinux.org/alpine/edge/testing hub
-
-# Install build dependencies
-SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3018
-RUN apk add --no-cache --virtual .build-deps \
-    gcc \
-    python3-dev \
-    libffi-dev \
-    musl-dev \
-    openssl-dev
+# Versions of dependecies, GCP has no default handler
+ARG AWS_VERSION=latest
+ARG GCP_VERSION
+ARG TF_VERSION=latest
+ARG TG_VERSION=latest
 
 # List of Python packages
-COPY pip/common/requirements.txt /tmp/common_requirements.txt
-COPY pip/aws/requirements.txt /tmp/aws_requirements.txt
-COPY pip/azure/requirements.txt /tmp/azure_requirements.txt
+COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
+COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
+COPY pip/azure/requirements.txt /tmp/pip_azure_requirements.txt
+
+# Install apt prerequisits
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3008
+RUN apt-get update -y ;\
+  apt-get install --no-install-recommends -y \
+    ca-certificates \
+    curl \
+    git \
+    jq \
+    unzip ;\
+  if [ "${SLIM}" = "no" ]; then \
+    apt-get install --no-install-recommends -y \
+      bc \
+      docker \
+      hub \
+      make \
+      ncurses-base \
+      openssh-client \
+      openssl \
+      python3 \
+      python3-pip \
+      zip ;\
+  fi ;\
+  if [ "${AZURE}" = "yes" ]; then \
+    apt-get install --no-install-recommends -y \
+      gcc \
+      libsodium-dev \
+      python3-dev ;\
+  fi ;\
+  apt-get clean ;\
+  rm -rf /var/lib/apt/lists/*
 
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
-RUN pip3 install --no-cache-dir -r /tmp/common_requirements.txt
+RUN if [ "${SLIM}" = "no" ]; then \
+    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
+  fi
 
 # Get Terraform by a specific version or search for the latest one
-ARG TF_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   if [ "${TF_VERSION}" = "latest" ]; then \
-  VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ \
-    | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' \
-    | sort -V | tail -1 )" ;\
+    VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
   else \
     VERSION="${TF_VERSION}" ;\
   fi ;\
@@ -71,12 +75,10 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
   mv ./terraform /usr/bin/terraform
 
 # Get Terragrunt by a specific version or search for the latest one
-ARG TG_VERSION=latest
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   if [ "${TG_VERSION}" = "latest" ]; then \
-  VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest \
-    | jq -r .name )" ;\
+    VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .name )" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
@@ -96,59 +98,63 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-  curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" -o hcledit.tar.gz ;\
-  tar -xf hcledit.tar.gz ;\
-  rm -f hcledit.tar.gz ;\
-  chmod +x hcledit ;\
-  chown "$(id -u):$(id -g)" hcledit ;\
-  mv hcledit /usr/bin/hcledit
+RUN if [ "${SLIM}" = "no" ]; then \
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+    curl -LsS \
+      "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" -o hcledit.tar.gz ;\
+    tar -xf hcledit.tar.gz ;\
+    rm -f hcledit.tar.gz ;\
+    chmod +x hcledit ;\
+    chown "$(id -u):$(id -g)" hcledit ;\
+    mv hcledit /usr/bin/hcledit ;\
+  fi
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-  curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" -o /usr/bin/sops ;\
-  chmod +x /usr/bin/sops
+RUN if [ "${SLIM}" = "no" ]; then \
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+    curl -LsS \
+      "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" -o /usr/bin/sops ;\
+    chmod +x /usr/bin/sops ;\
+  fi
 
 # Cloud CLIs
-ARG AWS=no
+# AWS
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    xargs -n 1 -a /tmp/aws_requirements.txt pip3 install --no-cache-dir ;\
+    xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir ;\
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=x86_64; fi ;\
+    if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
+    curl -LsS "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip ;\
+    mkdir -p /usr/local/awscli ;\
+    unzip -q /tmp/awscli.zip -d /usr/local/awscli ;\
+    /usr/local/awscli/aws/install ;\
   fi
 
-# Disabled due to ld-linux-x86-64.so.2 errors in Alpine
-# Using google/cloud-sdk image as base as a workaround
-#ARG GCP=no
-#SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-## hadolint ignore=SC1091
-#RUN if [ "${GCP}" = "yes" ]; then \
-#    apk --no-cache add \
-#      py3-crcmod~=1.7 \
-#      py3-openssl~=21.0.0 \
-#      libc6-compat~=1.2.2 \
-#      gnupg~=2.2.31 ;\
-#    curl https://sdk.cloud.google.com > /tmp/install.sh ;\
-#    bash /tmp/install.sh --disable-prompts --install-dir=/ ;\
-#    find /google-cloud-sdk/bin -maxdepth 1 -executable -type f -exec sh -c 'ln -s "$1" /usr/local/bin/$(basename "$1")' sh {} \; ;\
-#    echo ". /google-cloud-sdk/completion.bash.inc" >> /root/.profile ;\
-#    echo ". /google-cloud-sdk/path.bash.inc" >> /root/.profile ;\
-#    gcloud config set core/disable_usage_reporting true ;\
-#    gcloud config set component_manager/disable_update_check true ;\
-#    gcloud config set metrics/environment github_docker_image ;\
-#    git config --system credential.'https://source.developers.google.com'.helper gcloud.sh ;\
-#    rm -f /tmp/install.sh ;\
-#  fi
+# GCP
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC1091
+RUN if [ "${GCP}" = "yes" ]; then \
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm; else ARCHITECTURE=x86_64; fi ;\
+    curl -LsS "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz ;\
+    tar -xf google-cloud-sdk.tar.gz ;\
+    rm -f google-cloud-sdk.tar.gz ;\
+    ./google-cloud-sdk/install.sh \
+      --usage-reporting false \
+      --command-completion true \
+      --path-update true \
+      --quiet ;\
+    /google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check true ;\
+    /google-cloud-sdk/bin/gcloud config set metrics/environment github_docker_image ;\
+  fi
 
-ARG AZURE=no
+# Azure
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AZURE}" = "yes" ]; then \
     pip3 install --no-cache-dir --upgrade pip ;\
-    pip3 install --no-cache-dir -r /tmp/azure_requirements.txt ;\
+    SODIUM_INSTALL=system pip3 install --no-cache-dir -r /tmp/pip_azure_requirements.txt ;\
   fi
 
 # Scripts, configs and cleanup
@@ -160,7 +166,6 @@ RUN chmod +x \
     /usr/bin/terragrunt-fmt.sh \
     /usr/bin/show-versions.sh ;\
   # Cleanup
-  apk del .build-deps ;\
   rm -rf /var/cache/* ;\
   rm -rf /root/.cache/* ;\
   rm -rf /tmp/*

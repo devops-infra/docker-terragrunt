@@ -32,11 +32,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Docker Lint
-        uses: luke142367/Docker-Lint-Action@v1.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Haskell Dockerfile Linter (Hadolint)
         uses: brpaz/hadolint-action@v1.5.0
         with:
@@ -49,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavour: [plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
+        flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
