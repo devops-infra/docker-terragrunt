@@ -18,7 +18,7 @@ TG_LATEST := $(shell curl -LsS https://api.github.com/repos/gruntwork-io/terragr
 VERSION := tf-$(TF_VERSION)-tg-$(TG_VERSION)
 VERSION_LATEST := tf-$(TF_LATEST)-tg-$(TG_LATEST)
 AWS_LATEST := $(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1)
-GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/install | grep -e "curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk" | head -1 | sed 's/curl.*sdk-//; s/-linux.*//')
+GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/install | grep -e "curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli" | head -1 | sed 's/curl.*cli-//; s/-linux.*//')
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
@@ -63,33 +63,33 @@ help: ## Display help prompt
 .PHONY: update-versions
 update-versions: ## Check TF and TG versions and update if there's new
 	$(info $(NL)$(TXT_GREEN) == CURRENT VERSIONS ==$(TXT_RESET))
-	$(info $(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET))
-	$(info $(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET))
-	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] && [[ $(TG_VERSION) != $(TG_LATEST) ]] && [[ $(AWS_VERSION) != $(AWS_LATEST) ]] && [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
-  		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)"; \
-  		echo "VERSION_TAG=$(VERSION_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)" >> $(GITHUB_ENV); \
-  	else \
-  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ; \
-  	fi
+	@echo -e "$(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET)"
 	@if [[ $(TF_VERSION) != $(TF_LATEST) ]]; then \
-  		echo -e "$(TXT_GREEN)Latest Terraform:$(TXT_YELLOW)     $(TF_LATEST)$(TXT_RESET)"; \
-  		sed -i "s/$(TF_VERSION)/$(TF_LATEST)/g" Makefile; \
-		sed -i "s/$(TF_VERSION)/$(TF_LATEST)/g" README.md; \
+  		echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $(TF_LATEST)$(TXT_RESET)" ;\
+  		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' Makefile ;\
+		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' README.md ;\
   	fi
+	@echo -e "$(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET)"
 	@if [[ $(TG_VERSION) != $(TG_LATEST) ]]; then \
-  		echo -e "$(TXT_GREEN)Latest Terragrunt:$(TXT_YELLOW)    $(TG_LATEST)$(TXT_RESET)"; \
-  		sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g" Makefile; \
-		sed -i "s/$(TG_VERSION)/$(TG_LATEST)/g" README.md; \
+  		echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $(TG_LATEST)$(TXT_RESET)" ;\
+  		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' Makefile ;\
+		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' README.md ;\
   	fi
+	@echo -e "$(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET)"
 	@if [[ $(AWS_VERSION) != $(AWS_LATEST) ]]; then \
-  		echo -e "$(TXT_GREEN)Latest AWS CLI:$(TXT_YELLOW)       $(AWS_LATEST)$(TXT_RESET)"; \
-  		sed -i "s/$(AWS_VERSION)/$(AWS_LATEST)/g" Makefile; \
+  		echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $(AWS_LATEST)$(TXT_RESET)" ;\
+  		sed -i 's/$(AWS_VERSION)/$(AWS_LATEST)/g' Makefile ;\
   	fi
+	@echo -e "$(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET)"
 	@if [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
-  		echo -e "$(TXT_GREEN)Latest GCP CLI:$(TXT_YELLOW)       $(GCP_LATEST)$(TXT_RESET)"; \
-  		sed -i "s/$(GCP_VERSION)/$(GCP_LATEST)/g" Makefile; \
+  		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)" ;\
+  		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile ;\
+  	fi
+	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] && [[ $(TG_VERSION) != $(TG_LATEST) ]] && [[ $(AWS_VERSION) != $(AWS_LATEST) ]] && [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
+  		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
+  		echo "VERSION_TAG=$(VERSION_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)" >> $(GITHUB_ENV) ;\
+  	else \
+  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ;\
   	fi
 
 
