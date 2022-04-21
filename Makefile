@@ -2,10 +2,10 @@
 phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
-AWS_VERSION := 2.5.4
-GCP_VERSION := 380.0.0
-TF_VERSION := 1.1.8
-TG_VERSION := 0.36.6
+AWS_VERSION := 2.5.7
+GCP_VERSION := 382.0.0
+TF_VERSION := 1.1.9
+TG_VERSION := 0.36.7
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
@@ -85,7 +85,7 @@ update-versions: ## Check TF and TG versions and update if there's new
   		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)" ;\
   		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile ;\
   	fi
-	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] && [[ $(TG_VERSION) != $(TG_LATEST) ]] && [[ $(AWS_VERSION) != $(AWS_LATEST) ]] && [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
+	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] || [[ $(TG_VERSION) != $(TG_LATEST) ]] || [[ $(AWS_VERSION) != $(AWS_LATEST) ]] || [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
   		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
   		echo "VERSION_TAG=$(VERSION_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)" >> $(GITHUB_ENV) ;\
   	else \
