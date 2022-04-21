@@ -2,7 +2,7 @@
 
 # Now supporting `amd64` and `aarch64/arm64` images!
 # And supporting `slim-latest` version having only Terraform, Terragrunt and TFlint
-# Base operating system changed from Alpine to Ubuntu starting from the release `tf-1.1.9-tg-0.36.7`
+# Base operating system changed from Alpine to Ubuntu starting from the release `tf-1.1.8-tg-0.36.6`
 
 
 Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud
