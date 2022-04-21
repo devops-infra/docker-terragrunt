@@ -85,7 +85,7 @@ update-versions: ## Check TF and TG versions and update if there's new
   		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)" ;\
   		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile ;\
   	fi
-	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] && [[ $(TG_VERSION) != $(TG_LATEST) ]] && [[ $(AWS_VERSION) != $(AWS_LATEST) ]] && [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
+	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] || [[ $(TG_VERSION) != $(TG_LATEST) ]] || [[ $(AWS_VERSION) != $(AWS_LATEST) ]] || [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
   		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
   		echo "VERSION_TAG=$(VERSION_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)" >> $(GITHUB_ENV) ;\
   	else \
