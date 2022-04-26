@@ -89,8 +89,8 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 # Get latest TFLint
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-  curl -LsS \
-    "$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" -o tflint.zip ;\
+  DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" ;\
+  curl -LsS "${DOWNLOAD_URL}" -o tflint.zip ;\
   unzip tflint.zip ;\
   rm -f tflint.zip ;\
   chmod +x tflint ;\
@@ -100,8 +100,8 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${SLIM}" = "no" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    curl -LsS \
-      "$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" -o hcledit.tar.gz ;\
+    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
+    curl -LsS "${DOWNLOAD_URL}" -o hcledit.tar.gz ;\
     tar -xf hcledit.tar.gz ;\
     rm -f hcledit.tar.gz ;\
     chmod +x hcledit ;\
@@ -113,8 +113,8 @@ RUN if [ "${SLIM}" = "no" ]; then \
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${SLIM}" = "no" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    curl -LsS \
-      "$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" -o /usr/bin/sops ;\
+    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" ;\
+    curl -LsS "${DOWNLOAD_URL}" -o /usr/bin/sops ;\
     chmod +x /usr/bin/sops ;\
   fi
 
