@@ -1,4 +1,4 @@
-FROM ubuntu:jammy-20220428
+FROM ubuntu:jammy-20220531
 
 # Which flavour of image to build
 ARG SLIM=no
