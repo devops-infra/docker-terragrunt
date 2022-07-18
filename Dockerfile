@@ -33,7 +33,7 @@ RUN apt-get update -y ;\
   if [ "${SLIM}" = "no" ]; then \
     apt-get install --no-install-recommends -y \
       bc \
-      docker \
+      docker.io \
       graphviz \
       hub \
       make \
