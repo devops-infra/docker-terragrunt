@@ -29,6 +29,7 @@ RUN apt-get update -y ;\
     curl \
     git \
     jq \
+    vim \
     unzip ;\
   if [ "${SLIM}" = "no" ]; then \
     apt-get install --no-install-recommends -y \
