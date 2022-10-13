@@ -1,5 +1,5 @@
 cloudflare==2.10.2
-PyGithub==1.55
+PyGithub==1.56
 python-hcl2==3.0.5
 requests==2.28.1
 slack_sdk==3.19.1
