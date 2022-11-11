@@ -25,7 +25,7 @@ jobs:
 
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-commit-push@v0.9.1
+        uses: devops-infra/action-commit-push@v0.9.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_TAG }}
@@ -40,7 +40,7 @@ jobs:
 
       - name: Create pull request
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-pull-request@v0.5.2
+        uses: devops-infra/action-pull-request@v0.5.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           title: Bump for ${{ env.VERSION_TAG }}
