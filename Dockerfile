@@ -1,4 +1,4 @@
-FROM ubuntu:jammy-20221101
+FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20221101
 
 # Which flavour of image to build
 ARG SLIM=no
