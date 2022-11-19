@@ -1,4 +1,5 @@
-FROM ubuntu:jammy-20221101
+# hadolint ignore=DL3029
+FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20221101
 
 # Which flavour of image to build
 ARG SLIM=no
