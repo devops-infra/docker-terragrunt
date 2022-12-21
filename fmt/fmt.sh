@@ -42,7 +42,7 @@ fi
 ### Output and execute command
 ###
 echo "${_cmd} ${_file}"
-cp -f "${_file}" "${_temp}"
+cp -p -f "${_file}" "${_temp}"
 if ! eval "${_cmd} ${_temp}"; then
 	_ret=1
 fi
