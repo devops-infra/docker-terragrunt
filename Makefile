@@ -3,9 +3,9 @@ phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
 AWS_VERSION := 2.9.19
-GCP_VERSION := 415.0.0
+GCP_VERSION := 416.0.0
 TF_VERSION := 1.3.7
-TG_VERSION := 0.43.0
+TG_VERSION := 0.43.1
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
