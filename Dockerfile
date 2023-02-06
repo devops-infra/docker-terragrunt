@@ -35,8 +35,6 @@ RUN for i in {1..5}; do \
       vim \
       unzip && break || sleep 15; done ;\
   for i in {1..5}; do \
-    command && break || sleep 15; done ;\
-  for i in {1..5}; do \
     if [ "${SLIM}" = "no" ]; then \
       apt-get install --no-install-recommends -y \
         bc \
