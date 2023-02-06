@@ -21,38 +21,44 @@ COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
 COPY pip/azure/requirements.txt /tmp/pip_azure_requirements.txt
 
-# Install apt prerequisits
+# Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3008
-RUN apt-get update -y ;\
-  apt-get install --no-install-recommends -y \
-    ca-certificates \
-    curl \
-    git \
-    jq \
-    vim \
-    unzip ;\
-  if [ "${SLIM}" = "no" ]; then \
+RUN for i in {1..5}; do \
+    apt-get update -y && break || sleep 15; done ;\
+  for i in {1..5}; do \
     apt-get install --no-install-recommends -y \
-      bc \
-      docker.io \
-      golang-go \
-      graphviz \
-      hub \
-      make \
-      ncurses-base \
-      openssh-client \
-      openssl \
-      python3 \
-      python3-pip \
-      zip ;\
-  fi ;\
-  if [ "${AZURE}" = "yes" ]; then \
-    apt-get install --no-install-recommends -y \
-      gcc \
-      libsodium-dev \
-      python3-dev ;\
-  fi ;\
+      ca-certificates \
+      curl \
+      git \
+      jq \
+      vim \
+      unzip && break || sleep 15; done ;\
+  for i in {1..5}; do \
+    command && break || sleep 15; done ;\
+  for i in {1..5}; do \
+    if [ "${SLIM}" = "no" ]; then \
+      apt-get install --no-install-recommends -y \
+        bc \
+        docker.io \
+        golang-go \
+        graphviz \
+        hub \
+        make \
+        ncurses-base \
+        openssh-client \
+        openssl \
+        python3 \
+        python3-pip \
+        zip ;\
+    fi && break || sleep 15; done ;\
+  for i in {1..5}; do \
+    if [ "${AZURE}" = "yes" ]; then \
+      apt-get install --no-install-recommends -y \
+        gcc \
+        libsodium-dev \
+        python3-dev ;\
+    fi && break || sleep 15; done ;\
   apt-get clean ;\
   rm -rf /var/lib/apt/lists/*
 
