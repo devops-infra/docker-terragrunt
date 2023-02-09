@@ -23,7 +23,7 @@ COPY pip/azure/requirements.txt /tmp/pip_azure_requirements.txt
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3008
+# hadolint ignore=DL3008,SC2015
 RUN for i in {1..5}; do \
     apt-get update -y && break || sleep 15; done ;\
   for i in {1..5}; do \
