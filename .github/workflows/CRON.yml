@@ -48,4 +48,3 @@ jobs:
           label: automatic,dependency
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          target_branch: develop
