@@ -117,18 +117,7 @@ jobs:
           mkdir -p .tmp
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
 
-      - name: Create pull request - develop (conditional)
-        if: ${{ github.ref == 'refs/heads/develop' }}
-        uses: devops-infra/action-pull-request@v0.5.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          assignee: ${{ github.actor }}
-          label: automatic,dependency
-          template: .tmp/PULL_REQUEST_TEMPLATE.md
-          get_diff: true
-          title: Updates for ${{ steps.date.outputs.curr_date }}
-
-      - name: Create pull request - bugfix (conditional)
+      - name: Pull request - bugfix (conditional)
         if: startsWith(github.ref, 'refs/heads/bugfix')
         uses: devops-infra/action-pull-request@v0.5.3
         with:
@@ -137,9 +126,8 @@ jobs:
           label: bugfix
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          target_branch: develop
 
-      - name: Create pull request - dependency (conditional)
+      - name: Pull request - dependency (conditional)
         if: startsWith(github.ref, 'refs/heads/dependency')
         uses: devops-infra/action-pull-request@v0.5.3
         with:
@@ -148,9 +136,8 @@ jobs:
           label: dependency
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          target_branch: develop
 
-      - name: Create pull request - documentation (conditional)
+      - name: Pull request - documentation (conditional)
         if: startsWith(github.ref, 'refs/heads/documentation')
         uses: devops-infra/action-pull-request@v0.5.3
         with:
@@ -159,9 +146,8 @@ jobs:
           label: documentation
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          target_branch: develop
 
-      - name: Create pull request - feature (conditional)
+      - name: Pull request - feature (conditional)
         if: startsWith(github.ref, 'refs/heads/feature')
         uses: devops-infra/action-pull-request@v0.5.3
         with:
@@ -170,9 +156,8 @@ jobs:
           label: feature
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          target_branch: develop
 
-      - name: Create pull request - test (conditional)
+      - name: Pull request - test (conditional)
         if: startsWith(github.ref, 'refs/heads/test')
         uses: devops-infra/action-pull-request@v0.5.3
         with:
@@ -183,10 +168,9 @@ jobs:
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           draft: true
           get_diff: true
-          target_branch: develop
 
       - name: Create pull request - other (conditional)
-        if: "!startsWith(github.ref, 'refs/heads/develop') && !startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
+        if: "!startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
         uses: devops-infra/action-pull-request@v0.5.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -194,4 +178,3 @@ jobs:
           label: feature
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-          target_branch: develop
