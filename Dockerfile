@@ -69,14 +69,16 @@ RUN if [ "${SLIM}" = "no" ]; then \
 
 # Get Terraform by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   if [ "${TF_VERSION}" = "latest" ]; then \
     VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
   else \
     VERSION="${TF_VERSION}" ;\
   fi ;\
-  curl -LsS \
-    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip ;\
+  for i in {1..5}; do curl -LsS \
+    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip \
+    && break || sleep 15; done ;\
   unzip ./terraform.zip ;\
   rm -f ./terraform.zip ;\
   chmod +x ./terraform ;\
@@ -84,21 +86,24 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get Terragrunt by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   if [ "${TG_VERSION}" = "latest" ]; then \
     VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .name )" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
-  curl -LsS \
-    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE} -o /usr/bin/terragrunt ;\
+  for i in {1..5}; do curl -LsS \
+    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE} -o /usr/bin/terragrunt \
+    && break || sleep 15; done ;\
   chmod +x /usr/bin/terragrunt
 
 # Get latest TFLint
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" ;\
-  curl -LsS "${DOWNLOAD_URL}" -o tflint.zip ;\
+  for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o tflint.zip && break || sleep 15; done ;\
   unzip tflint.zip ;\
   rm -f tflint.zip ;\
   chmod +x tflint ;\
@@ -106,10 +111,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
 RUN if [ "${SLIM}" = "no" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
     DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
-    curl -LsS "${DOWNLOAD_URL}" -o hcledit.tar.gz ;\
+    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o hcledit.tar.gz && break || sleep 15; done ;\
     tar -xf hcledit.tar.gz ;\
     rm -f hcledit.tar.gz ;\
     chmod +x hcledit ;\
@@ -119,22 +125,23 @@ RUN if [ "${SLIM}" = "no" ]; then \
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
 RUN if [ "${SLIM}" = "no" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
     DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" ;\
-    curl -LsS "${DOWNLOAD_URL}" -o /usr/bin/sops ;\
+    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o /usr/bin/sops && break || sleep 15; done ;\
     chmod +x /usr/bin/sops ;\
   fi
 
 # Cloud CLIs
 # AWS
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013
+# hadolint ignore=DL3013,SC2015
 RUN if [ "${AWS}" = "yes" ]; then \
     xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir ;\
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=x86_64; fi ;\
     if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
-    curl -LsS "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip ;\
+    for i in {1..5}; do curl -LsS "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip && break || sleep 15; done ;\
     mkdir -p /usr/local/awscli ;\
     unzip -q /tmp/awscli.zip -d /usr/local/awscli ;\
     /usr/local/awscli/aws/install ;\
@@ -142,10 +149,10 @@ RUN if [ "${AWS}" = "yes" ]; then \
 
 # GCP
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC1091
+# hadolint ignore=SC1091,SC2015
 RUN if [ "${GCP}" = "yes" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm; else ARCHITECTURE=x86_64; fi ;\
-    curl -LsS "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz ;\
+    for i in {1..5}; do curl -LsS "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz && break || sleep 15; done ;\
     tar -xf google-cloud-sdk.tar.gz ;\
     rm -f google-cloud-sdk.tar.gz ;\
     ./google-cloud-sdk/install.sh \
