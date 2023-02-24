@@ -44,7 +44,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
+        flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp, yc]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3

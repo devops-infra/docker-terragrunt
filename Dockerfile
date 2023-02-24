@@ -6,6 +6,7 @@ ARG SLIM=no
 ARG AZURE=no
 ARG AWS=no
 ARG GCP=no
+ARG YC=no
 
 # Multi-architecture from buildx
 ARG TARGETPLATFORM=linux/amd64
@@ -20,6 +21,7 @@ ARG TG_VERSION=latest
 COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
 COPY pip/azure/requirements.txt /tmp/pip_azure_requirements.txt
+COPY pip/yc/requirements.txt /tmp/pip_yc_requirements.txt
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -170,6 +172,14 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AZURE}" = "yes" ]; then \
     pip3 install --no-cache-dir --upgrade pip ;\
     SODIUM_INSTALL=system pip3 install --no-cache-dir -r /tmp/pip_azure_requirements.txt ;\
+  fi
+
+# YandexCloud
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3013,SC2015
+RUN if [ "${YC}" = "yes" ]; then \
+    xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir ;\
+    for i in {1..5}; do curl -LsS "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -r /etc/bash.bashrc && break || sleep 15; done ;\
   fi
 
 # Scripts, configs and cleanup

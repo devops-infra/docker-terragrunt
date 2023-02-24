@@ -75,9 +75,9 @@ Infrastructure-as-a-Code.
 Tag of the image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's
 bundled with or not (see second table below).
 
-| Registry                                                                             | Example full image name                                                                     | Image name          | Image version        | Terraform version | Terragrunt version |
-|--------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|---------------------|----------------------|-------------------|--------------------|
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.3.9-tg-0.44.0`                                          | `docker-terragrunt` | `tf-1.3.9-tg-0.44.0` | `1.3.9`           | `0.44.0`           |
+| Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | Terragrunt version |
+|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|--------------------|
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.3.9-tg-0.44.0`                            | `docker-terragrunt` | `tf-1.3.9-tg-0.44.0` | `1.3.9`           | `0.44.0`           |
 | [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.3.9-tg-0.44.0` | `docker-terragrunt` | `tf-1.3.9-tg-0.44.0` | `1.3.9`           | `0.44.0`           |
 
 
@@ -85,17 +85,18 @@ bundled with or not (see second table below).
 
 Tag of the image tells also which cloud API/SDK is included in the image.
 
-| Image name                                           | AWS | Azure | GCP | Size                                                                                                                                                         |
-| ---------------------------------------------------- | --- | ----- | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `docker-terragrunt:slim-tf-1.3.9-tg-0.44.0`          | ❌  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/slim-latest?label=Image%20size&style=flat-square&logo=docker)          |
-| `docker-terragrunt:tf-1.3.9-tg-0.44.0`               | ❌  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)               |
-| `docker-terragrunt:aws-tf-1.3.9-tg-0.44.0`           | ✅  | ❌    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)           |
-| `docker-terragrunt:azure-tf-1.3.9-tg-0.44.0`         | ❌  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)         |
-| `docker-terragrunt:aws-azure-tf-1.3.9-tg-0.44.0`     | ✅  | ✅    | ❌  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-latest?label=Image%20size&style=flat-square&logo=docker)     |
-| `docker-terragrunt:gcp-tf-1.3.9-tg-0.44.0`           | ❌  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)           |
-| `docker-terragrunt:aws-gcp-tf-1.3.9-tg-0.44.0`       | ✅  | ❌    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
-| `docker-terragrunt:azure-gcp-tf-1.3.9-tg-0.44.0`     | ❌  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
-| `docker-terragrunt:aws-azure-gcp-tf-1.3.9-tg-0.44.0` | ✅  | ✅    | ✅  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
+| Image name                                           | AWS | Azure | GCP | Description                                         | Size                                                                                                                                                         |
+|------------------------------------------------------|-----|-------|-----|-----------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `docker-terragrunt:slim-tf-1.3.9-tg-0.44.0`          | ❌   | ❌     | ❌   | Lightweight version in TF, TG and bare dependencies | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/slim-latest?label=Image%20size&style=flat-square&logo=docker)          |
+| `docker-terragrunt:tf-1.3.9-tg-0.44.0`               | ❌   | ❌     | ❌   | Normal version. Having Go, Python, Make, etc.       | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/latest?label=Image%20size&style=flat-square&logo=docker)               |
+| `docker-terragrunt:aws-tf-1.3.9-tg-0.44.0`           | ✅   | ❌     | ❌   | Normal version with AWS CLI.                        | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)           |
+| `docker-terragrunt:azure-tf-1.3.9-tg-0.44.0`         | ❌   | ✅     | ❌   | Normal version with Azure CLI.                      | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)         |
+| `docker-terragrunt:aws-azure-tf-1.3.9-tg-0.44.0`     | ✅   | ✅     | ❌   | Normal version with AWS and Azure CLIs.             | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-latest?label=Image%20size&style=flat-square&logo=docker)     |
+| `docker-terragrunt:gcp-tf-1.3.9-tg-0.44.0`           | ❌   | ❌     | ✅   | Normal version with GCP CLI.                        | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)           |
+| `docker-terragrunt:aws-gcp-tf-1.3.9-tg-0.44.0`       | ✅   | ❌     | ✅   | Normal version with AWS and GCP CLIs.               | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
+| `docker-terragrunt:azure-gcp-tf-1.3.9-tg-0.44.0`     | ❌   | ✅     | ✅   | Normal version with Azure and GCP CLIs.             | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
+| `docker-terragrunt:aws-azure-gcp-tf-1.3.9-tg-0.44.0` | ✅   | ✅     | ✅   | Normal version with AWS, Azure and GCP CLIs.        | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
+| `docker-terragrunt:yc-tf-1.3.9-tg-0.44.0`            | ❌   | ❌     | ❌   | Normal version with YandexCloud CLI.                | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/yc?label=Image%20size&style=flat-square&logo=docker)                   |
 
 
 # Usage
@@ -201,7 +202,7 @@ docker run --rm \
 Some are conditional, depending on the selected flavour, marked with `*`
 
 | Name                | Type           | Description                                                                                                                                                    | Source/Documentation                               |
-| ------------------- | -------------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------| -------------------------------------------------- |
+|---------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
 | *awscli**           | Binary         | For interacting with AWS via terminal.                                                                                                                         | https://github.com/aws/aws-cli                     |
 | *azure-cli**        | Binary         | For interacting with Azure via terminal.                                                                                                                       | https://github.com/Azure/azure-cli                 |
 | bc                  | Binary         | For numeric operations.                                                                                                                                        | https://www.gnu.org/software/bc/bc.html            |

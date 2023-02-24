@@ -31,7 +31,7 @@ GITHUB_USER_ID := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
+FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp yc
 
 # Recognize whether docker buildx is installed or not
 DOCKER_CHECK := $(shell docker buildx version 1>&2 2>/dev/null; echo $$?)
@@ -264,6 +264,22 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest .
 
 
+.PHONY: build-yc
+build-yc: ## Build image with YandexCloud CLI
+	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(VERSION)$(TXT_RESET)$(NL))
+	@$(DOCKER_COMMAND) \
+		--build-arg YC=yes \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--file=Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(VERSION) \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
+
+
 .PHONY: login
 login: ## Log into all registries
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)Docker Hub$(TXT_RESET)"
@@ -446,3 +462,20 @@ push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest .
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(VERSION)$(TXT_RESET)"
+
+
+.PHONY: push-yc
+push-yc: login ## Push image with YandexCloud CLI
+	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(VERSION)$(TXT_RESET)$(NL))
+	@$(DOCKER_COMMAND) --push \
+		--build-arg YC=yes \
+		--build-arg BUILD_DATE=$(BUILD_DATE) \
+		--build-arg TF_VERSION=$(TF_VERSION) \
+		--build-arg TG_VERSION=$(TG_VERSION) \
+		--build-arg VCS_REF=$(GITHUB_SHORT_SHA) \
+		--file=Dockerfile \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(VERSION) \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
+	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(VERSION)$(TXT_RESET)"
