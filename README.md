@@ -1,15 +1,15 @@
 # Dockerized IaC framework for Terraform and Terragrunt
 
-# Now supporting `amd64` and `aarch64/arm64` images!
-# And supporting `slim-latest` version having only Terraform, Terragrunt and TFlint
-# Base operating system changed from Alpine to Ubuntu starting from the release `tf-1.1.8-tg-0.36.6`
+### Supporting `amd64` and `aarch64/arm64` images!
 
+### Supporting `slim-latest` version having only Terraform, Terragrunt and TFlint
 
-Docker image with Terraform, Terragrunt, Python, Make, Docker, Git, and all needed components to easily manage cloud
-infrastructure.  
-Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure and Google Cloud Platform**.
+Docker image with Terraform, Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud
+infrastructure for CI/CD environments as a runner image.
 
-**Best used as runner image for CI/CD in automation, as well as a local environment.**
+Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google Cloud Platform and YandexCloud**.
+
+**Best used as runner image for CI/CD in automation, as well as a local run environment.**
 
 Please note focus of those images is to maintain availability of current versions of **Terraform and Terragrunt**,
 not CLIs or other dependencies.  
@@ -231,6 +231,7 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | terragrunt          | Binary         | For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform).                                                                            | https://github.com/gruntwork-io/terragrunt         |
 | tflint              | Binary         | For linting Terraform files.                                                                                                                                   | https://github.com/terraform-linters/tflint        |
 | unzip               | Binary         | For extracting packages.                                                                                                                                       | http://infozip.sourceforge.net/                    |
+| yc                  | Binary         | For interaction with Yandex Cloud via terminal.                                                                                                                | https://cloud.yandex.com/en/docs/cli               |
 | zip                 | Binary         | For creating packages for Lambdas.                                                                                                                             | http://infozip.sourceforge.net/                    |
 
 
