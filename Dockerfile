@@ -1,4 +1,7 @@
-# hadolint ignore=DL3029
+# Multi-architecture from buildx, and defaults if buildx not available
+ARG TARGETPLATFORM=linux/amd64
+ARG BUILDPLATFORM=linux/amd64
+
 FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20230308
 
 # Which flavour of image to build
@@ -7,9 +10,6 @@ ARG AZURE=no
 ARG AWS=no
 ARG GCP=no
 ARG YC=no
-
-# Multi-architecture from buildx
-ARG TARGETPLATFORM=linux/amd64
 
 # Versions of dependecies, GCP has no default handler
 ARG AWS_VERSION=latest
