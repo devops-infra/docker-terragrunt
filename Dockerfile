@@ -1,5 +1,7 @@
-# hadolint ignore=DL3029
 FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20230308
+
+# Multi-architecture from buildx, and defaults if buildx not available
+ARG TARGETPLATFORM=linux/amd64
 
 # Which flavour of image to build
 ARG SLIM=no
@@ -7,9 +9,6 @@ ARG AZURE=no
 ARG AWS=no
 ARG GCP=no
 ARG YC=no
-
-# Multi-architecture from buildx
-ARG TARGETPLATFORM=linux/amd64
 
 # Versions of dependecies, GCP has no default handler
 ARG AWS_VERSION=latest
@@ -22,6 +21,17 @@ COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
 COPY pip/azure/requirements.txt /tmp/pip_azure_requirements.txt
 COPY pip/yc/requirements.txt /tmp/pip_yc_requirements.txt
+
+# Debug information
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=DL3008,SC2015
+RUN echo Debug information: ;\
+  echo TARGETPLATFORM="${TARGETPLATFORM}" ;\
+  if [ "${AWS}" == "yes" ]; then echo AWS_VERSION="${AWS_VERSION}"; fi ;\
+  if [ "${GCP}" == "yes" ]; then echo GCP_VERSION="${GCP_VERSION}"; fi ;\
+  echo TF_VERSION="${TF_VERSION}" ;\
+  echo TG_VERSION="${TG_VERSION}" ;\
+  echo
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
