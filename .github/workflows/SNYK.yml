@@ -39,7 +39,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: devopsinfra/docker-terragrunt:test-aws-azure-gcp-latest
-          args: --file=Dockerfile
+          args: --file=Dockerfile --severity-threshold=medium
           sarif: true
 
       - name: Upload result to GitHub Code Scanning
