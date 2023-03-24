@@ -99,7 +99,7 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 | `docker-terragrunt:aws-gcp-tf-1.4.2-tg-0.45.0`       | ✅   | ❌     | ✅   | Normal version with AWS and GCP CLIs.                 | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-gcp-latest?label=Image%20size&style=flat-square&logo=docker)       |
 | `docker-terragrunt:azure-gcp-tf-1.4.2-tg-0.45.0`     | ❌   | ✅     | ✅   | Normal version with Azure and GCP CLIs.               | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker)     |
 | `docker-terragrunt:aws-azure-gcp-tf-1.4.2-tg-0.45.0` | ✅   | ✅     | ✅   | Normal version with AWS, Azure and GCP CLIs.          | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-latest?label=Image%20size&style=flat-square&logo=docker) |
-| `docker-terragrunt:yc-tf-1.4.2-tg-0.45.0`            | ❌   | ❌     | ❌   | Normal version with YandexCloud CLI.                  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/yc?label=Image%20size&style=flat-square&logo=docker)                   |
+| `docker-terragrunt:yc-tf-1.4.2-tg-0.45.0`            | ❌   | ❌     | ❌   | Normal version with YandexCloud CLI.                  | ![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/yc-latest?label=Image%20size&style=flat-square&logo=docker)            |
 
 
 # Usage

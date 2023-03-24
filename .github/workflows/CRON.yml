@@ -47,7 +47,7 @@ jobs:
             --field branch="$TARGET_BRANCH" \
             --field sha="$SHA_MAKEFILE"
           export SHA_README=$( git rev-parse $TARGET_BRANCH:README.md )
-          export CONTENT_README=$( base64 -i Makefile )
+          export CONTENT_README=$( base64 -i README.md )
           gh api --method PUT /repos/devops-infra/docker-terragrunt/contents/README.md \
             --field message="$COMMIT_MESSAGE - README.md" \
             --field content="$CONTENT_README" \
