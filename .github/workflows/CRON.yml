@@ -23,13 +23,37 @@ jobs:
 
       # env.VERSION_TAG is set by 'make update-versions'
 
+#      - name: Commit and push changes (conditional)
+#        if: env.VERSION_TAG != 'null'
+#        uses: devops-infra/action-commit-push@v0.9.2
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          target_branch: dependency/${{ env.VERSION_TAG }}
+#          commit_message: Bump for ${{ env.VERSION_TAG }}
+
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != 'null'
-        uses: devops-infra/action-commit-push@v0.9.2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: dependency/${{ env.VERSION_TAG }}
-          commit_message: "Bump for ${{ env.VERSION_TAG }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_BRANCH: dependency/${{ env.VERSION_TAG }}
+          COMMIT_MESSAGE: Bump for ${{ env.VERSION_TAG }}
+        run: |
+          export SHA_MAKEFILE=$( git rev-parse $TARGET_BRANCH:Makefile )
+          export CONTENT_MAKEFILE=$( base64 -i Makefile )
+          gh api --method PUT /repos/devops-infra/docker-terragrunt/contents/Makefile \
+            --field message="$COMMIT_MESSAGE - Makefile" \
+            --field content="$CONTENT_MAKEFILE" \
+            --field encoding="base64" \
+            --field branch="$TARGET_BRANCH" \
+            --field sha="$SHA_MAKEFILE"
+          export SHA_README=$( git rev-parse $TARGET_BRANCH:README.md )
+          export CONTENT_README=$( base64 -i Makefile )
+          gh api --method PUT /repos/devops-infra/docker-terragrunt/contents/README.md \
+            --field message="$COMMIT_MESSAGE - README.md" \
+            --field content="$CONTENT_README" \
+            --field encoding="base64" \
+            --field branch="$TARGET_BRANCH" \
+            --field sha="$SHA_README"
 
       - name: Download Pull Request template
         if: env.VERSION_TAG != 'null'
