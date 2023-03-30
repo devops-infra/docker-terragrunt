@@ -115,11 +115,11 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" ;\
-  for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o tflint.zip && break || sleep 15; done ;\
-  unzip tflint.zip ;\
-  rm -f tflint.zip ;\
-  chmod +x tflint ;\
-  mv tflint /usr/bin/tflint
+  for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o ./tflint.zip && break || sleep 15; done ;\
+  unzip ./tflint.zip ;\
+  rm -f ./tflint.zip ;\
+  chmod +x ./tflint ;\
+  mv ./tflint /usr/bin/tflint
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -127,12 +127,12 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${SLIM}" = "no" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
     DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
-    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o hcledit.tar.gz && break || sleep 15; done ;\
-    tar -xf hcledit.tar.gz ;\
-    rm -f hcledit.tar.gz ;\
-    chmod +x hcledit ;\
-    chown "$(id -u):$(id -g)" hcledit ;\
-    mv hcledit /usr/bin/hcledit ;\
+    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break || sleep 15; done ;\
+    tar -xf ./hcledit.tar.gz ;\
+    rm -f ./hcledit.tar.gz ;\
+    chmod +x ./hcledit ;\
+    chown "$(id -u):$(id -g)" ./hcledit ;\
+    mv ./hcledit /usr/bin/hcledit ;\
   fi
 
 # Get latest sops
