@@ -4,8 +4,6 @@
 
 ### Supporting `slim-latest` version having only Terraform, Terragrunt and TFlint
 
-## Due to the recent announcement from Docker my [devopsinfra](https://hub.docker.com/u/devopsinfra) organization may be terminated on April 14th 2023. Please use [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/pkgs/container/docker-terragrunt) instead. 
-
 
 Docker image with Terraform, Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud
 infrastructure for CI/CD environments as a runner image.
