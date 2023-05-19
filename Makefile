@@ -5,7 +5,7 @@ phony: help
 AWS_VERSION := 2.11.20
 GCP_VERSION := 431.0.0
 TF_VERSION := 1.4.6
-TG_VERSION := 0.45.13
+TG_VERSION := 0.45.14
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
