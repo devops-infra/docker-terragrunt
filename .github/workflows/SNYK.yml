@@ -39,7 +39,7 @@ jobs:
 
       - name: Run Snyk
         continue-on-error: true
-        uses: snyk/actions/docker@0.3.0
+        uses: snyk/actions/docker@0.4.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
