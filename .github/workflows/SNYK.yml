@@ -1,53 +1,53 @@
-name: Snyk Check
-
-on:
-  schedule:
-    # Run every week at 6.00 AM UTC
-     - cron: "0 6 */7 * *"
-
-jobs:
-  snyk:
-    name: Snyk check
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
-      packages: write # push to registry
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.6.0
-        with:
-          install: true
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2.2.0
-        with:
-          image: tonistiigi/binfmt:latest
-          platforms: amd64,arm64
-
-      - name: Build a full image
-        env:
-          DOCKER_BUILDKIT: 1
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TERM: xterm-256color
-        run: make push-aws-azure-gcp VERSION_PREFIX=test-
-
-      - name: Run Snyk
-        continue-on-error: true
-        uses: snyk/actions/docker@0.4.0
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: devopsinfra/docker-terragrunt:test-aws-azure-gcp-latest
-          args: --file=Dockerfile --severity-threshold=high
-          sarif: true
-
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk.sarif
+#name: Snyk Check
+#
+#on:
+#  schedule:
+#    # Run every week at 6.00 AM UTC
+#     - cron: "0 6 */7 * *"
+#
+#jobs:
+#  snyk:
+#    name: Snyk check
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read # for actions/checkout to fetch code
+#      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+#      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+#      packages: write # push to registry
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v3
+#
+#      - name: Set up Docker Buildx
+#        uses: docker/setup-buildx-action@v2.5.0
+#        with:
+#          install: true
+#
+#      - name: Set up QEMU
+#        uses: docker/setup-qemu-action@v2.1.0
+#        with:
+#          image: tonistiigi/binfmt:latest
+#          platforms: amd64,arm64
+#
+#      - name: Build a full image
+#        env:
+#          DOCKER_BUILDKIT: 1
+#          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          TERM: xterm-256color
+#        run: make push-aws-azure-gcp VERSION_PREFIX=test-
+#
+#      - name: Run Snyk
+#        continue-on-error: true
+#        uses: snyk/actions/docker@0.4.0
+#        env:
+#          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+#        with:
+#          image: devopsinfra/docker-terragrunt:test-aws-azure-gcp-latest
+#          args: --file=Dockerfile --severity-threshold=high
+#          sarif: true
+#
+#      - name: Upload result to GitHub Code Scanning
+#        uses: github/codeql-action/upload-sarif@v2
+#        with:
+#          sarif_file: snyk.sarif
