@@ -3,7 +3,7 @@ phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
 AWS_VERSION := 2.12.3
-GCP_VERSION := 436.0.0
+GCP_VERSION := 437.0.0
 TF_VERSION := 1.5.1
 TG_VERSION := 0.48.0
 
