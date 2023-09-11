@@ -20,7 +20,7 @@ jobs:
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/.github/labels.yml -o .tmp/labels.yml
 
       - name: Update labels
-        uses: crazy-max/ghaction-github-labeler@v4.2.0
+        uses: crazy-max/ghaction-github-labeler@v5.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           yaml-file: .tmp/labels.yml
