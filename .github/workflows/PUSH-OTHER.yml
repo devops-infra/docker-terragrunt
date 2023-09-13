@@ -57,7 +57,7 @@ jobs:
           install: true
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2.2.0
+        uses: docker/setup-qemu-action@v3.0.0
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
@@ -84,7 +84,7 @@ jobs:
           install: true
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2.2.0
+        uses: docker/setup-qemu-action@v3.0.0
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
