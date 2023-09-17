@@ -140,7 +140,7 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015
 RUN if [ "${SLIM}" = "no" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/mozilla/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" )" ;\
+    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/getsops/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" | head -1 )" ;\
     for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o /usr/bin/sops && break || sleep 15; done ;\
     chmod +x /usr/bin/sops ;\
   fi
