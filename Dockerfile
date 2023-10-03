@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20230816
+FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20230916
 
 # Multi-architecture from buildx, and defaults if buildx not available
 ARG TARGETPLATFORM=linux/amd64
