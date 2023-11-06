@@ -18,7 +18,7 @@ TG_LATEST := $(shell curl -LsS https://api.github.com/repos/gruntwork-io/terragr
 VERSION := tf-$(TF_VERSION)-tg-$(TG_VERSION)
 VERSION_LATEST := tf-$(TF_LATEST)-tg-$(TG_LATEST)
 AWS_LATEST := $(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1)
-GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/install | grep -e "curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli" | head -1 | sed 's/curl.*cli-//; s/-linux.*//')
+GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/install\#linux | grep -o 'google-cloud-cli-[0-9.]\+' | head -1 | sed 's/google.*cli-//')
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
