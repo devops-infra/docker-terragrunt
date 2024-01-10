@@ -1,4 +1,4 @@
-cloudflare==2.15.1
+cloudflare==2.16.0
 PyGithub==2.1.1
 python-hcl2==4.3.2
 requests==2.31.0
