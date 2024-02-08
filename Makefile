@@ -2,9 +2,9 @@
 phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
-AWS_VERSION := 2.15.17
+AWS_VERSION := 2.15.18
 GCP_VERSION := 463.0.0
-TF_VERSION := 1.7.2
+TF_VERSION := 1.7.3
 TG_VERSION := 0.55.1
 
 # GitHub Actions bogus variables
