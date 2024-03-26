@@ -2,7 +2,7 @@
 
 ### Supporting `amd64` and `aarch64/arm64` images!
 
-### Supporting `slim-latest` version having only Terraform, Terragrunt and TFlint
+### Supporting now latest OpenTofu version for every release
 
 
 Docker image with Terraform, Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud
@@ -222,6 +222,7 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | ncurses             | Binary         | For expanding `Makefile` with some colors.                                                                                                                     | https://invisible-island.net/ncurses/announce.html |
 | openssh             | Binary         | For allowing outgoing SSH connections.                                                                                                                         | https://www.openssh.com/                           |
 | openssl             | Binary         | For calculating BASE64SHA256 hash of Lambda packages. Assures updating Lambdas only when package hash changed.                                                 | https://github.com/openssl/openssl                 |
+| opentofu            | Binary         | As open-source alternative to Terraform.                                                                                                                       | https://github.com/opentofu/opentofu               |
 | PyGithub            | Python library | For interacting with GitHub API.                                                                                                                               | https://github.com/PyGithub/PyGithub               |
 | python-hcl2         | Python library | For reading HCL files in Python.                                                                                                                               | https://github.com/amplify-education/python-hcl2   |
 | python3             | Binary         | For running more complex scripts during deployment process.                                                                                                    | https://www.python.org/                            |
