@@ -135,6 +135,18 @@ RUN if [ "${SLIM}" = "no" ]; then \
     mv ./hcledit /usr/bin/hcledit ;\
   fi
 
+# Get latest OpenTofu
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
+RUN if [ "${SLIM}" = "no" ]; then \
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | grep -o -E "https://.+?_${ARCHITECTURE}.deb" | head -1)" ;\
+    echo -e "Downloading OpenTofu from ${DOWNLOAD_URL}" ;\
+    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o ./tofu.deb && break || sleep 15; done ;\
+    dpkg -i ./tofu.deb ;\
+    rm -f ./tofu.deb ;\
+  fi
+
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015
