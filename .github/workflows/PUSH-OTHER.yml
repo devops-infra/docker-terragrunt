@@ -7,19 +7,19 @@ on:
 
 jobs:
   labels:
-    name: Update repo labels
+    name: Repo labels
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download labels' config
+      - name: Labels' config
         shell: bash
         run: |
           mkdir -p .tmp
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/.github/labels.yml -o .tmp/labels.yml
 
-      - name: Update labels - dry run
+      - name: Update labels (dry run)
         uses: crazy-max/ghaction-github-labeler@v5.0.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -27,20 +27,20 @@ jobs:
           dry-run: true
 
   lint:
-    name: Run linters
+    name: Linters
     if: "!startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Haskell Dockerfile Linter (Hadolint)
+      - name: Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
 
   build_and_push:
-    name: Build and push images in parallel
+    name: Build & push
     if: "!startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
     strategy:
@@ -48,21 +48,21 @@ jobs:
       matrix:
         flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp, yc]
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Docker Buildx
         uses: docker/setup-buildx-action@v3.2.0
         with:
           install: true
 
-      - name: Set up QEMU
+      - name: QEMU
         uses: docker/setup-qemu-action@v3.0.0
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build Docker images and push to registry
+      - name: Build & push
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
@@ -71,25 +71,25 @@ jobs:
         run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
 
   build_dependabot:
-    name: Build full image for Dependabot
+    name: Dependabot build
     if: "startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Docker Buildx
         uses: docker/setup-buildx-action@v3.2.0
         with:
           install: true
 
-      - name: Set up QEMU
+      - name: QEMU
         uses: docker/setup-qemu-action@v3.0.0
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build Docker images
+      - name: Build
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
@@ -105,18 +105,18 @@ jobs:
         id: date
         run: echo "curr_date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Download Pull Request template
+      - name: Template
         shell: bash
         run: |
           mkdir -p .tmp
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
 
-      - name: Pull request - bugfix (conditional)
+      - name: PR - bugfix (conditional)
         if: startsWith(github.ref, 'refs/heads/bugfix')
         uses: devops-infra/action-pull-request@v0.5.5
         with:
@@ -126,7 +126,7 @@ jobs:
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
-      - name: Pull request - dependency (conditional)
+      - name: PR - dependency (conditional)
         if: startsWith(github.ref, 'refs/heads/dependency')
         uses: devops-infra/action-pull-request@v0.5.5
         with:
@@ -136,7 +136,7 @@ jobs:
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
-      - name: Pull request - documentation (conditional)
+      - name: PR - documentation (conditional)
         if: startsWith(github.ref, 'refs/heads/documentation')
         uses: devops-infra/action-pull-request@v0.5.5
         with:
@@ -146,7 +146,7 @@ jobs:
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
-      - name: Pull request - feature (conditional)
+      - name: PR - feature (conditional)
         if: startsWith(github.ref, 'refs/heads/feature')
         uses: devops-infra/action-pull-request@v0.5.5
         with:
@@ -156,7 +156,7 @@ jobs:
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
-      - name: Pull request - test (conditional)
+      - name: PR - test (conditional)
         if: startsWith(github.ref, 'refs/heads/test')
         uses: devops-infra/action-pull-request@v0.5.5
         with:
@@ -168,7 +168,7 @@ jobs:
           draft: true
           get_diff: true
 
-      - name: Create pull request - other (conditional)
+      - name: PR - other (conditional)
         if: "!startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
         uses: devops-infra/action-pull-request@v0.5.5
         with:
