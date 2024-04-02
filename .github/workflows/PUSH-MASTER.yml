@@ -7,13 +7,13 @@ on:
 
 jobs:
   labels:
-    name: Update repo labels
+    name: Repo labels
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download labels' config
+      - name: Labels' config
         shell: bash
         run: |
           mkdir -p .tmp
@@ -26,19 +26,19 @@ jobs:
           yaml-file: .tmp/labels.yml
 
   lint:
-    name: Run linters
+    name: Linters
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Haskell Dockerfile Linter (Hadolint)
+      - name: Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
           dockerfile: Dockerfile
 
   build_and_push:
-    name: Build and push images in parallel
+    name: Build & push
     needs: lint
     runs-on: ubuntu-latest
     strategy:
@@ -46,21 +46,21 @@ jobs:
       matrix:
         flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp, yc]
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: Docker Buildx
         uses: docker/setup-buildx-action@v3.2.0
         with:
           install: true
 
-      - name: Set up QEMU
+      - name: QEMU
         uses: docker/setup-qemu-action@v3.0.0
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build Docker image and push to registry
+      - name: Build & push
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
