@@ -53,6 +53,7 @@ RUN for i in {1..5}; do \
         docker.io \
         golang-go \
         graphviz \
+        gnupg \
         hub \
         make \
         ncurses-base \
