@@ -41,6 +41,8 @@ else
 DOCKER_COMMAND := docker build
 endif
 
+DOCKER_COMMAND := docker buildx build --platform linux/arm64
+
 # Some cosmetics
 SHELL := bash
 TXT_RED := $(shell tput setaf 1)
