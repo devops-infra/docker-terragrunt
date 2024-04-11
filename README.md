@@ -20,7 +20,7 @@ images contain versions of said software to emphasize it.
 **Source code is available at [devops-infra/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt).**
 
 Dockerfile was based on two images made
-by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30.56.54fd386f)
+by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f)
 and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f109b5a7)
 .  
 Original README files are included in this
@@ -248,7 +248,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tr>
     <td align="center"><a href="https://shyper.pro/"><img src="https://avatars.githubusercontent.com/u/45788587?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Krzysztof Szyper</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=ChristophShyper" title="Code">💻</a> <a href="#platform-ChristophShyper" title="Packaging/porting to new platform">📦</a> <a href="#maintenance-ChristophShyper" title="Maintenance">🚧</a></td>
-    <td align="center"><a href="https://www.everythingcli.org/"><img src="https://avatars.githubusercontent.com/u/1.8.0999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cytopia</b></sub></a><br /><a href="#ideas-cytopia" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=cytopia" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.everythingcli.org/"><img src="https://avatars.githubusercontent.com/u/1.7.5999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cytopia</b></sub></a><br /><a href="#ideas-cytopia" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=cytopia" title="Code">💻</a></td>
     <td align="center"><a href="https://evaate.com/"><img src="https://avatars.githubusercontent.com/u/12538173?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Djukic</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=markodjukic" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/clushie"><img src="https://avatars.githubusercontent.com/u/47661139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phileas Lebada</b></sub></a><br /><a href="#ideas-clushie" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/SmedbergM"><img src="https://avatars.githubusercontent.com/u/3883154?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Smedberg</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=SmedbergM" title="Code">💻</a></td>
