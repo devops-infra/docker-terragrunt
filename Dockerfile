@@ -187,9 +187,9 @@ RUN if [ "${GCP}" = "yes" ]; then \
       --quiet ;\
     /google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check true ;\
     /google-cloud-sdk/bin/gcloud config set metrics/environment github_docker_image ;\
-    echo -e "\n# Add Google Cloud SDK" >> /etc/bash.bashrc ;\
-    echo "source /google-cloud-sdk/path.bash.inc" >> /etc/bash.bashrc ;\
-    echo "source /google-cloud-sdk/completion.bash.inc" >> /etc/bash.bashrc ;\
+    echo -e "\n# Add Google Cloud SDK" >> /etc/profile ;\
+    echo "source /google-cloud-sdk/path.bash.inc" >> /etc/profile ;\
+    echo "source /google-cloud-sdk/completion.bash.inc" >> /etc/profile ;\
   fi
 
 # Azure
