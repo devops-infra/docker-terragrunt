@@ -192,6 +192,8 @@ RUN if [ "${GCP}" = "yes" ]; then \
     echo "source /google-cloud-sdk/completion.bash.inc" >> /etc/bash.bashrc ;\
   fi
 
+ENV PATH "$PATH:/google-cloud-sdk/bin"
+
 # Azure
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
