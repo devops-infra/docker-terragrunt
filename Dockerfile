@@ -13,7 +13,8 @@ ARG YC=no
 # Versions of dependecies, GCP has no default handler
 ARG AWS_VERSION=latest
 ARG GCP_VERSION
-ARG TF_VERSION=latest
+ARG TF_VERSION=none
+ARG OT_VERSION=none
 ARG TG_VERSION=latest
 
 # List of Python packages
@@ -30,6 +31,7 @@ RUN echo Debug information: ;\
   if [ "${AWS}" == "yes" ]; then echo AWS_VERSION="${AWS_VERSION}"; fi ;\
   if [ "${GCP}" == "yes" ]; then echo GCP_VERSION="${GCP_VERSION}"; fi ;\
   echo TF_VERSION="${TF_VERSION}" ;\
+  echo OT_VERSION="${OT_VERSION}" ;\
   echo TG_VERSION="${TG_VERSION}" ;\
   echo
 
@@ -84,18 +86,41 @@ RUN if [ "${SLIM}" = "no" ]; then \
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-  if [ "${TF_VERSION}" = "latest" ]; then \
-    VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
+  if [ "${TF_VERSION}" = "none" ]; then \
+    echo "No Terraform version specified..." ;\
   else \
-    VERSION="${TF_VERSION}" ;\
-  fi ;\
-  for i in {1..5}; do curl -LsS \
-    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip \
-    && break || sleep 15; done ;\
-  unzip ./terraform.zip ;\
-  rm -f ./terraform.zip ;\
-  chmod +x ./terraform ;\
-  mv ./terraform /usr/bin/terraform
+    if [ "${TF_VERSION}" = "latest" ]; then \
+      VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
+    else \
+      VERSION="${TF_VERSION}" ;\
+    fi ;\
+    for i in {1..5}; do curl -LsS \
+      https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip \
+      && break || sleep 15; done ;\
+    unzip ./terraform.zip ;\
+    rm -f ./terraform.zip ;\
+    chmod +x ./terraform ;\
+    mv ./terraform /usr/bin/terraform ;\
+  fi
+
+# Get OpenTofu by a specific version or search for the latest one
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+  if [ "${OT_VERSION}" = "none" ]; then \
+    echo "No OpenTofu version specified ..." ;\
+  else \
+    if [ "${OT_VERSION}" = "latest" ]; then \
+      VERSION="$( curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//' )" ;\
+    else \
+      VERSION="${OT_VERSION}" ;\
+    fi ;\
+    for i in {1..5}; do curl -LsS \
+      https://github.com/opentofu/opentofu/releases/download/v${VERSION}/tofu_${VERSION}_${ARCHITECTURE}.deb -o ./tofu.deb \
+      && break || sleep 15; done ;\
+    dpkg -i ./tofu.deb ;\
+    rm -f ./tofu.deb ;\
+  fi
 
 # Get Terragrunt by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -136,18 +161,6 @@ RUN if [ "${SLIM}" = "no" ]; then \
     mv ./hcledit /usr/bin/hcledit ;\
   fi
 
-# Get latest OpenTofu
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
-RUN if [ "${SLIM}" = "no" ]; then \
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | grep -o -E "https://.+?_${ARCHITECTURE}.deb" | head -1)" ;\
-    echo -e "Downloading OpenTofu from ${DOWNLOAD_URL}" ;\
-    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o ./tofu.deb && break || sleep 15; done ;\
-    dpkg -i ./tofu.deb ;\
-    rm -f ./tofu.deb ;\
-  fi
-
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015
@@ -174,7 +187,7 @@ RUN if [ "${AWS}" = "yes" ]; then \
 
 # GCP
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC1091,SC2015
+# hadolint ignore=SC1091,SC2015,SC2129
 RUN if [ "${GCP}" = "yes" ]; then \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm; else ARCHITECTURE=x86_64; fi ;\
     for i in {1..5}; do curl -LsS "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz && break || sleep 15; done ;\
