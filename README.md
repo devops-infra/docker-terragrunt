@@ -73,6 +73,8 @@ Infrastructure-as-a-Code.
 Tag of the image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's
 bundled with or not (see second table below).
 
+Current release version tf-1.8.3-ot-1.7.0-tg-0.58.3
+
 | Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
 |--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|------------------|--------------------|
 | [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.8.3-tg-0.58.3`                            | `docker-terragrunt` | `tf-1.8.3-tg-0.58.3` | `1.8.3`           | `N/A`            | `0.58.3`           |
