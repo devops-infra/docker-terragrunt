@@ -12,7 +12,14 @@ if command -v gcloud &> /dev/null; then
   gcloud --version ; echo
 fi
 
-terraform --version ; echo
+if command -v terraform &> /dev/null; then
+  terraform --version ; echo
+fi
+
+if command -v opentofu &> /dev/null; then
+  opentofu --version ; echo
+fi
+
 terragrunt --version ; echo
 python3 --version
 pip freeze ; echo
