@@ -16,8 +16,8 @@ if command -v terraform &> /dev/null; then
   terraform --version ; echo
 fi
 
-if command -v opentofu &> /dev/null; then
-  opentofu --version ; echo
+if command -v tofu &> /dev/null; then
+  tofu --version ; echo
 fi
 
 terragrunt --version ; echo
