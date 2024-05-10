@@ -73,7 +73,9 @@ Infrastructure-as-a-Code.
 Tag of the image tells which version of Terraform and Terragrunt it contains and which public cloud provider CLI it's
 bundled with or not (see second table below).
 
-Current release version tf-1.8.3-ot-1.7.0-tg-0.58.3
+| Current release full tag version value |
+|:---------------------------------------|
+| `tf-1.8.3-ot-1.7.0-tg-0.58.3`          |
 
 | Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
 |--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|------------------|--------------------|
