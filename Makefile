@@ -142,8 +142,8 @@ build-slim: check-dockerfile ## Build slim image without cloud CLIs and any addi
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-tf-latest \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-$(TF_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-tf-latest \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-latest .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-tf-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg SLIM=yes \
