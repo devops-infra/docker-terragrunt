@@ -76,7 +76,7 @@ bundled with or not (see second table below).
 
 | Current release full tag version value |
 |:---------------------------------------|
-| `tf-1.8.4-ot-1.7.0-tg-0.58.14`          |
+| `tf-1.8.4-ot-1.7.2-tg-0.58.14`         |
 
 
 | Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
