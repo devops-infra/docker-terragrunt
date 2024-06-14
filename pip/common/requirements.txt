@@ -2,4 +2,4 @@ cloudflare==2.20.0
 PyGithub==2.3.0
 python-hcl2==4.3.4
 requests==2.32.3
-slack_sdk==3.28.0
+slack_sdk==3.29.0
