@@ -1,7 +1,6 @@
-FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20240530
-
 # Multi-architecture from buildx, and defaults if buildx not available
 ARG TARGETPLATFORM=linux/amd64
+FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20240530
 
 # Which flavour of image to build
 ARG SLIM=no
@@ -22,6 +21,9 @@ COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
 COPY pip/azure/requirements.txt /tmp/pip_azure_requirements.txt
 COPY pip/yc/requirements.txt /tmp/pip_yc_requirements.txt
+
+# This variable needs to be declared twice since it's used in the build
+ARG TARGETPLATFORM=linux/amd64
 
 # Debug information
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
