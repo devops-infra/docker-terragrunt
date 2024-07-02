@@ -22,7 +22,7 @@ OT_TG_VERSION := ot-$(OT_VERSION)-tg-$(TG_VERSION)
 TF_TG_LATEST := tf-$(TF_LATEST)-tg-$(TG_LATEST)
 OT_TG_LATEST := ot-$(OT_LATEST)-tg-$(TG_LATEST)
 AWS_LATEST := $(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1)
-GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/install\#linux | grep -o 'google-cloud-cli-[0-9.]\+' | head -1 | sed 's/google.*cli-//')
+GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-*//')
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
