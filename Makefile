@@ -6,7 +6,7 @@ AWS_VERSION := 2.17.18
 GCP_VERSION := 485.0.0
 TF_VERSION := 1.9.3
 OT_VERSION := 1.7.3
-TG_VERSION := 0.64.0
+TG_VERSION := 0.64.1
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
