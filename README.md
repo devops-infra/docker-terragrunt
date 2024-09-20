@@ -17,8 +17,8 @@ Hence, images are updated when new version of Terraform, OpenTofu or Terragrunt 
 **Source code is available at [devops-infra/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt).**
 
 Dockerfile was based on two images made
-by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt/tree/1bc1a2c6de42c6d19f7e91f64f30256c24fd386f)
-and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt/tree/3f8964bea0db043a05d4a8d622f94a07f1.9.6a7)
+by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt)
+and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt)
 .  
 Original README files are included in this
 repository: [docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt.md)
