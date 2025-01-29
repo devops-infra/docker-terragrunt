@@ -77,8 +77,16 @@ terragrunt-fmt.sh ${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} ${IGNORE} "$@"
 HCL_RET_CODE=$?
 
 echo -e "\n=> Searching for .tf and .tfvars files"
-terraform fmt ${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} "$@"
-TF_RET_CODE=$?
+if command -v terraform &> /dev/null; then
+  terraform fmt "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "$@"
+  TF_RET_CODE=$?
+elif command -v tofu &> /dev/null; then
+  tofu fmt "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "$@"
+  TF_RET_CODE=$?
+else
+  echo "Neither terraform nor opentofu (tofu) is installed."
+  exit 1
+fi
 
 if [[ "${HCL_RET_CODE}" != "0" ]] || [[ "${TF_RET_CODE}" != "0" ]]; then
   exit 1
