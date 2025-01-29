@@ -1,7 +1,7 @@
-FROM --platform=${BUILDPLATFORM} ubuntu:jammy-20240808
+FROM ubuntu:jammy-20240808
 
-# Multi-architecture from buildx, and defaults if buildx not available
-ARG TARGETPLATFORM=linux/amd64
+# Multi-architecture from buildx
+ARG TARGETPLATFORM
 
 # Which flavour of image to build
 ARG SLIM=no
@@ -32,8 +32,7 @@ RUN echo Debug information: ;\
   if [ "${GCP}" == "yes" ]; then echo GCP_VERSION="${GCP_VERSION}"; fi ;\
   echo TF_VERSION="${TF_VERSION}" ;\
   echo OT_VERSION="${OT_VERSION}" ;\
-  echo TG_VERSION="${TG_VERSION}" ;\
-  echo
+  echo TG_VERSION="${TG_VERSION}"
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
