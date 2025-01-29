@@ -1,4 +1,4 @@
-FROM ubuntu:jammy-20240808
+FROM ubuntu:noble-20241118.1
 
 # Multi-architecture from buildx
 ARG TARGETPLATFORM
