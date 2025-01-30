@@ -1,4 +1,4 @@
-FROM ubuntu:jammy-20240808
+FROM ubuntu:24.04
 
 # Multi-architecture from buildx
 ARG TARGETPLATFORM
@@ -78,7 +78,7 @@ RUN for i in {1..5}; do \
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${SLIM}" = "no" ]; then \
-    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
+    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt --break-system-packages ;\
   fi
 
 # Get Terraform by a specific version or search for the latest one
@@ -175,7 +175,7 @@ RUN if [ "${SLIM}" = "no" ]; then \
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013,SC2015
 RUN if [ "${AWS}" = "yes" ]; then \
-    xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir ;\
+    xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=x86_64; fi ;\
     if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
     for i in {1..5}; do curl -LsS "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip && break || sleep 15; done ;\
@@ -210,15 +210,14 @@ ENV PATH="$PATH:/google-cloud-sdk/bin"
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013
 RUN if [ "${AZURE}" = "yes" ]; then \
-    pip3 install --no-cache-dir --upgrade pip ;\
-    SODIUM_INSTALL=system pip3 install --no-cache-dir -r /tmp/pip_azure_requirements.txt ;\
+    SODIUM_INSTALL=system pip3 install --no-cache-dir -r /tmp/pip_azure_requirements.txt --break-system-packages ;\
   fi
 
 # YandexCloud
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3013,SC2015
 RUN if [ "${YC}" = "yes" ]; then \
-    xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir ;\
+    xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
     for i in {1..5}; do curl -LsS "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -r /etc/bash.bashrc && break || sleep 15; done ;\
   fi
 
