@@ -49,6 +49,7 @@ RUN for i in {1..5}; do \
       git \
       jq \
       vim \
+      wget \
       unzip && break || sleep 15;  \
   done ;\
   for i in {1..5}; do \
@@ -220,7 +221,7 @@ ENV PATH="$PATH:/google-cloud-sdk/bin"
 # Azure
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # using wget to bypass curl error for arm64 https://bugs.launchpad.net/ubuntu/+source/curl/+bug/2073448
-# hadolint ignore=DL3009
+# hadolint ignore=DL3009,DL4001
 RUN if [ "${AZURE}" = "yes" ]; then \
     echo "Installing Azure CLI" ;\
     mkdir -p /etc/apt/keyrings ;\
@@ -239,7 +240,7 @@ Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architect
 
 # YandexCloud
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,SC2015
+# hadolint ignore=DL3013,SC2015,DL4001
 RUN if [ "${YC}" = "yes" ]; then \
     echo "Installing Yandex Cloud CLI" ;\
     xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
