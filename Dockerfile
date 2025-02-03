@@ -236,7 +236,7 @@ Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architect
     cat /etc/apt/sources.list.d/azure-cli.sources ;\
     echo "BBBB" ;\
     apt-get update -y ;\
-    apt-get install --no-install-recommends -y azure-cli="${AZ_VER}-1~${AZ_DIST}" ;\
+    apt-get install --no-install-recommends -y azure-cli="${AZ_VERSION}-1~${AZ_DIST}" ;\
   fi
 
 # YandexCloud
