@@ -219,7 +219,7 @@ ENV PATH="$PATH:/google-cloud-sdk/bin"
 
 # Azure
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013
+# hadolint ignore=DL3009
 RUN if [ "${AZURE}" = "yes" ]; then \
     echo "Installing Azure CLI" ;\
     mkdir -p /etc/apt/keyrings ;\
