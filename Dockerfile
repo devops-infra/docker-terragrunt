@@ -232,8 +232,10 @@ RUN if [ "${AZURE}" = "yes" ]; then \
     Components: main \
     Architectures: $(dpkg --print-architecture) \
     Signed-by: /etc/apt/keyrings/microsoft.gpg" | tee /etc/apt/sources.list.d/azure-cli.sources ;\
-    apt-get update ;\
-    apt-get install azure-cli=${AZ_VER}-1~${AZ_DIST} ;\
+    cat /etc/apt/sources.list.d/azure-cli.sources ;\
+    cat /etc/apt/keyrings/microsoft.gpg ;\
+    apt-get update -y ;\
+    apt-get install --no-install-recommends -y azure-cli="${AZ_VER}-1~${AZ_DIST}" ;\
   fi
 
 # YandexCloud
