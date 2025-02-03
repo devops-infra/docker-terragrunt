@@ -90,11 +90,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
     echo "No Terraform version specified..." ;\
   else \
     if [ "${TF_VERSION}" = "latest" ]; then \
-      VERSION="$( curl -LsS https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
+      VERSION="$( curl -sL https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
     else \
       VERSION="${TF_VERSION}" ;\
     fi ;\
-    for i in {1..5}; do curl -LsS \
+    for i in {1..5}; do curl -sL \
       https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip \
       && break || sleep 15;  \
     done ;\
@@ -113,11 +113,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
   else \
     echo "Installing OpenTofu" ;\
     if [ "${OT_VERSION}" = "latest" ]; then \
-      VERSION="$( curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//' )" ;\
+      VERSION="$( curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//' )" ;\
     else \
       VERSION="${OT_VERSION}" ;\
     fi ;\
-    for i in {1..5}; do curl -LsS \
+    for i in {1..5}; do curl -sL \
       https://github.com/opentofu/opentofu/releases/download/v${VERSION}/tofu_${VERSION}_${ARCHITECTURE}.deb -o ./tofu.deb \
       && break || sleep 15;  \
     done ;\
@@ -131,11 +131,11 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   echo "Installing Terragrunt" ;\
   if [ "${TG_VERSION}" = "latest" ]; then \
-    VERSION="$( curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .name )" ;\
+    VERSION="$( curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .name )" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
-  for i in {1..5}; do curl -LsS \
+  for i in {1..5}; do curl -sL \
     https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE} -o /usr/bin/terragrunt \
     && break || sleep 15;  \
   done ;\
@@ -146,8 +146,8 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015
 RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
   echo "Installing TFLint" ;\
-  DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" ;\
-  for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o ./tflint.zip && break || sleep 15; done ;\
+  DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" ;\
+  for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o ./tflint.zip && break || sleep 15; done ;\
   unzip ./tflint.zip ;\
   rm -f ./tflint.zip ;\
   chmod +x ./tflint ;\
@@ -159,8 +159,8 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${SLIM}" = "no" ]; then \
     echo "Installing hcledit" ;\
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
-    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break || sleep 15; done ;\
+    DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
+    for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break || sleep 15; done ;\
     tar -xf ./hcledit.tar.gz ;\
     rm -f ./hcledit.tar.gz ;\
     chmod +x ./hcledit ;\
@@ -174,8 +174,8 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${SLIM}" = "no" ]; then \
     echo "Installing sops" ;\
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    DOWNLOAD_URL="$( curl -LsS https://api.github.com/repos/getsops/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" | head -1 )" ;\
-    for i in {1..5}; do curl -LsS "${DOWNLOAD_URL}" -o /usr/bin/sops && break || sleep 15; done ;\
+    DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/getsops/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" | head -1 )" ;\
+    for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o /usr/bin/sops && break || sleep 15; done ;\
     chmod +x /usr/bin/sops ;\
   fi
 
@@ -188,7 +188,7 @@ RUN if [ "${AWS}" = "yes" ]; then \
     xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=x86_64; fi ;\
     if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
-    for i in {1..5}; do curl -LsS "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip && break || sleep 15; done ;\
+    for i in {1..5}; do curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip && break || sleep 15; done ;\
     mkdir -p /usr/local/awscli ;\
     unzip -q /tmp/awscli.zip -d /usr/local/awscli ;\
     /usr/local/awscli/aws/install ;\
@@ -200,7 +200,7 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${GCP}" = "yes" ]; then \
     echo "Installing Google Cloud SDK" ;\
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm; else ARCHITECTURE=x86_64; fi ;\
-    for i in {1..5}; do curl -LsS "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz && break || sleep 15; done ;\
+    for i in {1..5}; do curl -sL "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz && break || sleep 15; done ;\
     tar -xf google-cloud-sdk.tar.gz ;\
     rm -f google-cloud-sdk.tar.gz ;\
     ./google-cloud-sdk/install.sh \
@@ -219,11 +219,12 @@ ENV PATH="$PATH:/google-cloud-sdk/bin"
 
 # Azure
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# using wget to bypass curl error for arm64 https://bugs.launchpad.net/ubuntu/+source/curl/+bug/2073448
 # hadolint ignore=DL3009
 RUN if [ "${AZURE}" = "yes" ]; then \
     echo "Installing Azure CLI" ;\
     mkdir -p /etc/apt/keyrings ;\
-    curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
     chmod go+r /etc/apt/keyrings/microsoft.gpg ;\
     AZ_DIST=$(lsb_release -cs) ;\
     printf "Types: deb\n\
@@ -242,7 +243,7 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${YC}" = "yes" ]; then \
     echo "Installing Yandex Cloud CLI" ;\
     xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    for i in {1..5}; do curl -LsS "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -r /etc/bash.bashrc && break || sleep 15; done ;\
+    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -r /etc/bash.bashrc && break || sleep 15; done ;\
   fi
 
 # Scripts, configs and cleanup
