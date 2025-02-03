@@ -75,6 +75,10 @@ jobs:
     if: "!startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: [ slim, aws-azure-gcp, yc ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -90,21 +94,13 @@ jobs:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build aws-azure-gcp
+      - name: Build & push
         env:
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make build-aws-azure-gcp VERSION_PREFIX=test-
-
-      - name: Build yc
-        env:
-          DOCKER_BUILDKIT: 1
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TERM: xterm-256color
-        run: make build-yc VERSION_PREFIX=test-
+        run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
 
   build_dependabot:
     name: Dependabot build
