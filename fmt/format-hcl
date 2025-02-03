@@ -78,10 +78,10 @@ HCL_RET_CODE=$?
 
 echo -e "\n=> Searching for .tf and .tfvars files"
 if command -v terraform &> /dev/null; then
-  terraform fmt "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "$@"
+  terraform fmt ${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} "$@"
   TF_RET_CODE=$?
 elif command -v tofu &> /dev/null; then
-  tofu fmt "${LIST}" "${WRITE}" "${DIFF}" "${CHECK}" "${RECURSIVE}" "$@"
+  tofu fmt ${LIST} ${WRITE} ${DIFF} ${CHECK} ${RECURSIVE} "$@"
   TF_RET_CODE=$?
 else
   echo "Neither terraform nor opentofu (tofu) is installed."
