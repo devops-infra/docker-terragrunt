@@ -226,7 +226,7 @@ RUN if [ "${AZURE}" = "yes" ]; then \
     curl -sLS https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
     chmod go+r /etc/apt/keyrings/microsoft.gpg ;\
     AZ_DIST=$(lsb_release -cs) ;\
-    echo "Types: deb \n\
+    printf "Types: deb \n\
     URIs: https://packages.microsoft.com/repos/azure-cli/ \n\
     Suites: ${AZ_DIST} \n\
     Components: main \n\
