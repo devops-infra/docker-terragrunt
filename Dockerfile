@@ -232,9 +232,6 @@ Suites: %s\n\
 Components: main\n\
 Architectures: %s\n\
 Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources ;\
-    echo "AAAA" ;\
-    cat /etc/apt/sources.list.d/azure-cli.sources ;\
-    echo "BBBB" ;\
     apt-get update -y ;\
     apt-get install --no-install-recommends -y azure-cli="${AZ_VERSION}-1~${AZ_DIST}" ;\
   fi
