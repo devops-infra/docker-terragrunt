@@ -4,6 +4,7 @@ phony: help
 # Provide versions of the main dependencies to use with this Docker image
 AWS_VERSION := 2.23.11
 GCP_VERSION := 508.0.0
+AZ_VERSION = 2.68.0
 TF_VERSION := 1.10.5
 OT_VERSION := 1.9.0
 TG_VERSION := 0.72.6
@@ -23,6 +24,7 @@ TF_TG_LATEST := tf-$(TF_LATEST)-tg-$(TG_LATEST)
 OT_TG_LATEST := ot-$(OT_LATEST)-tg-$(TG_LATEST)
 AWS_LATEST := $(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1)
 GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-*//')
+AZ_LATEST := $(shell curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info.version' | sed s'/azure-cli-//')
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
@@ -104,9 +106,14 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
   		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)" ;\
   		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile ;\
   	fi
-	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] || [[ $(TG_VERSION) != $(TG_LATEST) ]] || [[ $(AWS_VERSION) != $(AWS_LATEST) ]] || [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
+	@echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)    $(AZ_VERSION)$(TXT_RESET)"
+	@if [[ $(AZ_VERSION) != $(AZ_LATEST) ]]; then \
+  		echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $(AZ_LATEST)$(TXT_RESET)" ;\
+  		sed -i 's/$(AZ_VERSION)/$(AZ_LATEST)/g' Makefile ;\
+  	fi
+	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] || [[ $(TG_VERSION) != $(TG_LATEST) ]] || [[ $(AWS_VERSION) != $(AWS_LATEST) ]] || [[ $(GCP_VERSION) != $(GCP_LATEST) ]] || [[ $(AZ_VERSION) != $(AZ_LATEST) ]]; then \
   		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
-  		echo "VERSION_TAG=tf-$(TF_LATEST)-ot-$(OT_LATEST)-tg-$(TG_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)" >> $(GITHUB_ENV) ;\
+  		echo "VERSION_TAG=tf-$(TF_LATEST)-ot-$(OT_LATEST)-tg-$(TG_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)-az-$(AZ_VERSION)" >> $(GITHUB_ENV) ;\
   	else \
   	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ;\
   	fi
@@ -225,6 +232,7 @@ build-azure: check-dockerfile ## Build image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg OT_VERSION=none \
@@ -239,6 +247,7 @@ build-azure: check-dockerfile ## Build image with Azure CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \
@@ -258,6 +267,7 @@ build-aws-azure: check-dockerfile ## Build image with AWS and Azure CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg OT_VERSION=none \
@@ -274,6 +284,7 @@ build-aws-azure: check-dockerfile ## Build image with AWS and Azure CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \
@@ -361,6 +372,7 @@ build-azure-gcp: check-dockerfile ## Build image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION)$(TXT_RESET) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -377,6 +389,7 @@ build-azure-gcp: check-dockerfile ## Build image with Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -398,6 +411,7 @@ build-aws-azure-gcp: check-dockerfile ## Build image with AWS, Azure and GCP CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -416,6 +430,7 @@ build-aws-azure-gcp: check-dockerfile ## Build image with AWS, Azure and GCP CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -584,6 +599,7 @@ push-azure: login ## Push image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg OT_VERSION=none \
@@ -599,6 +615,7 @@ push-azure: login ## Push image with Azure CLI
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION)$(TXT_RESET)"
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \
@@ -619,6 +636,7 @@ push-aws-azure: login ## Push image with AWS and Azure CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg OT_VERSION=none \
@@ -636,6 +654,7 @@ push-aws-azure: login ## Push image with AWS and Azure CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \
@@ -728,6 +747,7 @@ push-azure-gcp: login ## Push image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -745,6 +765,7 @@ push-azure-gcp: login ## Push image with Azure and GCP CLI
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION)$(TXT_RESET)"
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -767,6 +788,7 @@ push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -786,6 +808,7 @@ push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
 		--build-arg AZURE=yes \
+		--build-arg AZ_VERSION=$(AZ_VERSION) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
