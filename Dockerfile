@@ -227,12 +227,11 @@ RUN if [ "${AZURE}" = "yes" ]; then \
     chmod go+r /etc/apt/keyrings/microsoft.gpg ;\
     AZ_DIST=$(lsb_release -cs) ;\
     printf "Types: deb\n\
-    URIs: https://packages.microsoft.com/repos/azure-cli/\n\
-    Suites: %s\n\
-    Components: main\n\
-    Architectures: %s\n\
-    Signed-by: /etc/apt/keyrings/microsoft.gpg" \
-    "$AZ_DIST" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources ;\
+URIs: https://packages.microsoft.com/repos/azure-cli/\n\
+Suites: %s\n\
+Components: main\n\
+Architectures: %s\n\
+Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources ;\
     echo "AAAA" ;\
     cat /etc/apt/sources.list.d/azure-cli.sources ;\
     echo "BBBB" ;\
