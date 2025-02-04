@@ -49,9 +49,9 @@ updates:
       - automatic
       - dependency
 
-  # Enable version updates for azure
+  # Enable version updates for yandex
   - package-ecosystem: pip
-    directory: "/pip/azure/"
+    directory: "/pip/yc/"
     target-branch: master
     schedule:
       interval: daily

@@ -39,41 +39,11 @@ jobs:
         with:
           dockerfile: Dockerfile
 
-#  build_and_push:
-#    name: Build & push
-#    if: "!startsWith(github.ref, 'refs/heads/dependabot')"
-#    runs-on: ubuntu-latest
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp, yc]
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#
-#      - name: Docker Buildx
-#        uses: docker/setup-buildx-action@v3.8.0
-#        with:
-#          install: true
-#
-#      - name: QEMU
-#        uses: docker/setup-qemu-action@v3.3.0
-#        with:
-#          image: tonistiigi/binfmt:latest
-#          platforms: amd64,arm64
-#
-#      - name: Build & push
-#        env:
-#          DOCKER_BUILDKIT: 1
-#          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          TERM: xterm-256color
-#        run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
-
   build_and_push:
     name: Build & push
+    if: "!startsWith(github.ref, 'refs/heads/dependabot')"
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
