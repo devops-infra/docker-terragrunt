@@ -8,7 +8,7 @@ on:
 jobs:
   labels:
     name: Repo labels
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
   lint:
     name: Linters
     if: "!startsWith(github.ref, 'refs/heads/dependabot')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
   build_and_push:
     name: Build & push
     if: "!startsWith(github.ref, 'refs/heads/dependabot')"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -73,7 +73,7 @@ jobs:
 
   pull_request:
     name: Create Pull Request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Get current date
         id: date
