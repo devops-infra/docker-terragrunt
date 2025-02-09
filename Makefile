@@ -2,12 +2,12 @@
 phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
-AWS_VERSION := 2.23.15
+AWS_VERSION := 2.24.0
 GCP_VERSION := 509.0.0
 AZ_VERSION = 2.68.0
 TF_VERSION := 1.10.5
 OT_VERSION := 1.9.0
-TG_VERSION := 0.72.6
+TG_VERSION := 0.72.9
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
