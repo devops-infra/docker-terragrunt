@@ -8,7 +8,7 @@ on:
 jobs:
   labels:
     name: Repo labels
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
 
   lint:
     name: Linters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
   build_and_push:
     name: Build & push
     needs: lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     strategy:
       fail-fast: false
