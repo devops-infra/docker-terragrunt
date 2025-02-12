@@ -72,8 +72,8 @@ jobs:
         run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
 
   pull_request:
-    name: Create Pull Request
-    runs-on: ubuntu-24.04
+    name: Pull Request
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Get current date
         id: date
@@ -91,7 +91,7 @@ jobs:
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
 
       - name: PR - bugfix (conditional)
-        if: startsWith(github.ref, 'refs/heads/bugfix')
+        if: startsWith(github.ref, 'refs/heads/bug')
         uses: devops-infra/action-pull-request@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +101,7 @@ jobs:
           get_diff: true
 
       - name: PR - dependency (conditional)
-        if: startsWith(github.ref, 'refs/heads/dependency')
+        if: startsWith(github.ref, 'refs/heads/dep') && !startsWith(github.ref, 'refs/heads/dependabot')
         uses: devops-infra/action-pull-request@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -121,7 +121,7 @@ jobs:
           get_diff: true
 
       - name: PR - feature (conditional)
-        if: startsWith(github.ref, 'refs/heads/feature')
+        if: startsWith(github.ref, 'refs/heads/feat')
         uses: devops-infra/action-pull-request@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -142,8 +142,8 @@ jobs:
           draft: true
           get_diff: true
 
-      - name: PR - other (conditional)
-        if: "!startsWith(github.ref, 'refs/heads/bugfix') && !startsWith(github.ref, 'refs/heads/dependabot') && !startsWith(github.ref, 'refs/heads/dependency') && !startsWith(github.ref, 'refs/heads/documentation')  && !startsWith(github.ref, 'refs/heads/feature') && !startsWith(github.ref, 'refs/heads/test')"
+      - name: PR - test (conditional)
+        if: "!startsWith(github.ref, 'refs/heads/bug') && !startsWith(github.ref, 'refs/heads/dep') && !startsWith(github.ref, 'refs/heads/doc')  && !startsWith(github.ref, 'refs/heads/feat') && !startsWith(github.ref, 'refs/heads/test')"
         uses: devops-infra/action-pull-request@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -29,11 +29,11 @@ AZ_LATEST := $(shell curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-7)
-DOCKER_USER_ID := christophshyper
+DOCKER_USERNAME := christophshyper
 DOCKER_ORG_NAME := devopsinfra
 DOCKER_IMAGE := docker-terragrunt
 DOCKER_NAME := $(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)
-GITHUB_USER_ID := ChristophShyper
+GITHUB_USERNAME := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -64,15 +64,6 @@ endef
 help: ## Display help prompt
 	$(info Available options:)
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "$(TXT_YELLOW)%-25s $(TXT_RESET) %s\n", $$1, $$2}'
-
-
-.PHONY: check-dockerfile
-check-dockerfile: ## Temporarily updates Makefile if buildx is not available, preventing build errors
-	$(info Checking Makefile)
-	@if [[ "$(DOCKER_COMMAND)" == "docker build" ]]; then \
-		echo Docker buildx not available, simplyfing ;\
-		sed -i 's/--platform=\$${BUILDPLATFORM}//' Dockerfile  ;\
-	fi
 
 
 .PHONY: update-versions
@@ -124,7 +115,7 @@ build-all: build-slim build-plain build-aws build-azure build-aws-azure build-gc
 
 
 .PHONY: build-parallel
-build-parallel: check-dockerfile ## Build all image in parallel
+build-parallel: ## Build all image in parallel
 	# build plain image first so unconditional layers can be reused
 	@make -s build-slim VERSION_PREFIX=$(VERSION_PREFIX)
 	@make -s build-plain VERSION_PREFIX=$(VERSION_PREFIX)
@@ -135,7 +126,7 @@ build-parallel: check-dockerfile ## Build all image in parallel
 
 
 .PHONY: build-slim
-build-slim: check-dockerfile ## Build slim image without cloud CLIs and any additional software
+build-slim: ## Build slim image without cloud CLIs and any additional software
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
@@ -166,7 +157,7 @@ build-slim: check-dockerfile ## Build slim image without cloud CLIs and any addi
 
 
 .PHONY: build-plain
-build-plain: check-dockerfile ## Build image without cloud CLIs
+build-plain: ## Build image without cloud CLIs
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
@@ -195,7 +186,7 @@ build-plain: check-dockerfile ## Build image without cloud CLIs
 
 
 .PHONY: build-aws
-build-aws: check-dockerfile ## Build image with AWS CLI
+build-aws: ## Build image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
@@ -228,7 +219,7 @@ build-aws: check-dockerfile ## Build image with AWS CLI
 
 
 .PHONY: build-azure
-build-azure: check-dockerfile ## Build image with Azure CLI
+build-azure: ## Build image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
@@ -261,7 +252,7 @@ build-azure: check-dockerfile ## Build image with Azure CLI
 
 
 .PHONY: build-aws-azure
-build-aws-azure: check-dockerfile ## Build image with AWS and Azure CLI
+build-aws-azure: ## Build image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
@@ -298,7 +289,7 @@ build-aws-azure: check-dockerfile ## Build image with AWS and Azure CLI
 
 
 .PHONY: build-gcp
-build-gcp: check-dockerfile ## Build image with GCP CLI
+build-gcp: ## Build image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
@@ -331,7 +322,7 @@ build-gcp: check-dockerfile ## Build image with GCP CLI
 
 
 .PHONY: build-aws-gcp
-build-aws-gcp: check-dockerfile ## Build image with AWS and GCP CLI
+build-aws-gcp: ## Build image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
@@ -368,7 +359,7 @@ build-aws-gcp: check-dockerfile ## Build image with AWS and GCP CLI
 
 
 .PHONY: build-azure-gcp
-build-azure-gcp: check-dockerfile ## Build image with Azure and GCP CLI
+build-azure-gcp: ## Build image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION)$(TXT_RESET) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
@@ -405,7 +396,7 @@ build-azure-gcp: check-dockerfile ## Build image with Azure and GCP CLI
 
 
 .PHONY: build-aws-azure-gcp
-build-aws-azure-gcp: check-dockerfile ## Build image with AWS, Azure and GCP CLI
+build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
@@ -446,7 +437,7 @@ build-aws-azure-gcp: check-dockerfile ## Build image with AWS, Azure and GCP CLI
 
 
 .PHONY: build-yc
-build-yc: check-dockerfile ## Build image with YandexCloud CLI
+build-yc: ## Build image with YandexCloud CLI
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) \
 		--build-arg YC=yes \
@@ -479,9 +470,9 @@ build-yc: check-dockerfile ## Build image with YandexCloud CLI
 .PHONY: login
 login: ## Log into all registries
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)Docker Hub$(TXT_RESET)"
-	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
+	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USERNAME) --password-stdin
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)GitHub Packages$(TXT_RESET)"
-	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USER_ID) --password-stdin
+	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 
 
 .PHONY: push-parallel
