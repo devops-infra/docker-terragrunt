@@ -30,17 +30,17 @@ COPY pip/yc/requirements.txt /tmp/pip_yc_requirements.txt
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3008,SC2015
 RUN echo Debug information: ;\
-  echo TARGETPLATFORM="${TARGETPLATFORM}" ;\
-  if [ "${AWS}" == "yes" ]; then echo AWS_VERSION="${AWS_VERSION}"; fi ;\
-  if [ "${GCP}" == "yes" ]; then echo GCP_VERSION="${GCP_VERSION}"; fi ;\
-  if [ "${AZURE}" == "yes" ]; then echo AZ_VERSION="${AZ_VERSION}"; fi ;\
-  echo TF_VERSION="${TF_VERSION}" ;\
-  echo OT_VERSION="${OT_VERSION}" ;\
-  echo TG_VERSION="${TG_VERSION}"
+  echo TARGETPLATFORM = "${TARGETPLATFORM}" ;\
+  if [ "${AWS}" == "yes" ]; then echo AWS_VERSION = "${AWS_VERSION}"; fi ;\
+  if [ "${GCP}" == "yes" ]; then echo GCP_VERSION = "${GCP_VERSION}"; fi ;\
+  if [ "${AZURE}" == "yes" ]; then echo AZ_VERSION = "${AZ_VERSION}"; fi ;\
+  echo TF_VERSION = "${TF_VERSION}" ;\
+  echo OT_VERSION = "${OT_VERSION}" ;\
+  echo TG_VERSION = "${TG_VERSION}"
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3008,SC2015
+# hadolint ignore=DL3008,SC2015,DL3009
 RUN for i in {1..5}; do \
     apt-get update -y && break || sleep 15;  \
   done ;\
@@ -75,9 +75,7 @@ RUN for i in {1..5}; do \
         python3-pip \
         zip ;\
     fi && break || sleep 15;  \
-  done ;\
-  apt-get clean ;\
-  rm -rf /var/lib/apt/lists/*
+  done
 
 # Python packages
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -259,7 +257,8 @@ RUN chmod +x \
     /usr/bin/fmt.sh \
     /usr/bin/terragrunt-fmt.sh \
     /usr/bin/show-versions.sh ;\
-  # Cleanup
+  apt-get clean ;\
+  rm -rf /var/lib/apt/lists/* ;\
   rm -rf /var/cache/* ;\
   rm -rf /root/.cache/* ;\
   rm -rf /tmp/*
