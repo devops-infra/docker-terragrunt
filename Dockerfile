@@ -40,7 +40,7 @@ RUN echo Debug information: ;\
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3008,SC2015
+# hadolint ignore=DL3008,SC2015,DL3009
 RUN for i in {1..5}; do \
     apt-get update -y && break || sleep 15;  \
   done ;\
