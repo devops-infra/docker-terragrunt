@@ -29,11 +29,11 @@ AZ_LATEST := $(shell curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
 GITHUB_SHORT_SHA := $(shell echo $(GITHUB_SHA) | cut -c1-7)
-DOCKER_USER_ID := christophshyper
+DOCKER_USERNAME := christophshyper
 DOCKER_ORG_NAME := devopsinfra
 DOCKER_IMAGE := docker-terragrunt
 DOCKER_NAME := $(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)
-GITHUB_USER_ID := ChristophShyper
+GITHUB_USERNAME := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -479,9 +479,9 @@ build-yc: check-dockerfile ## Build image with YandexCloud CLI
 .PHONY: login
 login: ## Log into all registries
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)Docker Hub$(TXT_RESET)"
-	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USER_ID) --password-stdin
+	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USERNAME) --password-stdin
 	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)GitHub Packages$(TXT_RESET)"
-	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USER_ID) --password-stdin
+	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 
 
 .PHONY: push-parallel
@@ -496,7 +496,7 @@ push-parallel: ## Push all images in parallel
 
 
 .PHONY: push-slim
-push-slim: login ## Push only slim image
+push-slim: check-dockerfile login ## Push only slim image
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
@@ -529,7 +529,7 @@ push-slim: login ## Push only slim image
 
 
 .PHONY: push-plain
-push-plain: login ## Push only plain image
+push-plain: check-dockerfile login ## Push only plain image
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
@@ -560,7 +560,7 @@ push-plain: login ## Push only plain image
 
 
 .PHONY: push-aws
-push-aws: login ## Push image with AWS CLI
+push-aws: check-dockerfile login ## Push image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -595,7 +595,7 @@ push-aws: login ## Push image with AWS CLI
 
 
 .PHONY: push-azure
-push-azure: login ## Push image with Azure CLI
+push-azure: check-dockerfile login ## Push image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
@@ -630,7 +630,7 @@ push-azure: login ## Push image with Azure CLI
 
 
 .PHONY: push-aws-azure
-push-aws-azure: login ## Push image with AWS and Azure CLI
+push-aws-azure: check-dockerfile login ## Push image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -669,7 +669,7 @@ push-aws-azure: login ## Push image with AWS and Azure CLI
 
 
 .PHONY: push-gcp
-push-gcp: login ## Push image with GCP CLI
+push-gcp: check-dockerfile login ## Push image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg BUILD_DATE=$(BUILD_DATE) \
@@ -704,7 +704,7 @@ push-gcp: login ## Push image with GCP CLI
 
 
 .PHONY: push-aws-gcp
-push-aws-gcp: login ## Push image with AWS and GCP CLI
+push-aws-gcp: check-dockerfile login ## Push image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -743,7 +743,7 @@ push-aws-gcp: login ## Push image with AWS and GCP CLI
 
 
 .PHONY: push-azure-gcp
-push-azure-gcp: login ## Push image with Azure and GCP CLI
+push-azure-gcp: check-dockerfile login ## Push image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
@@ -782,7 +782,7 @@ push-azure-gcp: login ## Push image with Azure and GCP CLI
 
 
 .PHONY: push-aws-azure-gcp
-push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
+push-aws-azure-gcp: check-dockerfile login ## Push image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -825,7 +825,7 @@ push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 
 
 .PHONY: push-yc
-push-yc: login ## Push image with YandexCloud CLI
+push-yc: check-dockerfile login ## Push image with YandexCloud CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg YC=yes \

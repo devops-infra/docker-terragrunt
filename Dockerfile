@@ -1,5 +1,8 @@
 FROM ubuntu:24.04
 
+# Disable interactive mode
+ENV DEBIAN_FRONTEND noninteractive
+
 # Multi-architecture from buildx
 ARG TARGETPLATFORM
 
@@ -41,6 +44,7 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN for i in {1..5}; do \
     apt-get update -y && break || sleep 15;  \
   done ;\
+  echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections ;\
   echo "Installing apt packages" ;\
   for i in {1..5}; do \
     apt-get install --no-install-recommends -y \
@@ -263,11 +267,11 @@ RUN chmod +x \
 # Labels for http://label-schema.org/rc1/#build-time-labels
 # And for https://github.com/opencontainers/image-spec/blob/master/annotations.md
 # And for https://help.github.com/en/actions/building-actions/metadata-syntax-for-github-actions
-ARG NAME="IaaC dockerized framework for Terraform/Terragrunt"
+ARG NAME="IaaC dockerized framework for Terraform/Terragrunt/OpenTofu"
 ARG DESCRIPTION="Docker image with Terraform v${TF_VERSION} or OpenTofu v${OT_VERSION}, and Terragrunt v${TG_VERSION} together with all needed components to easily manage cloud infrastructure."
 ARG REPO_URL="https://github.com/devops-infra/docker-terragrunt"
-ARG AUTHOR="Krzysztof Szyper <biotyk@mail.com>"
-ARG HOMEPAGE="https://christophshyper.github.io/"
+ARG AUTHOR="Krzysztof 'ChristophShyper' Szyper <biotyk@mail.com>"
+ARG HOMEPAGE="https://shyper.pro"
 ARG BUILD_DATE=2020-04-01T00:00:00Z
 ARG VCS_REF=abcdef1
 ARG VERSION="tf-${TF_VERSION}-tg-${TG_VERSION}"
