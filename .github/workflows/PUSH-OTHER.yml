@@ -73,9 +73,9 @@ jobs:
         run: |
           docker buildx create --use
           make push-${{ matrix.flavour }} VERSION_PREFIX=test-
-          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest   
-          echo
-          docker image ls
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
 
       - name: CST - Common
         uses: plexsystems/container-structure-test-action@v0.3.0
