@@ -73,32 +73,26 @@ jobs:
         run: |
           docker buildx create --use
           make push-${{ matrix.flavour }} VERSION_PREFIX=test-
-          docker pull docker-terragrunt:test-${{ matrix.flavour }}-latest   
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest   
           echo
           docker image ls
-          echo
-          curl -sL https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-arm64 -o ~/container-structure-test 
-          chmod +x ~/container-structure-test
-          ~/container-structure-test test --image docker-terragrunt:test-${{ matrix.flavour }}-latest --config tests/${{ matrix.flavour }}.yml
-          ~/container-structure-test test --image docker-terragrunt:test-${{ matrix.flavour }}-ot-latest --config tests/ot.yml
-          ~/container-structure-test test --image docker-terragrunt:test-${{ matrix.flavour }}-tf-latest --config tests/tf.yml
 
       - name: CST - Common
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: docker-terragrunt:test-${{ matrix.flavour }}-latest
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
           config: tests/${{ matrix.flavour }}.yml
 
       - name: CST - Terraform
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
           config: tests/tf.yml
 
       - name: CST - OpenTofu
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
           config: tests/ot.yml
 
   pull_request:
