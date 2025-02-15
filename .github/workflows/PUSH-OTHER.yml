@@ -76,7 +76,7 @@ jobs:
         env:
           TERM: xterm-256color
         run: |
-          curl -LO https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-arm64 -o ~/container-structure-test 
+          curl -sL https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-arm64 -o ~/container-structure-test 
           chmod +x ~/container-structure-test
           ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-latest --config tests/${{ matrix.flavour }}.yml
           ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest --config tests/ot.yml
