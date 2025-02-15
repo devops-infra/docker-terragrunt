@@ -191,8 +191,7 @@ build-slim: ## Build slim image without cloud CLIs and any additional software
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg SLIM=yes \
 		--build-arg TF_VERSION=none \
@@ -201,8 +200,7 @@ build-slim: ## Build slim image without cloud CLIs and any additional software
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-ot-latest .
 
 
 .PHONY: build-plain
@@ -223,8 +221,7 @@ build-plain: ## Build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
         --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-tf-latest \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-latest \
-		--output type=tar,dest=tf-image.tar .
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \
@@ -236,8 +233,7 @@ build-plain: ## Build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-ot-latest \
-        --output type=tar,dest=ot-image.tar .
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-ot-latest .
 
 
 .PHONY: build-aws
@@ -254,8 +250,7 @@ build-aws: ## Build image with AWS CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
@@ -265,8 +260,7 @@ build-aws: ## Build image with AWS CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-ot-latest .
 
 
 .PHONY: build-azure
@@ -283,8 +277,7 @@ build-azure: ## Build image with Azure CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
 		--build-arg AZ_VERSION=$(AZ_VERSION) \
@@ -294,8 +287,7 @@ build-azure: ## Build image with Azure CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-ot-latest .
 
 
 .PHONY: build-aws-azure
@@ -314,8 +306,7 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-tf-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-tf-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
@@ -327,8 +318,7 @@ build-aws-azure: ## Build image with AWS and Azure CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-ot-latest .
 
 
 .PHONY: build-gcp
@@ -345,8 +335,7 @@ build-gcp: ## Build image with GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg GCP=yes \
 		--build-arg GCP_VERSION=$(GCP_VERSION) \
@@ -356,8 +345,7 @@ build-gcp: ## Build image with GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)gcp-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)gcp-ot-latest .
 
 
 .PHONY: build-aws-gcp
@@ -376,8 +364,7 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
@@ -389,8 +376,7 @@ build-aws-gcp: ## Build image with AWS and GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-gcp-ot-latest .
 
 
 .PHONY: build-azure-gcp
@@ -409,8 +395,7 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AZURE=yes \
 		--build-arg AZ_VERSION=$(AZ_VERSION) \
@@ -422,8 +407,7 @@ build-azure-gcp: ## Build image with Azure and GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)azure-gcp-ot-latest .
 
 
 .PHONY: build-aws-azure-gcp
@@ -444,8 +428,7 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg AWS=yes \
 		--build-arg AWS_VERSION=$(AWS_VERSION) \
@@ -459,8 +442,7 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest .
 
 
 .PHONY: build-yc
@@ -476,8 +458,7 @@ build-yc: ## Build image with YandexCloud CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest \
-		--output type=tar,dest=tf-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg YC=yes \
 		--build-arg TF_VERSION=none \
@@ -486,8 +467,7 @@ build-yc: ## Build image with YandexCloud CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest \
-		--output type=tar,dest=ot-image.tar .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest .
 
 
 .PHONY: login
