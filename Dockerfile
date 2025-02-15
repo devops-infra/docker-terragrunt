@@ -28,7 +28,7 @@ COPY pip/yc/requirements.txt /tmp/pip_yc_requirements.txt
 
 # Debug information
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3008,SC2015
+# hadolint ignore=DL3008,SC2015,SC2129
 RUN echo Debug information: ;\
   echo TARGETPLATFORM = "${TARGETPLATFORM}" ;\
   if [ "${AWS}" == "yes" ]; then echo AWS_VERSION = "${AWS_VERSION}"; fi ;\
@@ -36,7 +36,14 @@ RUN echo Debug information: ;\
   if [ "${AZURE}" == "yes" ]; then echo AZ_VERSION = "${AZ_VERSION}"; fi ;\
   echo TF_VERSION = "${TF_VERSION}" ;\
   echo OT_VERSION = "${OT_VERSION}" ;\
-  echo TG_VERSION = "${TG_VERSION}"
+  echo TG_VERSION = "${TG_VERSION}" ;\
+  echo 'path-exclude /usr/share/doc/*' > /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
+  echo 'path-exclude /usr/share/man/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
+  echo 'path-exclude /usr/share/groff/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
+  echo 'path-exclude /usr/share/info/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
+  echo 'path-exclude /usr/share/lintian/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
+  echo 'path-exclude /usr/share/linda/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
+  echo 'path-exclude /usr/share/locale/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -246,7 +253,8 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${YC}" = "yes" ]; then \
     echo "Installing Yandex Cloud CLI" ;\
     xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -r /etc/bash.bashrc && break || sleep 15; done ;\
+    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -a -i /opt/yc -r /etc/bash.bashrc && break || sleep 15; done ;\
+    ln -s /opt/yc/bin/yc /usr/bin/yc ;\
   fi
 
 # Scripts, configs and cleanup

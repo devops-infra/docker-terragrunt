@@ -1,0 +1,64 @@
+schemaVersion: 2.0.0
+
+commandTests:
+  - name: Ubuntu version
+    command: cat
+    args: ["/etc/os-release"]
+    expectedOutput: ["VERSION_ID=\"24.04\""]
+
+  - name: Essential tools
+    command: which
+    args:
+      - curl
+      - git
+      - jq
+      - vim
+      - wget
+      - unzip
+    expectedOutput:
+      - /usr/bin/curl
+      - /usr/bin/git
+      - /usr/bin/jq
+      - /usr/bin/jq
+      - /usr/bin/vim
+      - /usr/bin/unzip
+
+  - name: Terragrunt
+    command: terragrunt
+    args: ["--version"]
+    expectedOutput: ["terragrunt version v.*"]
+
+  - name: TFLint
+    command: tflint
+    args: ["--version"]
+    expectedOutput: ["TFLint version .*"]
+
+fileExistenceTests:
+  - name: show-versions.sh
+    path: /usr/bin/show-versions.sh
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+
+  - name: format-hcl
+    path: /usr/bin/format-hcl
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+
+  - name: fmt.sh
+    path: /usr/bin/fmt.sh
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+
+  - name: terragrunt-fmt.sh
+    path: /usr/bin/terragrunt-fmt.sh
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+
+metadataTest:
+  cmd: ["show-versions.sh"]
+  entrypoint: []
+  exposedPorts: []
+  workdir: "/data"
+  envVars:
+    - key: DEBIAN_FRONTEND
+      value: noninteractive

@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavour: [slim, aws, azure, gcp, yc]
+        flavour: [slim, plain, aws, azure, gcp, yc]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,11 +65,35 @@ jobs:
 
       - name: Build & push
         env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
+        run: |
+          docker buildx create --use
+          make push-${{ matrix.flavour }} VERSION_PREFIX=test-
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+
+      - name: CST - Common
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          config: tests/${{ matrix.flavour }}.yml
+
+      - name: CST - Terraform
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          config: tests/tf.yml
+
+      - name: CST - OpenTofu
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+          config: tests/ot.yml
 
   pull_request:
     name: Pull Request
