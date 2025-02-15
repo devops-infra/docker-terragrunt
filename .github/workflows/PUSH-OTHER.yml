@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: |
-          make push-${{ matrix.flavour }} VERSION_PREFIX=test-
+          make build-${{ matrix.flavour }} VERSION_PREFIX=test-
           docker image ls
           curl -sL https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-arm64 -o ~/container-structure-test 
           chmod +x ~/container-structure-test
