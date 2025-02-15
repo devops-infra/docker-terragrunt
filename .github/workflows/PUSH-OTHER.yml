@@ -71,13 +71,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: |
+          docker buildx create --use
           make build-${{ matrix.flavour }} VERSION_PREFIX=test-
+          docker load -i tf-image.tar
+          docker load -i ot-image.tar
+          echo
           docker image ls
+          echo
           curl -sL https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-arm64 -o ~/container-structure-test 
           chmod +x ~/container-structure-test
-          ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-latest --config tests/${{ matrix.flavour }}.yml
-          ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest --config tests/ot.yml
-          ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest --config tests/tf.yml
+          ~/container-structure-test test --image docker-terragrunt:test-${{ matrix.flavour }}-latest --config tests/${{ matrix.flavour }}.yml
+          ~/container-structure-test test --image docker-terragrunt:test-${{ matrix.flavour }}-ot-latest --config tests/ot.yml
+          ~/container-structure-test test --image docker-terragrunt:test-${{ matrix.flavour }}-tf-latest --config tests/tf.yml
 
       - name: Container Structure Tests
         env:

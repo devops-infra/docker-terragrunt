@@ -7,3 +7,7 @@
 package.json
 yarn.lock
 node_modules/
+
+# buildx tarball
+tf-image.tar
+ot-image.tar
