@@ -75,19 +75,19 @@ jobs:
       - name: Test - Matrix
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          image: docker-terragrunt:test-${{ matrix.flavour }}-latest
           config: tests/${{ matrix.flavour }}.yml
 
       - name: Test - OpenTofu
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: docker.io/devopsinfra/docker-terragrunt:test-plain-ot-latest
+          image: docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
           config: tests/ot.yml
 
       - name: Test - Terraform
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: docker.io/devopsinfra/docker-terragrunt:test-plain-tf-latest
+          image: docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
           config: tests/tf.yml
 
   pull_request:
