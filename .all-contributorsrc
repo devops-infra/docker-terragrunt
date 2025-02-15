@@ -67,7 +67,16 @@
         "bug",
         "code"
       ]
-    }
+    },
+        {
+          "login": "RafaelWO",
+          "name": "RafaelWO",
+          "avatar_url": "https://avatars.githubusercontent.com/u/38643099?v=4",
+          "profile": "https://github.com/RafaelWO",
+          "contributions": [
+            "code"
+          ]
+        }
   ],
   "contributorsPerLine": 7,
   "skipCi": true

@@ -529,12 +529,12 @@ push-plain: login ## Push only plain image
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)tf-latest \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest .
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-tf-latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-tf-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-latest .
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_IMAGE):$(VERSION_PREFIX)$(TF_TG_VERSION)$(TXT_RESET)"
 	@$(DOCKER_COMMAND) --push \
 		--build-arg TF_VERSION=none \
