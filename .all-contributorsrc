@@ -17,67 +17,10 @@
       "profile": "https://shyper.pro/",
       "contributions": [
         "code",
-        "platform",
         "maintenance"
       ]
-    },
-    {
-      "login": "cytopia",
-      "name": "cytopia",
-      "avatar_url": "https://avatars.githubusercontent.com/u/12533999?v=4",
-      "profile": "https://www.everythingcli.org/",
-      "contributions": [
-        "ideas",
-        "code"
-      ]
-    },
-    {
-      "login": "markodjukic",
-      "name": "Marko Djukic",
-      "avatar_url": "https://avatars.githubusercontent.com/u/12538173?v=4",
-      "profile": "https://evaate.com/",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "clushie",
-      "name": "Phileas Lebada",
-      "avatar_url": "https://avatars.githubusercontent.com/u/47661139?v=4",
-      "profile": "https://github.com/clushie",
-      "contributions": [
-        "ideas"
-      ]
-    },
-    {
-      "login": "SmedbergM",
-      "name": "Matthew Smedberg",
-      "avatar_url": "https://avatars.githubusercontent.com/u/3883154?v=4",
-      "profile": "https://github.com/SmedbergM",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
-      "login": "dsoudakov",
-      "name": "Dmitri",
-      "avatar_url": "https://avatars.githubusercontent.com/u/14098629?v=4",
-      "profile": "https://github.com/dsoudakov",
-      "contributions": [
-        "bug",
-        "code"
-      ]
-    },
-        {
-          "login": "RafaelWO",
-          "name": "RafaelWO",
-          "avatar_url": "https://avatars.githubusercontent.com/u/38643099?v=4",
-          "profile": "https://github.com/RafaelWO",
-          "contributions": [
-            "code"
-          ]
-        }
+    }
   ],
   "contributorsPerLine": 7,
-  "skipCi": true
+  "linkToUsage": true
 }
