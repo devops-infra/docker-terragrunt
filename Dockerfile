@@ -246,7 +246,8 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN if [ "${YC}" = "yes" ]; then \
     echo "Installing Yandex Cloud CLI" ;\
     xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -r /etc/bash.bashrc && break || sleep 15; done ;\
+    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -a -i /opt/yc -r /etc/bash.bashrc && break || sleep 15; done ;\
+    ln -s /opt/yc/bin/yc /usr/bin/yc ;\
   fi
 
 # Scripts, configs and cleanup

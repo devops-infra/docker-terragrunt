@@ -1,8 +1,6 @@
 # Dockerized IaC framework for Terraform, OpenTofu and Terragrunt
 
-### Supporting `amd64` and `aarch64/arm64` images!
-
-### Supporting fully OpenTofu by image version (prefix `ot-`)!
+### Supporting `amd64` and `arm64` images!
 
 
 Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
@@ -14,7 +12,17 @@ Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google
 Please note focus of those images is to maintain availability of current versions of **Terraform, OpenTofu and Terragrunt**, not CLIs or other dependencies.  
 Hence, images are updated when new version of Terraform, OpenTofu or Terragrunt is released. Furthermore, versioning labels of images contain versions of said software to emphasize it.
 
-**Source code is available at [devops-infra/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt).**
+
+### Sources and Docker images
+
+**Source code** at [devops-infra/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt).
+
+**Docker Hub** images at [docker.io/devopsinfra/docker-terragrunt](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt)
+
+**GitHub Packages** images at [ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt/pkgs/container/docker-terragrunt)
+
+
+### Info
 
 Dockerfile was based on two images made
 by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt)
@@ -257,12 +265,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://shyper.pro/"><img src="https://avatars.githubusercontent.com/u/45788587?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Krzysztof Szyper</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=ChristophShyper" title="Code">💻</a> <a href="#platform-ChristophShyper" title="Packaging/porting to new platform">📦</a> <a href="#maintenance-ChristophShyper" title="Maintenance">🚧</a></td>
-    <td align="center"><a href="https://www.everythingcli.org/"><img src="https://avatars.githubusercontent.com/u/1.7.5999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cytopia</b></sub></a><br /><a href="#ideas-cytopia" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=cytopia" title="Code">💻</a></td>
-    <td align="center"><a href="https://evaate.com/"><img src="https://avatars.githubusercontent.com/u/12538173?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Djukic</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=markodjukic" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/clushie"><img src="https://avatars.githubusercontent.com/u/47661139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phileas Lebada</b></sub></a><br /><a href="#ideas-clushie" title="Ideas, Planning, & Feedback">🤔</a></td>
-    <td align="center"><a href="https://github.com/SmedbergM"><img src="https://avatars.githubusercontent.com/u/3883154?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Smedberg</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=SmedbergM" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/dsoudakov"><img src="https://avatars.githubusercontent.com/u/14098629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmitri</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/issues?q=author%3Adsoudakov" title="Bug reports">🐛</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=dsoudakov" title="Code">💻</a></td>
+    <td style="text-align: center;"><a href="https://shyper.pro/"><img src="https://avatars.githubusercontent.com/u/45788587?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Krzysztof Szyper</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=ChristophShyper" title="Code">💻</a> <a href="" title="Packaging/porting to new platform">📦</a> <a href="" title="Maintenance">🚧</a></td>
+    <td style="text-align: center;"><a href="https://www.everythingcli.org/"><img src="https://avatars.githubusercontent.com/u/12533999?v=4?s=100" width="100px;" alt=""/><br /><sub><b>cytopia</b></sub></a><br /><a href="" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=cytopia" title="Code">💻</a></td>
+    <td style="text-align: center;"><a href="https://evaate.com/"><img src="https://avatars.githubusercontent.com/u/12538173?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Marko Djukic</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=markodjukic" title="Code">💻</a></td>
+    <td style="text-align: center;"><a href="https://github.com/clushie"><img src="https://avatars.githubusercontent.com/u/47661139?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Phileas Lebada</b></sub></a><br /><a href="" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td style="text-align: center;"><a href="https://github.com/SmedbergM"><img src="https://avatars.githubusercontent.com/u/3883154?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Smedberg</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=SmedbergM" title="Code">💻</a></td>
+    <td style="text-align: center;"><a href="https://github.com/dsoudakov"><img src="https://avatars.githubusercontent.com/u/14098629?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dmitri</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/issues?q=author%3Adsoudakov" title="Bug reports">🐛</a> <a href="https://github.com/devops-infra/docker-terragrunt/commits?author=dsoudakov" title="Code">💻</a></td>
+    <td style="text-align: center;"><a href="https://github.com/RafaelWO"><img src="https://avatars.githubusercontent.com/u/38643099?v=4?s=100" width="100px;" alt=""/><br /><sub><b>RafaelWO</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=RafaelWO" title="Code">💻</a></td>
   </tr>
 </table>
 

@@ -63,6 +63,7 @@ jobs:
 
       - name: Build & push
         env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

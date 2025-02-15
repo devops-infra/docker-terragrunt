@@ -181,7 +181,7 @@ build-parallel: ## Build all image in parallel
 .PHONY: build-slim
 build-slim: ## Build slim image without cloud CLIs and any additional software
 	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
-	$(DOCKER_COMMAND) \
+	@$(DOCKER_COMMAND) \
 		--build-arg SLIM=yes \
 		--build-arg TF_VERSION=$(TF_VERSION) \
 		--build-arg OT_VERSION=none \
@@ -215,7 +215,13 @@ build-plain: ## Build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
         --tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest .
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest \
+        --tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-tf-latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-tf-latest \
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \

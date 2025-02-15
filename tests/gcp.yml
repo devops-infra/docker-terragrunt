@@ -1,0 +1,7 @@
+schemaVersion: 2.0.0
+
+commandTests:
+  - name: Google Cloud SDK
+    command: gcloud
+    args: ["--version"]
+    expectedOutput: ["Google Cloud SDK .*"]

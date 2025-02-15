@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavour: [slim, aws, azure, gcp, yc]
+        flavour: [slim, plain, aws, azure, gcp, yc]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -65,11 +65,30 @@ jobs:
 
       - name: Build & push
         env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
           DOCKER_BUILDKIT: 1
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
+
+      - name: Test - Matrix
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          config: tests/${{ matrix.flavour }}.yaml
+
+      - name: Test - OpenTofu
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+          config: tests/ot.yaml
+
+      - name: Test - Terraform
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          config: tests/tf.yaml
 
   pull_request:
     name: Pull Request
