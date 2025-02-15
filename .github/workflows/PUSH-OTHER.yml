@@ -70,17 +70,19 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-        run: make push-${{ matrix.flavour }} VERSION_PREFIX=test-
-
-      - name: Container Structure Tests
-        env:
-          TERM: xterm-256color
         run: |
+          make push-${{ matrix.flavour }} VERSION_PREFIX=test-
+          docker image ls
           curl -sL https://github.com/GoogleContainerTools/container-structure-test/releases/latest/download/container-structure-test-linux-arm64 -o ~/container-structure-test 
           chmod +x ~/container-structure-test
           ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-latest --config tests/${{ matrix.flavour }}.yml
           ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest --config tests/ot.yml
           ~/container-structure-test test --image docker.io/devopsinfra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest --config tests/tf.yml
+
+      - name: Container Structure Tests
+        env:
+          TERM: xterm-256color
+        run: |
 
   pull_request:
     name: Pull Request
