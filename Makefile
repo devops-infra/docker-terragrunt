@@ -229,7 +229,11 @@ build-plain: ## Build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)ot-latest .
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)ot-latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-ot-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
+        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-ot-latest .
 
 
 .PHONY: build-aws
@@ -524,6 +528,12 @@ push-plain: login ## Push only plain image
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)tf-latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest .
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_IMAGE):$(VERSION_PREFIX)$(TF_TG_VERSION)$(TXT_RESET)"
 	@$(DOCKER_COMMAND) --push \
@@ -533,7 +543,11 @@ push-plain: login ## Push only plain image
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)ot-latest .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)ot-latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-ot-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-ot-latest .
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_IMAGE):$(VERSION_PREFIX)$(OT_TG_VERSION)$(TXT_RESET)"
 
 
