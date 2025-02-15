@@ -1,6 +1,6 @@
 # Dockerized IaC framework for Terraform, OpenTofu and Terragrunt
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ### Supporting `amd64` and `arm64` images!
@@ -273,6 +273,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/markodjukic"><img src="https://avatars.githubusercontent.com/u/12538173?v=4?s=100" width="100px;" alt="Marko Djukic"/><br /><sub><b>Marko Djukic</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=markodjukic" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://contextflow.com/jobs/"><img src="https://avatars.githubusercontent.com/u/47661139?v=4?s=100" width="100px;" alt="Phileas Lebada"/><br /><sub><b>Phileas Lebada</b></sub></a><br /><a href="#ideas-clushie" title="Ideas, Planning, & Feedback">🤔</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/SmedbergM"><img src="https://avatars.githubusercontent.com/u/3883154?v=4?s=100" width="100px;" alt="Matthew Smedberg"/><br /><sub><b>Matthew Smedberg</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=SmedbergM" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dsoudakov"><img src="https://avatars.githubusercontent.com/u/14098629?v=4?s=100" width="100px;" alt="Dmitri"/><br /><sub><b>Dmitri</b></sub></a><br /><a href="https://github.com/devops-infra/docker-terragrunt/commits?author=dsoudakov" title="Code">💻</a> <a href="https://github.com/devops-infra/docker-terragrunt/issues?q=author%3Adsoudakov" title="Bug reports">🐛</a></td>
     </tr>
   </tbody>
   <tfoot>

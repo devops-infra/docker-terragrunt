@@ -55,6 +55,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "dsoudakov",
+      "name": "Dmitri",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14098629?v=4",
+      "profile": "https://github.com/dsoudakov",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
