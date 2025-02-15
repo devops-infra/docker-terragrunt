@@ -56,26 +56,26 @@ DOCKER_COMMAND := docker buildx build \
 	--platform linux/amd64,linux/arm64 \
 	--file=Dockerfile \
 	--annotation "index:org.label-schema.build-date=$(BUILD_DATE)" \
-    --annotation "index:org.label-schema.name=$(LABEL_NAME)" \
-    --annotation "index:org.label-schema.description=$(LABEL_DESCRIPTION)" \
-    --annotation "index:org.label-schema.usage=$(LABEL_REPO_URL)/blob/$(GITHUB_SHA)/README.md" \
-    --annotation "index:org.label-schema.url=$(LABEL_HOMEPAGE)" \
-    --annotation "index:org.label-schema.vcs-url=$(LABEL_REPO_URL)" \
-    --annotation "index:org.label-schema.vcs-ref=$(GITHUB_SHORT_SHA)" \
-    --annotation "index:org.label-schema.vendor=$(LABEL_VENDOR)" \
-    --annotation "index:org.label-schema.version=$(FULL_VERSION)" \
-    --annotation "index:org.label-schema.schema-version=1.0"	\
-    --annotation "index:org.opencontainers.image.created=$(BUILD_DATE)" \
-    --annotation "index:org.opencontainers.image.authors=$(LABEL_AUTHOR)" \
-    --annotation "index:org.opencontainers.image.url=$(LABEL_HOMEPAGE)" \
-    --annotation "index:org.opencontainers.image.documentation=$(LABEL_REPO_URL)/blob/$(GITHUB_SHA)/README.md" \
-    --annotation "index:org.opencontainers.image.source=$(LABEL_REPO_URL)" \
-    --annotation "index:org.opencontainers.image.version=$(FULL_VERSION)" \
-    --annotation "index:org.opencontainers.image.revision=$(GITHUB_SHORT_SHA)" \
-    --annotation "index:org.opencontainers.image.vendor=$(LABEL_VENDOR)" \
-    --annotation "index:org.opencontainers.image.licenses=MIT" \
-    --annotation "index:org.opencontainers.image.title=$(LABEL_NAME)" \
-    --annotation "index:org.opencontainers.image.description=$(LABEL_DESCRIPTION)" \
+	--annotation "index:org.label-schema.name=$(LABEL_NAME)" \
+	--annotation "index:org.label-schema.description=$(LABEL_DESCRIPTION)" \
+	--annotation "index:org.label-schema.usage=$(LABEL_REPO_URL)/blob/$(GITHUB_SHA)/README.md" \
+	--annotation "index:org.label-schema.url=$(LABEL_HOMEPAGE)" \
+	--annotation "index:org.label-schema.vcs-url=$(LABEL_REPO_URL)" \
+	--annotation "index:org.label-schema.vcs-ref=$(GITHUB_SHORT_SHA)" \
+	--annotation "index:org.label-schema.vendor=$(LABEL_VENDOR)" \
+	--annotation "index:org.label-schema.version=$(FULL_VERSION)" \
+	--annotation "index:org.label-schema.schema-version=1.0"	\
+	--annotation "index:org.opencontainers.image.created=$(BUILD_DATE)" \
+	--annotation "index:org.opencontainers.image.authors=$(LABEL_AUTHOR)" \
+	--annotation "index:org.opencontainers.image.url=$(LABEL_HOMEPAGE)" \
+	--annotation "index:org.opencontainers.image.documentation=$(LABEL_REPO_URL)/blob/$(GITHUB_SHA)/README.md" \
+	--annotation "index:org.opencontainers.image.source=$(LABEL_REPO_URL)" \
+	--annotation "index:org.opencontainers.image.version=$(FULL_VERSION)" \
+	--annotation "index:org.opencontainers.image.revision=$(GITHUB_SHORT_SHA)" \
+	--annotation "index:org.opencontainers.image.vendor=$(LABEL_VENDOR)" \
+	--annotation "index:org.opencontainers.image.licenses=MIT" \
+	--annotation "index:org.opencontainers.image.title=$(LABEL_NAME)" \
+	--annotation "index:org.opencontainers.image.description=$(LABEL_DESCRIPTION)" \
 	--label org.label-schema.build-date="$(BUILD_DATE)" \
 	--label org.label-schema.name="$(LABEL_NAME)" \
 	--label org.label-schema.description="$(LABEL_DESCRIPTION)" \
@@ -200,7 +200,7 @@ build-slim: ## Build slim image without cloud CLIs and any additional software
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)slim-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-ot-latest .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)slim-ot-latest .
 
 
 .PHONY: build-plain
@@ -214,14 +214,14 @@ build-plain: ## Build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)tf-latest \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest \
-        --tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)tf-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)latest \
+		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-tf-latest \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(TF_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-tf-latest \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-latest .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-tf-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-latest .
 	@$(DOCKER_COMMAND) \
 		--build-arg TF_VERSION=none \
 		--build-arg OT_VERSION=$(OT_VERSION) \
@@ -229,11 +229,11 @@ build-plain: ## Build image without cloud CLIs
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)ot-latest \
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)ot-latest \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)plain-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-$(OT_TG_VERSION) \
-        --tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-ot-latest .
+		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)plain-ot-latest .
 
 
 .PHONY: build-aws
