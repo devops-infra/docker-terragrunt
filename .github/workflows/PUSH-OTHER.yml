@@ -135,7 +135,7 @@ jobs:
           get_diff: true
 
       - name: PR - documentation (conditional)
-        if: startsWith(github.ref, 'refs/heads/documentation')
+        if: startsWith(github.ref, 'refs/heads/doc')
         uses: devops-infra/action-pull-request@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
