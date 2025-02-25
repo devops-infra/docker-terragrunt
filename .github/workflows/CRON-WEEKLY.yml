@@ -1,0 +1,22 @@
+name: Delete stale Docker Hub images
+
+on:
+  schedule:
+    # Run every Monday at 3:00 AM UTC
+    - cron: "0 3 * * 1"
+
+jobs:
+  delete:
+    name: Delete stale Docker Hub images
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run delete-stale-images
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          TERM: xterm-256color
+        run: |
+          make login
+          make delete-stale-images
