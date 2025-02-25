@@ -34,6 +34,7 @@ DOCKER_USERNAME := christophshyper
 DOCKER_ORG_NAME := devopsinfra
 DOCKER_IMAGE := docker-terragrunt
 DOCKER_NAME := $(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)
+DOCKER_HUB_API := https://hub.docker.com/v2
 GITHUB_USERNAME := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
@@ -161,6 +162,45 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
   	else \
   	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ;\
   	fi
+
+
+.PHONY: login
+login: ## Log into all registries
+	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)Docker Hub$(TXT_RESET)"
+	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USERNAME) --password-stdin
+	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)GitHub Packages$(TXT_RESET)"
+	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
+
+
+
+.PHONY: delete-stale-images
+delete-stale-images: ## Delete stale images from DockerHub that haven't been pulled in 6 months
+	$(info $(NL)$(TXT_GREEN)Deleting stale Docker images...$(TXT_RESET))
+	@PAGE=1; \
+		while true; do \
+			echo "Fetching page $$PAGE..."; \
+			RESPONSE=$$(curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
+				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE"); \
+			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name'); \
+			if [ -z "$$TAGS" ]; then \
+				echo "No more stale images found on page $$PAGE."; \
+			else \
+				echo -e "Deleting stale images on page $$PAGE: \n$$TAGS"; \
+				for TAG in $$TAGS; do \
+					echo "Deleting tag: $$TAG"; \
+					echo curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
+						-X DELETE \
+						"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/$$TAG/"; \
+				done; \
+			fi; \
+			NEXT_PAGE=$$(echo "$$RESPONSE" | jq -r '.next'); \
+			if [ "$$NEXT_PAGE" = "null" ]; then \
+				echo "No more pages to process."; \
+				break; \
+			fi; \
+			PAGE=$$((PAGE + 1)); \
+			sleep 3; \
+		done
 
 
 .PHONY: build-all
@@ -468,14 +508,6 @@ build-yc: ## Build image with YandexCloud CLI
 		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-ot-latest \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest .
-
-
-.PHONY: login
-login: ## Log into all registries
-	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)Docker Hub$(TXT_RESET)"
-	@echo $(DOCKER_TOKEN) | docker login -u $(DOCKER_USERNAME) --password-stdin
-	@echo -e "\n$(TXT_GREEN)Logging to: $(TXT_YELLOW)GitHub Packages$(TXT_RESET)"
-	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 
 
 .PHONY: push-parallel
