@@ -125,42 +125,42 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
 	$(info $(NL)$(TXT_GREEN) == CURRENT VERSIONS ==$(TXT_RESET))
 	@echo -e "$(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET)"
 	@if [[ $(TF_VERSION) != $(TF_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $(TF_LATEST)$(TXT_RESET)" ;\
-  		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' Makefile ;\
-		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' README.md ;\
+  		echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $(TF_LATEST)$(TXT_RESET)"; \
+  		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' Makefile; \
+		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' README.md; \
   	fi
 	@echo -e "$(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET)"
 	@if [[ $(TG_VERSION) != $(TG_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $(TG_LATEST)$(TXT_RESET)" ;\
-  		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' Makefile ;\
-		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' README.md ;\
+  		echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $(TG_LATEST)$(TXT_RESET)"; \
+  		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' Makefile; \
+		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' README.md; \
   	fi
 	@echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW) $(OT_VERSION)$(TXT_RESET)"
 	@if [[ $(OT_VERSION) != $(OT_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $(OT_LATEST)$(TXT_RESET)" ;\
-  		sed -i 's/$(OT_VERSION)/$(OT_LATEST)/g' Makefile ;\
-		sed -i 's/$(OT_VERSION)/$(OT_LATEST)/g' README.md ;\
+  		echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $(OT_LATEST)$(TXT_RESET)"; \
+  		sed -i 's/$(OT_VERSION)/$(OT_LATEST)/g' Makefile; \
+		sed -i 's/$(OT_VERSION)/$(OT_LATEST)/g' README.md; \
   	fi
 	@echo -e "$(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET)"
 	@if [[ $(AWS_VERSION) != $(AWS_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $(AWS_LATEST)$(TXT_RESET)" ;\
-  		sed -i 's/$(AWS_VERSION)/$(AWS_LATEST)/g' Makefile ;\
+  		echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $(AWS_LATEST)$(TXT_RESET)"; \
+  		sed -i 's/$(AWS_VERSION)/$(AWS_LATEST)/g' Makefile; \
   	fi
 	@echo -e "$(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET)"
 	@if [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)" ;\
-  		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile ;\
+  		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)"; \
+  		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile; \
   	fi
 	@echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)    $(AZ_VERSION)$(TXT_RESET)"
 	@if [[ $(AZ_VERSION) != $(AZ_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $(AZ_LATEST)$(TXT_RESET)" ;\
-  		sed -i 's/$(AZ_VERSION)/$(AZ_LATEST)/g' Makefile ;\
+  		echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $(AZ_LATEST)$(TXT_RESET)"; \
+  		sed -i 's/$(AZ_VERSION)/$(AZ_LATEST)/g' Makefile; \
   	fi
 	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] || [[ $(TG_VERSION) != $(TG_LATEST) ]] || [[ $(AWS_VERSION) != $(AWS_LATEST) ]] || [[ $(GCP_VERSION) != $(GCP_LATEST) ]] || [[ $(AZ_VERSION) != $(AZ_LATEST) ]]; then \
-  		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
-  		echo "VERSION_TAG=tf-$(TF_LATEST)-ot-$(OT_LATEST)-tg-$(TG_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)-az-$(AZ_VERSION)" >> $(GITHUB_ENV) ;\
+  		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)"; \
+  		echo "VERSION_TAG=tf-$(TF_LATEST)-ot-$(OT_LATEST)-tg-$(TG_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)-az-$(AZ_VERSION)" >> $(GITHUB_ENV); \
   	else \
-  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ;\
+  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV); \
   	fi
 
 
@@ -214,7 +214,7 @@ build-parallel: ## Build all image in parallel
 	@make -s build-plain VERSION_PREFIX=$(VERSION_PREFIX)
 	@for FL in $(FLAVOURS); do \
 			make -s build-$$FL VERSION_PREFIX=$(VERSION_PREFIX) &\
-		done ;\
+		done; \
 		wait
 
 
@@ -517,12 +517,12 @@ push-parallel: ## Push all images in parallel
 	@make -s push-plain VERSION_PREFIX=$(VERSION_PREFIX)
 	@for FL in $(FLAVOURS); do \
 			make -s push-$$FL VERSION_PREFIX=$(VERSION_PREFIX) &\
-		done ;\
+		done; \
 		wait
 
 
 .PHONY: push-slim
-push-slim: login ## Push only slim image
+push-slim: ## Push only slim image
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)slim-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg SLIM=yes \
@@ -549,7 +549,7 @@ push-slim: login ## Push only slim image
 
 
 .PHONY: push-plain
-push-plain: login ## Push only plain image
+push-plain: ## Push only plain image
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg TF_VERSION=$(TF_VERSION) \
@@ -584,7 +584,7 @@ push-plain: login ## Push only plain image
 
 
 .PHONY: push-aws
-push-aws: login ## Push image with AWS CLI
+push-aws: ## Push image with AWS CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -613,7 +613,7 @@ push-aws: login ## Push image with AWS CLI
 
 
 .PHONY: push-azure
-push-azure: login ## Push image with Azure CLI
+push-azure: ## Push image with Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
@@ -642,7 +642,7 @@ push-azure: login ## Push image with Azure CLI
 
 
 .PHONY: push-aws-azure
-push-aws-azure: login ## Push image with AWS and Azure CLI
+push-aws-azure: ## Push image with AWS and Azure CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -675,7 +675,7 @@ push-aws-azure: login ## Push image with AWS and Azure CLI
 
 
 .PHONY: push-gcp
-push-gcp: login ## Push image with GCP CLI
+push-gcp: ## Push image with GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg GCP=yes \
@@ -704,7 +704,7 @@ push-gcp: login ## Push image with GCP CLI
 
 
 .PHONY: push-aws-gcp
-push-aws-gcp: login ## Push image with AWS and GCP CLI
+push-aws-gcp: ## Push image with AWS and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -737,7 +737,7 @@ push-aws-gcp: login ## Push image with AWS and GCP CLI
 
 
 .PHONY: push-azure-gcp
-push-azure-gcp: login ## Push image with Azure and GCP CLI
+push-azure-gcp: ## Push image with Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AZURE=yes \
@@ -770,7 +770,7 @@ push-azure-gcp: login ## Push image with Azure and GCP CLI
 
 
 .PHONY: push-aws-azure-gcp
-push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
+push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg AWS=yes \
@@ -807,7 +807,7 @@ push-aws-azure-gcp: login ## Push image with AWS, Azure and GCP CLI
 
 
 .PHONY: push-yc
-push-yc: login ## Push image with YandexCloud CLI
+push-yc: ## Push image with YandexCloud CLI
 	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
 	@$(DOCKER_COMMAND) --push \
 		--build-arg YC=yes \
