@@ -174,14 +174,14 @@ login: ## Log into all registries
 
 
 .PHONY: delete-stale-images
-delete-stale-images: ## Delete stale images from DockerHub that haven't been pulled in 6 months
-	$(info $(NL)$(TXT_GREEN)Deleting stale Docker images...$(TXT_RESET))
+delete-stale-images: ## Delete stale images from DockerHub and GitHub Packages that haven't been pulled in 3 months
+	$(info $(NL)$(TXT_GREEN)Deleting stale DockerHub images...$(TXT_RESET))
 	@PAGE=1; \
 		while true; do \
 			echo "Fetching page $$PAGE..."; \
 			RESPONSE=$$(curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
 				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE"); \
-			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name'); \
+			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 7776000))) | .name'); \
 			if [ -z "$$TAGS" ]; then \
 				echo "No more stale images found on page $$PAGE."; \
 			else \
@@ -201,6 +201,32 @@ delete-stale-images: ## Delete stale images from DockerHub that haven't been pul
 			PAGE=$$((PAGE + 1)); \
 			sleep 3; \
 		done
+	$(info $(NL)$(TXT_GREEN)Deleting stale GitHub Packages images...$(TXT_RESET))
+	@PAGE=1; \
+	while true; do \
+		echo "Fetching page $$PAGE from GitHub Packages..."; \
+		RESPONSE=$$(curl -s -H "Authorization: Bearer $(GITHUB_TOKEN)" \
+			"https://ghcr.io/v2/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)/tags/list?n=100&page=$$PAGE"); \
+		TAGS=$$(echo "$$RESPONSE" | jq -r '.tags[] | select(.last_pulled == null or (.last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 7776000))) | .name'); \
+		if [ -z "$$TAGS" ]; then \
+			echo "No more stale images found on page $$PAGE."; \
+		else \
+			echo -e "Deleting stale images on page $$PAGE: \n$$TAGS"; \
+			for TAG in $$TAGS; do \
+				echo "Deleting tag: $$TAG"; \
+				curl -s -H "Authorization: Bearer $(GITHUB_TOKEN)" \
+					-X DELETE \
+					"https://ghcr.io/v2/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)/manifests/$$TAG"; \
+			done; \
+		fi; \
+		NEXT_PAGE=$$(echo "$$RESPONSE" | jq -r '.next'); \
+		if [ "$$NEXT_PAGE" = "null" ]; then \
+			echo "No more pages to process."; \
+			break; \
+		fi; \
+		PAGE=$$((PAGE + 1)); \
+		sleep 3; \
+	done
 
 
 .PHONY: build-all
