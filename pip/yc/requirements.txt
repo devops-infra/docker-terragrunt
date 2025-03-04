@@ -1,1 +1,1 @@
-yandexcloud==0.334.0
+yandexcloud==0.335.0
