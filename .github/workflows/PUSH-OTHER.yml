@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavour: [slim, plain, aws, azure, gcp, yc]
+        flavour: [ slim, plain, aws, azure, gcp, yc ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -78,19 +78,19 @@ jobs:
           docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
           docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
 
-      - name: CST - Common
+      - name: Cont.Struc.Test - ${{ matrix.flavour }}
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
           config: tests/${{ matrix.flavour }}.yml
 
-      - name: CST - Terraform
+      - name: Cont.Struc.Test - Terraform
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
           config: tests/tf.yml
 
-      - name: CST - OpenTofu
+      - name: Cont.Struc.Test - OpenTofu
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
