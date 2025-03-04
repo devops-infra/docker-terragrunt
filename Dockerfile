@@ -47,9 +47,11 @@ RUN echo Debug information: ;\
 
 # Install apt prerequisits, retry since ubuntu archive is failing a lot
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3008,SC2015,DL3009
+# hadolint ignore=DL3008,SC2015,DL3009,SC2034
 RUN for i in {1..5}; do \
-    apt-get update -y && break || sleep 15;  \
+    apt-get update -y && break ;\
+    echo "Retrying install in 15 seconds..." ;\
+    sleep 15 ;\
   done ;\
   echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections ;\
   echo "Installing apt packages" ;\
@@ -61,7 +63,9 @@ RUN for i in {1..5}; do \
       jq \
       vim \
       wget \
-      unzip && break || sleep 15;  \
+      unzip && break ;\
+    echo "Retrying install in 15 seconds..." ;\
+    sleep 15 ;\
   done ;\
   for i in {1..5}; do \
     if [ "${SLIM}" = "no" ]; then \
@@ -81,32 +85,44 @@ RUN for i in {1..5}; do \
         python3 \
         python3-pip \
         zip ;\
-    fi && break || sleep 15;  \
+      pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt --break-system-packages ;\
+    fi && break ;\
+    echo "Retrying install in 15 seconds..." ;\
+    sleep 15 ;\
   done
-
-# Python packages
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013
-RUN if [ "${SLIM}" = "no" ]; then \
-    echo "Installing Python packages" ;\
-    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt --break-system-packages ;\
-  fi
 
 # Get Terraform by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+    ARCHITECTURE=amd64 ;\
+  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+    ARCHITECTURE=arm64 ;\
+  else \
+    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+    exit 1 ;\
+  fi ;\
   if [ "${TF_VERSION}" = "none" ]; then \
     echo "No Terraform version specified..." ;\
   else \
+    echo "Installing Terraform" ;\
     if [ "${TF_VERSION}" = "latest" ]; then \
-      VERSION="$( curl -sL https://releases.hashicorp.com/terraform/ | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1 )" ;\
+      VERSION="$(curl -sL https://releases.hashicorp.com/terraform/ | tac | tac | grep -Eo '/[.0-9]+/' | grep -Eo '[.0-9]+' | sort -V | tail -1)" ;\
     else \
       VERSION="${TF_VERSION}" ;\
     fi ;\
-    for i in {1..5}; do curl -sL \
-      https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip -o ./terraform.zip \
-      && break || sleep 15;  \
+    DOWNLOAD_URL="https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip" ;\
+    CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
+    for i in {1..5}; do \
+      curl -sL "${DOWNLOAD_URL}" -o ./terraform.zip && break ;\
+      echo "Retrying download in 15 seconds..." ;\
+      sleep 15 ;\
     done ;\
     unzip ./terraform.zip ;\
     rm -f ./terraform.zip ;\
@@ -116,20 +132,36 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get OpenTofu by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+    ARCHITECTURE=amd64 ;\
+  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+    ARCHITECTURE=arm64 ;\
+  else \
+    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+    exit 1 ;\
+  fi ;\
   if [ "${OT_VERSION}" = "none" ]; then \
     echo "No OpenTofu version specified ..." ;\
   else \
     echo "Installing OpenTofu" ;\
     if [ "${OT_VERSION}" = "latest" ]; then \
-      VERSION="$( curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//' )" ;\
+      VERSION="$(curl -sL https://api.github.com/repos/opentofu/opentofu/releases/latest | tac | tac | jq -r .tag_name | sed 's/^v//')" ;\
     else \
       VERSION="${OT_VERSION}" ;\
     fi ;\
-    for i in {1..5}; do curl -sL \
-      https://github.com/opentofu/opentofu/releases/download/v${VERSION}/tofu_${VERSION}_${ARCHITECTURE}.deb -o ./tofu.deb \
-      && break || sleep 15;  \
+    DOWNLOAD_URL="https://github.com/opentofu/opentofu/releases/download/v${VERSION}/tofu_${VERSION}_${ARCHITECTURE}.deb" ;\
+    CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
+    for i in {1..5}; do  \
+      curl -sL "${DOWNLOAD_URL}" -o ./tofu.deb && break ;\
+      echo "Retrying download in 15 seconds..." ;\
+      sleep 15 ;\
     done ;\
     dpkg -i ./tofu.deb ;\
     rm -f ./tofu.deb ;\
@@ -137,27 +169,61 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get Terragrunt by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+    ARCHITECTURE=amd64 ;\
+  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+    ARCHITECTURE=arm64 ;\
+  else \
+    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+    exit 1 ;\
+  fi ;\
   echo "Installing Terragrunt" ;\
   if [ "${TG_VERSION}" = "latest" ]; then \
-    VERSION="$( curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .name )" ;\
+    VERSION="$(curl -sL https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | tac | tac | jq -r .name)" ;\
   else \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
-  for i in {1..5}; do curl -sL \
-    https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE} -o /usr/bin/terragrunt \
-    && break || sleep 15;  \
+  DOWNLOAD_URL="https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE}" ;\
+  CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+  if [ -z "${CHECK_URL}" ]; then \
+    echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+    exit 1 ;\
+  else \
+    echo "Using URL: ${DOWNLOAD_URL}" ;\
+  fi ;\
+  for i in {1..5}; do \
+    curl -sL "${DOWNLOAD_URL}" -o /usr/bin/terragrunt && break ;\
+    echo "Retrying download in 15 seconds..." ;\
+    sleep 15 ;\
   done ;\
   chmod +x /usr/bin/terragrunt
 
 # Get latest TFLint
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+    ARCHITECTURE=amd64 ;\
+  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+    ARCHITECTURE=arm64 ;\
+  else \
+    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+    exit 1 ;\
+  fi ;\
   echo "Installing TFLint" ;\
-  DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip" )" ;\
-  for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o ./tflint.zip && break || sleep 15; done ;\
+  DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/terraform-linters/tflint/releases/latest | tac | tac | grep -Eo "https://.+?_linux_${ARCHITECTURE}.zip")" ;\
+  CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+  if [ -z "${CHECK_URL}" ]; then \
+    echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+    exit 1 ;\
+  else \
+    echo "Using URL: ${DOWNLOAD_URL}" ;\
+  fi ;\
+  for i in {1..5}; do \
+    curl -sL "${DOWNLOAD_URL}" -o ./tflint.zip && break ;\
+    echo "Retrying download in 15 seconds..." ;\
+    sleep 15 ;\
+  done ;\
   unzip ./tflint.zip ;\
   rm -f ./tflint.zip ;\
   chmod +x ./tflint ;\
@@ -165,12 +231,30 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ 
 
 # Get latest hcledit
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
+# hadolint ignore=SC2015,SC2034
 RUN if [ "${SLIM}" = "no" ]; then \
     echo "Installing hcledit" ;\
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
-    for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break || sleep 15; done ;\
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+      ARCHITECTURE=amd64 ;\
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+      ARCHITECTURE=arm64 ;\
+    else \
+      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+      exit 1 ;\
+    fi ;\
+    DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/minamijoyo/hcledit/releases/latest | tac | tac | grep -Eo "https://.+?_linux_${ARCHITECTURE}.tar.gz")" ;\
+    CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
+    for i in {1..5}; do \
+      curl -sL "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break ;\
+      echo "Retrying download in 15 seconds..." ;\
+      sleep 15 ;\
+    done ;\
     tar -xf ./hcledit.tar.gz ;\
     rm -f ./hcledit.tar.gz ;\
     chmod +x ./hcledit ;\
@@ -180,25 +264,62 @@ RUN if [ "${SLIM}" = "no" ]; then \
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015
+# hadolint ignore=SC2015,SC2034
 RUN if [ "${SLIM}" = "no" ]; then \
     echo "Installing sops" ;\
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=amd64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm64; else ARCHITECTURE=amd64; fi ;\
-    DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/getsops/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" | head -1 )" ;\
-    for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o /usr/bin/sops && break || sleep 15; done ;\
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+      ARCHITECTURE=amd64 ;\
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+      ARCHITECTURE=arm64 ;\
+    else \
+      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+      exit 1 ;\
+    fi ;\
+    DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/getsops/sops/releases/latest | tac | tac | grep -Eo "https://.+?\.linux.${ARCHITECTURE}" | head -1)" ;\
+    CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
+    for i in {1..5}; do \
+      curl -sL "${DOWNLOAD_URL}" -o /usr/bin/sops && break ;\
+      echo "Retrying download in 15 seconds..." ;\
+      sleep 15 ;\
+    done ;\
     chmod +x /usr/bin/sops ;\
   fi
 
 # Cloud CLIs
 # AWS
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,SC2015
+# hadolint ignore=DL3013,SC2015,SC2034
 RUN if [ "${AWS}" = "yes" ]; then \
     echo "Installing AWS CLI" ;\
     xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=aarch64; else ARCHITECTURE=x86_64; fi ;\
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+      ARCHITECTURE=x86_64 ;\
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+      ARCHITECTURE=aarch64 ;\
+    else \
+      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+      exit 1 ;\
+    fi ;\
     if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
-    for i in {1..5}; do curl -sL "https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" -o /tmp/awscli.zip && break || sleep 15; done ;\
+    DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" ;\
+    CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
+    for i in {1..5}; do \
+      curl -sL "${DOWNLOAD_URL}" -o /tmp/awscli.zip && break ;\
+      echo "Retrying download in 15 seconds..." ;\
+      sleep 15 ;\
+    done ;\
     mkdir -p /usr/local/awscli ;\
     unzip -q /tmp/awscli.zip -d /usr/local/awscli ;\
     /usr/local/awscli/aws/install ;\
@@ -209,8 +330,27 @@ SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC1091,SC2015,SC2129
 RUN if [ "${GCP}" = "yes" ]; then \
     echo "Installing Google Cloud SDK" ;\
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then ARCHITECTURE=x86_64; elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then ARCHITECTURE=arm; else ARCHITECTURE=x86_64; fi ;\
-    for i in {1..5}; do curl -sL "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz && break || sleep 15; done ;\
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+      ARCHITECTURE=x86_64 ;\
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+      ARCHITECTURE=arm ;\
+    else \
+      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+      exit 1 ;\
+    fi ;\
+    DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" ;\
+    CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
+    for i in {1..5}; do  \
+      curl -sL "${DOWNLOAD_URL}" -o google-cloud-sdk.tar.gz && break ;\
+      echo "Retrying download in 15 seconds..." ;\
+      sleep 15 ;\
+    done ;\
     tar -xf google-cloud-sdk.tar.gz ;\
     rm -f google-cloud-sdk.tar.gz ;\
     ./google-cloud-sdk/install.sh \
@@ -249,11 +389,13 @@ Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architect
 
 # YandexCloud
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,SC2015,DL4001
+# hadolint ignore=DL3013,SC2015,DL4001,SC2034
 RUN if [ "${YC}" = "yes" ]; then \
     echo "Installing Yandex Cloud CLI" ;\
     xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -a -i /opt/yc -r /etc/bash.bashrc && break || sleep 15; done ;\
+    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -a -i /opt/yc -r /etc/bash.bashrc && break ;\
+    echo "Retrying Install in 15 seconds..." ;\
+    sleep 15; done ;\
     ln -s /opt/yc/bin/yc /usr/bin/yc ;\
   fi
 
