@@ -106,7 +106,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
     fi ;\
     DOWNLOAD_URL="https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip" ;\
     CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-    if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
     for i in {1..5}; do  \
       curl -sL "${DOWNLOAD_URL}" -o ./terraform.zip && break || sleep 15 ;\
     done ;\
@@ -137,7 +141,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
     fi ;\
     DOWNLOAD_URL="https://github.com/opentofu/opentofu/releases/download/v${VERSION}/tofu_${VERSION}_${ARCHITECTURE}.deb" ;\
     CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-    if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
     for i in {1..5}; do curl -sL "${DOWNLOAD_URL}" -o ./tofu.deb && break || sleep 15 ;\
     done ;\
     dpkg -i ./tofu.deb ;\
@@ -162,7 +170,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
   fi ;\
   DOWNLOAD_URL="https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE}" ;\
   CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-  if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+  if [ -z "${CHECK_URL}" ]; then \
+    echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+  else \
+    echo "Using URL: ${DOWNLOAD_URL}" ;\
+  fi ;\
   for i in {1..5}; do \
     curl -sL "${DOWNLOAD_URL}" -o /usr/bin/terragrunt && break || sleep 15 ;\
   done ;\
@@ -181,7 +193,11 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
   echo "Installing TFLint" ;\
   DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.zip")" ;\
   CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-  if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+  if [ -z "${CHECK_URL}" ]; then \
+    echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+  else \
+    echo "Using URL: ${DOWNLOAD_URL}" ;\
+  fi ;\
   for i in {1..5}; do \
     curl -sL "${DOWNLOAD_URL}" -o ./tflint.zip && break || sleep 15 ;\
   done ;\
@@ -204,7 +220,11 @@ RUN if [ "${SLIM}" = "no" ]; then \
     fi ;\
     DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/minamijoyo/hcledit/releases/latest | grep -o -E "https://.+?_linux_${ARCHITECTURE}.tar.gz" )" ;\
     CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-    if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break || sleep 15 ;\
     done ;\
@@ -229,7 +249,11 @@ RUN if [ "${SLIM}" = "no" ]; then \
     fi ;\
     DOWNLOAD_URL="$( curl -sL https://api.github.com/repos/getsops/sops/releases/latest | grep -o -E "https://.+?\.linux.${ARCHITECTURE}" | head -1 )" ;\
     CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-    if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o /usr/bin/sops && break || sleep 15 ;\
     done ;\
@@ -253,7 +277,11 @@ RUN if [ "${AWS}" = "yes" ]; then \
     if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
     DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" ;\
     CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-    if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o /tmp/awscli.zip && break || sleep 15 ;\
     done ;\
@@ -276,7 +304,11 @@ RUN if [ "${GCP}" = "yes" ]; then \
     fi ;\
     DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" ;\
     CHECK_URL="$( curl -Is "${DOWNLOAD_URL}" | head -1 | grep -o -E "200|301|302" )" ;\
-    if [ -z "${CHECK_URL}" ]; then echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ; fi ;\
+    if [ -z "${CHECK_URL}" ]; then \
+      echo "Invalid URL: ${DOWNLOAD_URL}" ; exit 1 ;\
+    else \
+      echo "Using URL: ${DOWNLOAD_URL}" ;\
+    fi ;\
     for i in {1..5}; do  \
       curl -sL "${DOWNLOAD_URL}" -o google-cloud-sdk.tar.gz && break || sleep 15;  \
     done ;\
