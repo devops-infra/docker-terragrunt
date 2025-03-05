@@ -83,6 +83,7 @@ RUN for i in {1..5}; do \
         openssh-client \
         openssl \
         python3 \
+        python-is-python3 \
         python3-pip \
         zip ;\
       pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt --break-system-packages ;\
