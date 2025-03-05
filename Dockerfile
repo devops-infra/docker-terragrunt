@@ -64,7 +64,7 @@ RUN for i in {1..5}; do \
       vim \
       wget \
       unzip && break ;\
-    echo "Retrying install in 15 seconds..." ;\
+    echo "Retrying install in 15 seconds for basic binaries..." ;\
     sleep 15 ;\
   done ;\
   for i in {1..5}; do \
@@ -87,7 +87,7 @@ RUN for i in {1..5}; do \
         zip ;\
       pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt --break-system-packages ;\
     fi && break ;\
-    echo "Retrying install in 15 seconds..." ;\
+    echo "Retrying install in 15 seconds for slim binaries..." ;\
     sleep 15 ;\
   done
 
@@ -112,16 +112,18 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
       VERSION="${TF_VERSION}" ;\
     fi ;\
     DOWNLOAD_URL="https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_${ARCHITECTURE}.zip" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for Terraform" ;\
+      exit 1 ;\
+    fi ;\
     CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
     if [ -z "${CHECK_URL}" ]; then \
-      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      echo "Invalid URL for Terraform: ${DOWNLOAD_URL}" ;\
       exit 1 ;\
-    else \
-      echo "Using URL: ${DOWNLOAD_URL}" ;\
     fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o ./terraform.zip && break ;\
-      echo "Retrying download in 15 seconds..." ;\
+      echo "Retrying download for Terraform in 15 seconds..." ;\
       sleep 15 ;\
     done ;\
     unzip ./terraform.zip ;\
@@ -151,16 +153,18 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
       VERSION="${OT_VERSION}" ;\
     fi ;\
     DOWNLOAD_URL="https://github.com/opentofu/opentofu/releases/download/v${VERSION}/tofu_${VERSION}_${ARCHITECTURE}.deb" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for OpenTofu" ;\
+      exit 1 ;\
+    fi ;\
     CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
     if [ -z "${CHECK_URL}" ]; then \
-      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      echo "Invalid URL for Terragrunt: ${DOWNLOAD_URL}" ;\
       exit 1 ;\
-    else \
-      echo "Using URL: ${DOWNLOAD_URL}" ;\
     fi ;\
     for i in {1..5}; do  \
       curl -sL "${DOWNLOAD_URL}" -o ./tofu.deb && break ;\
-      echo "Retrying download in 15 seconds..." ;\
+      echo "Retrying download for OpenTofu in 15 seconds..." ;\
       sleep 15 ;\
     done ;\
     dpkg -i ./tofu.deb ;\
@@ -185,16 +189,20 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
     VERSION="v${TG_VERSION}" ;\
   fi ;\
   DOWNLOAD_URL="https://github.com/gruntwork-io/terragrunt/releases/download/${VERSION}/terragrunt_linux_${ARCHITECTURE}" ;\
+  if [ -z "${DOWNLOAD_URL}" ]; then \
+    echo "Empty download URL for Terragrunt" ;\
+    exit 1 ;\
+  fi ;\
   CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
   if [ -z "${CHECK_URL}" ]; then \
-    echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+    echo "Invalid URL for Terragrunt: ${DOWNLOAD_URL}" ;\
     exit 1 ;\
   else \
     echo "Using URL: ${DOWNLOAD_URL}" ;\
   fi ;\
   for i in {1..5}; do \
     curl -sL "${DOWNLOAD_URL}" -o /usr/bin/terragrunt && break ;\
-    echo "Retrying download in 15 seconds..." ;\
+    echo "Retrying download for Terragrunt in 15 seconds..." ;\
     sleep 15 ;\
   done ;\
   chmod +x /usr/bin/terragrunt
@@ -212,16 +220,18 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
   fi ;\
   echo "Installing TFLint" ;\
   DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/terraform-linters/tflint/releases/latest | tac | tac | grep -Eo "https://.+?_linux_${ARCHITECTURE}.zip")" ;\
+  if [ -z "${DOWNLOAD_URL}" ]; then \
+    echo "Empty download URL for TFLint" ;\
+    exit 1 ;\
+  fi ;\
   CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
   if [ -z "${CHECK_URL}" ]; then \
-    echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+    echo "Invalid URL for TFLint: ${DOWNLOAD_URL}" ;\
     exit 1 ;\
-  else \
-    echo "Using URL: ${DOWNLOAD_URL}" ;\
   fi ;\
   for i in {1..5}; do \
     curl -sL "${DOWNLOAD_URL}" -o ./tflint.zip && break ;\
-    echo "Retrying download in 15 seconds..." ;\
+    echo "Retrying download for TFLint in 15 seconds..." ;\
     sleep 15 ;\
   done ;\
   unzip ./tflint.zip ;\
@@ -243,16 +253,18 @@ RUN if [ "${SLIM}" = "no" ]; then \
       exit 1 ;\
     fi ;\
     DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/minamijoyo/hcledit/releases/latest | tac | tac | grep -Eo "https://.+?_linux_${ARCHITECTURE}.tar.gz")" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for hcledit" ;\
+      exit 1; \
+    fi ;\
     CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
     if [ -z "${CHECK_URL}" ]; then \
-      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      echo "Invalid URL for hcledit: ${DOWNLOAD_URL}" ;\
       exit 1 ;\
-    else \
-      echo "Using URL: ${DOWNLOAD_URL}" ;\
     fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o ./hcledit.tar.gz && break ;\
-      echo "Retrying download in 15 seconds..." ;\
+      echo "Retrying download for hcledit in 15 seconds..." ;\
       sleep 15 ;\
     done ;\
     tar -xf ./hcledit.tar.gz ;\
@@ -276,16 +288,18 @@ RUN if [ "${SLIM}" = "no" ]; then \
       exit 1 ;\
     fi ;\
     DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/getsops/sops/releases/latest | tac | tac | grep -Eo "https://.+?\.linux.${ARCHITECTURE}" | head -1)" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for sops" ;\
+      exit 1; \
+    fi ;\
     CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
     if [ -z "${CHECK_URL}" ]; then \
-      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      echo "Invalid URL for sops: ${DOWNLOAD_URL}" ;\
       exit 1 ;\
-    else \
-      echo "Using URL: ${DOWNLOAD_URL}" ;\
     fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o /usr/bin/sops && break ;\
-      echo "Retrying download in 15 seconds..." ;\
+      echo "Retrying download for sops in 15 seconds..." ;\
       sleep 15 ;\
     done ;\
     chmod +x /usr/bin/sops ;\
@@ -308,16 +322,18 @@ RUN if [ "${AWS}" = "yes" ]; then \
     fi ;\
     if [ "${AWS_VERSION}" = "latest" ]; then VERSION=""; else VERSION="-${AWS_VERSION}"; fi ;\
     DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}${VERSION}.zip" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for AWS CLI" ;\
+      exit 1; \
+    fi ;\
     CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
     if [ -z "${CHECK_URL}" ]; then \
-      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      echo "Invalid URL for AWS CLI: ${DOWNLOAD_URL}" ;\
       exit 1 ;\
-    else \
-      echo "Using URL: ${DOWNLOAD_URL}" ;\
     fi ;\
     for i in {1..5}; do \
       curl -sL "${DOWNLOAD_URL}" -o /tmp/awscli.zip && break ;\
-      echo "Retrying download in 15 seconds..." ;\
+      echo "Retrying download for AWS CLI in 15 seconds..." ;\
       sleep 15 ;\
     done ;\
     mkdir -p /usr/local/awscli ;\
@@ -339,16 +355,18 @@ RUN if [ "${GCP}" = "yes" ]; then \
       exit 1 ;\
     fi ;\
     DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for Google Cloud SDK" ;\
+      exit 1; \
+    fi ;\
     CHECK_URL="$(curl -Is "${DOWNLOAD_URL}" | tac | tac | head -1 | grep -Eo "200|301|302")" ;\
     if [ -z "${CHECK_URL}" ]; then \
-      echo "Invalid URL: ${DOWNLOAD_URL}" ;\
+      echo "Invalid URL for Google Cloud SDK: ${DOWNLOAD_URL}" ;\
       exit 1 ;\
-    else \
-      echo "Using URL: ${DOWNLOAD_URL}" ;\
     fi ;\
     for i in {1..5}; do  \
       curl -sL "${DOWNLOAD_URL}" -o google-cloud-sdk.tar.gz && break ;\
-      echo "Retrying download in 15 seconds..." ;\
+      echo "Retrying download for Google Cloud SDK in 15 seconds..." ;\
       sleep 15 ;\
     done ;\
     tar -xf google-cloud-sdk.tar.gz ;\

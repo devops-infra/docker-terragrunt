@@ -71,7 +71,6 @@ jobs:
         run: |
           docker buildx create --use
           make login
-          make delete-stale-images
           make push-${{ matrix.flavour }}
 
       - name: Docker Hub Description
