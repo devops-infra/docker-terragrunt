@@ -2,6 +2,8 @@
 
 ### Supporting `amd64` and `arm64` images!
 
+### After 
+
 Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
 
 Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google Cloud Platform and YandexCloud**.
@@ -121,8 +123,6 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 | `docker-terragrunt:azure-gcp-ot-latest`     | ❌   | ✅     | ✅   | ✅  | ❌  | Normal version with Azure and GCP CLIs, with OT. <br>![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-gcp-ot-latest?label=Image%20size&style=flat-square&logo=docker)          |
 | `docker-terragrunt:aws-azure-gcp-tf-latest` | ✅   | ✅     | ✅   | ❌  | ✅  | Normal version with AWS, Azure and GCP CLIs, with TF. <br>![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-tf-latest?label=Image%20size&style=flat-square&logo=docker) |
 | `docker-terragrunt:aws-azure-gcp-ot-latest` | ✅   | ✅     | ✅   | ✅  | ❌  | Normal version with AWS, Azure and GCP CLIs, with OT. <br>![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-azure-gcp-ot-latest?label=Image%20size&style=flat-square&logo=docker) |
-| `docker-terragrunt:yc-tf-latest`            | ❌   | ❌     | ❌   | ❌  | ✅  | Normal version with YandexCloud CLI, with TF. <br>![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/yc-tf-latest?label=Image%20size&style=flat-square&logo=docker)                    |
-| `docker-terragrunt:yc-ot-latest`            | ❌   | ❌     | ❌   | ✅  | ❌  | Normal version with YandexCloud CLI, with OT. <br>![Docker size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/yc-ot-latest?label=Image%20size&style=flat-square&logo=docker)                    |
 
 
 # Usage
@@ -259,7 +259,6 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | terragrunt          | Binary         | For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform).                                                                            | https://github.com/gruntwork-io/terragrunt         |
 | tflint              | Binary         | For linting Terraform files.                                                                                                                                   | https://github.com/terraform-linters/tflint        |
 | unzip               | Binary         | For extracting packages.                                                                                                                                       | http://infozip.sourceforge.net/                    |
-| yc                  | Binary         | For interaction with Yandex Cloud via terminal.                                                                                                                | https://cloud.yandex.com/en/docs/cli               |
 | zip                 | Binary         | For creating packages for Lambdas.                                                                                                                             | http://infozip.sourceforge.net/                    |
 
 

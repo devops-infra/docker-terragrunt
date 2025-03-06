@@ -29,7 +29,7 @@ GITHUB_USERNAME := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp yc
+FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
 
 # Labels and annotations for Docker images
 # Labels for http://label-schema.org/rc1/#build-time-labels
@@ -482,31 +482,6 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest .
 
 
-.PHONY: build-yc
-build-yc: ## Build image with YandexCloud CLI
-	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
-	@$(DOCKER_COMMAND) \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=$(TF_VERSION) \
-		--build-arg OT_VERSION=none \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
-	@$(DOCKER_COMMAND) \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=none \
-		--build-arg OT_VERSION=$(OT_VERSION) \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-ot-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest .
-
-
 .PHONY: push-parallel
 push-parallel: ## Push all images in parallel
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET)$(NL))
@@ -801,30 +776,3 @@ push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest .
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)"
-
-
-.PHONY: push-yc
-push-yc: ## Push image with YandexCloud CLI
-	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
-	@$(DOCKER_COMMAND) --push \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=$(TF_VERSION) \
-		--build-arg OT_VERSION=none \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION)$(TXT_RESET)"
-	@$(DOCKER_COMMAND) --push \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=none \
-		--build-arg OT_VERSION=$(OT_VERSION) \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-ot-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)"

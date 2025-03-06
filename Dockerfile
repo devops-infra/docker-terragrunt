@@ -24,7 +24,6 @@ ARG TG_VERSION=none
 # List of Python packages
 COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
-COPY pip/yc/requirements.txt /tmp/pip_yc_requirements.txt
 
 # Debug information
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
@@ -285,27 +284,6 @@ Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architect
     apt-get update -y ;\
     apt-get install --no-install-recommends -y azure-cli="${AZ_VERSION}-1~${AZ_DIST}" ;\
   fi
-
-# YandexCloud
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,SC2015,DL4001,SC2034
-RUN if [ "${YC}" = "yes" ]; then \
-    echo "Installing Yandex Cloud CLI" ;\
-    xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -a -i /opt/yc -r /etc/bash.bashrc ;\
-  fi
-
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,SC2015,DL4001,SC2034
-RUN if [ "${YC}" = "yes" ]; then \
-    echo "Installing Yandex Cloud CLI" ;\
-    xargs -n 1 -a /tmp/pip_yc_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
-    for i in {1..5}; do curl -sL "https://storage.yandexcloud.net/yandexcloud-yc/install.sh" | bash -s -- -a -i /opt/yc -r /etc/bash.bashrc && break ;\
-    echo "Retrying Install in 15 seconds..." ;\
-    sleep 15; done ;\
-    ln -s /opt/yc/bin/yc /usr/bin/yc ;\
-  fi
-
 
 # Scripts, configs and cleanup
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh show-versions.sh /usr/bin/
