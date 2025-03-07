@@ -48,15 +48,3 @@ updates:
     labels:
       - automatic
       - dependency
-
-  # Enable version updates for yandex
-  - package-ecosystem: pip
-    directory: "/pip/yc/"
-    target-branch: master
-    schedule:
-      interval: daily
-    assignees:
-      - ChristophShyper
-    labels:
-      - automatic
-      - dependency

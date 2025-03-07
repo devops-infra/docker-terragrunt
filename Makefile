@@ -8,24 +8,14 @@ AZ_VERSION = 2.70.0
 TF_VERSION := 1.11.1
 OT_VERSION := 1.9.0
 TG_VERSION := 0.75.2
+TF_TG_VERSION := tf-$(TF_VERSION)-tg-$(TG_VERSION)
+OT_TG_VERSION := ot-$(OT_VERSION)-tg-$(TG_VERSION)
+FULL_VERSION := tf-$(TF_VERSION)-ot-$(OT_VERSION)-tg-$(TG_VERSION)
 
 # GitHub Actions bogus variables
 GITHUB_REF ?= refs/heads/null
 GITHUB_SHA ?= aabbccddeeff
 VERSION_PREFIX ?=
-
-# Set version tags
-TF_LATEST := $(shell curl -LsS https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r .tag_name | sed 's/^v//')
-OT_LATEST := $(shell curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//')
-TG_LATEST := $(shell curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//')
-TF_TG_VERSION := tf-$(TF_VERSION)-tg-$(TG_VERSION)
-OT_TG_VERSION := ot-$(OT_VERSION)-tg-$(TG_VERSION)
-TF_TG_LATEST := tf-$(TF_LATEST)-tg-$(TG_LATEST)
-OT_TG_LATEST := ot-$(OT_LATEST)-tg-$(TG_LATEST)
-FULL_VERSION := tf-$(TF_VERSION)-ot-$(OT_VERSION)-tg-$(TG_VERSION)
-AWS_LATEST := $(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1)
-GCP_LATEST := $(shell curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-*//')
-AZ_LATEST := $(shell curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info.version' | sed s'/azure-cli-//')
 
 # Other variables and constants
 CURRENT_BRANCH := $(shell echo $(GITHUB_REF) | sed 's/refs\/heads\///')
@@ -39,7 +29,7 @@ GITHUB_USERNAME := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp yc
+FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
 
 # Labels and annotations for Docker images
 # Labels for http://label-schema.org/rc1/#build-time-labels
@@ -123,45 +113,53 @@ help: ## Display help prompt
 .PHONY: update-versions
 update-versions: ## Check TF, OT, and TG versions and update if there's newer version available
 	$(info $(NL)$(TXT_GREEN) == CURRENT VERSIONS ==$(TXT_RESET))
-	@echo -e "$(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET)"
-	@if [[ $(TF_VERSION) != $(TF_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $(TF_LATEST)$(TXT_RESET)"; \
-  		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' Makefile; \
-		sed -i 's/$(TF_VERSION)/$(TF_LATEST)/g' README.md; \
-  	fi
-	@echo -e "$(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET)"
-	@if [[ $(TG_VERSION) != $(TG_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $(TG_LATEST)$(TXT_RESET)"; \
-  		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' Makefile; \
-		sed -i 's/$(TG_VERSION)/$(TG_LATEST)/g' README.md; \
-  	fi
-	@echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW) $(OT_VERSION)$(TXT_RESET)"
-	@if [[ $(OT_VERSION) != $(OT_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $(OT_LATEST)$(TXT_RESET)"; \
-  		sed -i 's/$(OT_VERSION)/$(OT_LATEST)/g' Makefile; \
-		sed -i 's/$(OT_VERSION)/$(OT_LATEST)/g' README.md; \
-  	fi
-	@echo -e "$(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET)"
-	@if [[ $(AWS_VERSION) != $(AWS_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $(AWS_LATEST)$(TXT_RESET)"; \
-  		sed -i 's/$(AWS_VERSION)/$(AWS_LATEST)/g' Makefile; \
-  	fi
-	@echo -e "$(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET)"
-	@if [[ $(GCP_VERSION) != $(GCP_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $(GCP_LATEST)$(TXT_RESET)"; \
-  		sed -i 's/$(GCP_VERSION)/$(GCP_LATEST)/g' Makefile; \
-  	fi
-	@echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)    $(AZ_VERSION)$(TXT_RESET)"
-	@if [[ $(AZ_VERSION) != $(AZ_LATEST) ]]; then \
-  		echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $(AZ_LATEST)$(TXT_RESET)"; \
-  		sed -i 's/$(AZ_VERSION)/$(AZ_LATEST)/g' Makefile; \
-  	fi
-	@if [[ $(TF_VERSION) != $(TF_LATEST) ]] || [[ $(TG_VERSION) != $(TG_LATEST) ]] || [[ $(AWS_VERSION) != $(AWS_LATEST) ]] || [[ $(GCP_VERSION) != $(GCP_LATEST) ]] || [[ $(AZ_VERSION) != $(AZ_LATEST) ]]; then \
-  		echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)"; \
-  		echo "VERSION_TAG=tf-$(TF_LATEST)-ot-$(OT_LATEST)-tg-$(TG_LATEST)-aws-$(AWS_LATEST)-gcp-$(GCP_LATEST)-az-$(AZ_VERSION)" >> $(GITHUB_ENV); \
-  	else \
-  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV); \
-  	fi
+	@export TF_LATEST=$(shell curl -LsS https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r .tag_name | sed 's/^v//') \
+		OT_LATEST=$(shell curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//') \
+		TG_LATEST=$(shell curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//') \
+		TF_TG_LATEST=tf-$$TF_LATEST-tg-$$TG_LATEST \
+		OT_TG_LATEST=ot-$$OT_LATEST-tg-$$TG_LATEST \
+		AWS_LATEST=$(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1) \
+		GCP_LATEST=$(shell curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-*//') \
+		AZ_LATEST=$(shell curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info.version' | sed s'/azure-cli-//') ;\
+		echo -e "$(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET)" ;\
+		if [[ $(TF_VERSION) != $$TF_LATEST ]]; then \
+  			echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $$TF_LATEST$(TXT_RESET)" ;\
+  			sed -i 's/$(TF_VERSION)/$$TF_LATEST/g' Makefile ;\
+			sed -i 's/$(TF_VERSION)/$$TF_LATEST/g' README.md ;\
+  		fi ;\
+		echo -e "$(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET)" ;\
+		if [[ $(TG_VERSION) != $$TG_LATEST ]]; then \
+  			echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $$TG_LATEST$(TXT_RESET)" ;\
+  			sed -i 's/$(TG_VERSION)/$$TG_LATEST/g' Makefile ;\
+			sed -i 's/$(TG_VERSION)/$$TG_LATEST/g' README.md ;\
+  		fi ;\
+		echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW) $(OT_VERSION)$(TXT_RESET)" ;\
+		if [[ $(OT_VERSION) != $$OT_LATEST ]]; then \
+  			echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $$OT_LATEST$(TXT_RESET)" ;\
+  			sed -i 's/$(OT_VERSION)/$$OT_LATEST/g' Makefile ;\
+			sed -i 's/$(OT_VERSION)/$$OT_LATEST/g' README.md ;\
+  		fi ;\
+		echo -e "$(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET)" ;\
+		if [[ $(AWS_VERSION) != $$AWS_LATEST ]]; then \
+  			echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $$AWS_LATEST$(TXT_RESET)" ;\
+  			sed -i 's/$(AWS_VERSION)/$$AWS_LATEST/g' Makefile ;\
+  		fi ;\
+		echo -e "$(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET)" ;\
+		if [[ $(GCP_VERSION) != $$GCP_LATEST ]]; then \
+  			echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $$GCP_LATEST$(TXT_RESET)" ;\
+  			sed -i 's/$(GCP_VERSION)/$$GCP_LATEST/g' Makefile ;\
+  		fi ;\
+		echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)    $(AZ_VERSION)$(TXT_RESET)" ;\
+		if [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
+  			echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $$AZ_LATEST$(TXT_RESET)" ;\
+  			sed -i 's/$(AZ_VERSION)/$$AZ_LATEST/g' Makefile ;\
+  		fi ;\
+		if [[ $(TF_VERSION) != $$TF_LATEST ]] || [[ $(TG_VERSION) != $$TG_LATEST ]] || [[ $(AWS_VERSION) != $$AWS_LATEST ]] || [[ $(GCP_VERSION) != $$GCP_LATEST ]] || [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
+  			echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
+  			echo "VERSION_TAG=tf-$$TF_LATEST-ot-$$OT_LATEST-tg-$$TG_LATEST-aws-$$AWS_LATEST-gcp-$$GCP_LATEST-az-$$AZ_LATEST" >> $(GITHUB_ENV) ;\
+  		else \
+	  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ;\
+  		fi
 
 
 .PHONY: login
@@ -172,34 +170,33 @@ login: ## Log into all registries
 	@echo $(GITHUB_TOKEN) | docker login ghcr.io -u $(GITHUB_USERNAME) --password-stdin
 
 
-
 .PHONY: delete-stale-images
 delete-stale-images: ## Delete stale images from DockerHub that haven't been pulled in 6 months
 	$(info $(NL)$(TXT_GREEN)Deleting stale Docker images...$(TXT_RESET))
-	@PAGE=1; \
+	@PAGE=1 ;\
 		while true; do \
-			echo "Fetching page $$PAGE..."; \
+			echo "Fetching page $$PAGE..." ;\
 			RESPONSE=$$(curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
-				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE"); \
-			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name'); \
+				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE") ;\
+			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name') ;\
 			if [ -z "$$TAGS" ]; then \
-				echo "No more stale images found on page $$PAGE."; \
+				echo "No more stale images found on page $$PAGE." ;\
 			else \
-				echo -e "Deleting stale images on page $$PAGE: \n$$TAGS"; \
+				echo -e "Deleting stale images on page $$PAGE: \n$$TAGS" ;\
 				for TAG in $$TAGS; do \
-					echo "Deleting tag: $$TAG"; \
+					echo "Deleting tag: $$TAG" ;\
 					echo curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
 						-X DELETE \
-						"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/$$TAG/"; \
-				done; \
-			fi; \
-			NEXT_PAGE=$$(echo "$$RESPONSE" | jq -r '.next'); \
+						"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/$$TAG/" ;\
+				done ;\
+			fi ;\
+			NEXT_PAGE=$$(echo "$$RESPONSE" | jq -r '.next') ;\
 			if [ "$$NEXT_PAGE" = "null" ]; then \
-				echo "No more pages to process."; \
-				break; \
-			fi; \
-			PAGE=$$((PAGE + 1)); \
-			sleep 3; \
+				echo "No more pages to process." ;\
+				break ;\
+			fi ;\
+			PAGE=$$((PAGE + 1)) ;\
+			sleep 3 ;\
 		done
 
 
@@ -214,7 +211,7 @@ build-parallel: ## Build all image in parallel
 	@make -s build-plain VERSION_PREFIX=$(VERSION_PREFIX)
 	@for FL in $(FLAVOURS); do \
 			make -s build-$$FL VERSION_PREFIX=$(VERSION_PREFIX) &\
-		done; \
+		done ;\
 		wait
 
 
@@ -485,31 +482,6 @@ build-aws-azure-gcp: ## Build image with AWS, Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest .
 
 
-.PHONY: build-yc
-build-yc: ## Build image with YandexCloud CLI
-	$(info $(NL)$(TXT_GREEN)Building image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
-	@$(DOCKER_COMMAND) \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=$(TF_VERSION) \
-		--build-arg OT_VERSION=none \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
-	@$(DOCKER_COMMAND) \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=none \
-		--build-arg OT_VERSION=$(OT_VERSION) \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-ot-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest .
-
-
 .PHONY: push-parallel
 push-parallel: ## Push all images in parallel
 	$(info $(NL)$(TXT_GREEN) == STARTING DEPLOYMENT == $(TXT_RESET)$(NL))
@@ -517,7 +489,7 @@ push-parallel: ## Push all images in parallel
 	@make -s push-plain VERSION_PREFIX=$(VERSION_PREFIX)
 	@for FL in $(FLAVOURS); do \
 			make -s push-$$FL VERSION_PREFIX=$(VERSION_PREFIX) &\
-		done; \
+		done ;\
 		wait
 
 
@@ -804,30 +776,3 @@ push-aws-azure-gcp: ## Push image with AWS, Azure and GCP CLI
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION) \
 		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)aws-azure-gcp-ot-latest .
 	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)aws-azure-gcp-$(OT_TG_VERSION)$(TXT_RESET)"
-
-
-.PHONY: push-yc
-push-yc: ## Push image with YandexCloud CLI
-	$(info $(NL)$(TXT_GREEN)Building and pushing image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) $(TXT_GREEN)and $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)$(NL))
-	@$(DOCKER_COMMAND) --push \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=$(TF_VERSION) \
-		--build-arg OT_VERSION=none \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-tf-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(TF_TG_VERSION)$(TXT_RESET)"
-	@$(DOCKER_COMMAND) --push \
-		--build-arg YC=yes \
-		--build-arg TF_VERSION=none \
-		--build-arg OT_VERSION=$(OT_VERSION) \
-		--build-arg TG_VERSION=$(TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(DOCKER_NAME):$(VERSION_PREFIX)yc-ot-latest \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION) \
-		--tag=$(GITHUB_NAME):$(VERSION_PREFIX)yc-ot-latest .
-	@echo -e "\n$(TXT_GREEN)Pushed image: $(TXT_YELLOW)$(DOCKER_NAME):$(VERSION_PREFIX)yc-$(OT_TG_VERSION)$(TXT_RESET)"
