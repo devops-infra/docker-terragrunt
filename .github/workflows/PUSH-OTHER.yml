@@ -47,7 +47,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        flavour: [ slim, plain, aws, azure, gcp, yc ]
+        flavour: [slim, plain, aws, azure, gcp]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
