@@ -27,6 +27,7 @@ DOCKER_NAME := $(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)
 DOCKER_HUB_API := https://hub.docker.com/v2
 GITHUB_USERNAME := ChristophShyper
 GITHUB_ORG_NAME := devops-infra
+GITHUB_HUB_API := https://ghcr.io/v2
 GITHUB_NAME := ghcr.io/$(GITHUB_ORG_NAME)/$(DOCKER_IMAGE)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 FLAVOURS := aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
@@ -124,35 +125,35 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
 		echo -e "$(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET)" ;\
 		if [[ $(TF_VERSION) != $$TF_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $$TF_LATEST$(TXT_RESET)" ;\
-  			sed -i 's/$(TF_VERSION)/$$TF_LATEST/g' Makefile ;\
-			sed -i 's/$(TF_VERSION)/$$TF_LATEST/g' README.md ;\
+  			sed -i "s/$(TF_VERSION)/$$TF_LATEST/g" Makefile ;\
+			sed -i "s/$(TF_VERSION)/$$TF_LATEST/g" README.md ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET)" ;\
 		if [[ $(TG_VERSION) != $$TG_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $$TG_LATEST$(TXT_RESET)" ;\
-  			sed -i 's/$(TG_VERSION)/$$TG_LATEST/g' Makefile ;\
-			sed -i 's/$(TG_VERSION)/$$TG_LATEST/g' README.md ;\
+  			sed -i "s/$(TG_VERSION)/$$TG_LATEST/g" Makefile ;\
+			sed -i "s/$(TG_VERSION)/$$TG_LATEST/g" README.md ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW) $(OT_VERSION)$(TXT_RESET)" ;\
 		if [[ $(OT_VERSION) != $$OT_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $$OT_LATEST$(TXT_RESET)" ;\
-  			sed -i 's/$(OT_VERSION)/$$OT_LATEST/g' Makefile ;\
-			sed -i 's/$(OT_VERSION)/$$OT_LATEST/g' README.md ;\
+  			sed -i "s/$(OT_VERSION)/$$OT_LATEST/g" Makefile ;\
+			sed -i "s/$(OT_VERSION)/$$OT_LATEST/g" README.md ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET)" ;\
 		if [[ $(AWS_VERSION) != $$AWS_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $$AWS_LATEST$(TXT_RESET)" ;\
-  			sed -i 's/$(AWS_VERSION)/$$AWS_LATEST/g' Makefile ;\
+  			sed -i "s/$(AWS_VERSION)/$$AWS_LATEST/g" Makefile ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET)" ;\
 		if [[ $(GCP_VERSION) != $$GCP_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $$GCP_LATEST$(TXT_RESET)" ;\
-  			sed -i 's/$(GCP_VERSION)/$$GCP_LATEST/g' Makefile ;\
+  			sed -i "s/$(GCP_VERSION)/$$GCP_LATEST/g" Makefile ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)    $(AZ_VERSION)$(TXT_RESET)" ;\
 		if [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $$AZ_LATEST$(TXT_RESET)" ;\
-  			sed -i 's/$(AZ_VERSION)/$$AZ_LATEST/g' Makefile ;\
+  			sed -i "s/$(AZ_VERSION)/$$AZ_LATEST/g" Makefile ;\
   		fi ;\
 		if [[ $(TF_VERSION) != $$TF_LATEST ]] || [[ $(TG_VERSION) != $$TG_LATEST ]] || [[ $(AWS_VERSION) != $$AWS_LATEST ]] || [[ $(GCP_VERSION) != $$GCP_LATEST ]] || [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
   			echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
@@ -171,11 +172,11 @@ login: ## Log into all registries
 
 
 .PHONY: delete-stale-images
-delete-stale-images: ## Delete stale images from DockerHub that haven't been pulled in 6 months
+delete-stale-images: ## Delete stale Docker images that haven't been pulled in 3 months
 	$(info $(NL)$(TXT_GREEN)Deleting stale Docker images...$(TXT_RESET))
 	@PAGE=1 ;\
 		while true; do \
-			echo "Fetching page $$PAGE..." ;\
+			echo "Fetching page $$PAGE for DockerHub..." ;\
 			RESPONSE=$$(curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
 				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE") ;\
 			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name') ;\
