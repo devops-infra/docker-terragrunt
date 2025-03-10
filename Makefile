@@ -134,7 +134,7 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
   			sed -i "s/$(TG_VERSION)/$$TG_LATEST/g" Makefile ;\
 			sed -i "s/$(TG_VERSION)/$$TG_LATEST/g" README.md ;\
   		fi ;\
-		echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW) $(OT_VERSION)$(TXT_RESET)" ;\
+		echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW)   $(OT_VERSION)$(TXT_RESET)" ;\
 		if [[ $(OT_VERSION) != $$OT_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $$OT_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(OT_VERSION)/$$OT_LATEST/g" Makefile ;\
@@ -150,7 +150,7 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
   			echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $$GCP_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(GCP_VERSION)/$$GCP_LATEST/g" Makefile ;\
   		fi ;\
-		echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)    $(AZ_VERSION)$(TXT_RESET)" ;\
+		echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)  $(AZ_VERSION)$(TXT_RESET)" ;\
 		if [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $$AZ_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(AZ_VERSION)/$$AZ_LATEST/g" Makefile ;\
