@@ -2,19 +2,9 @@
 
 ### Supporting `amd64` and `arm64` images!
 
-### After 
+### Due to excessive size of the images and upcoming Docker Hub limits, I'm are currently working on reducing it. Please use the latest versions of the images to keep up with the most active versions. Images older than 3 month will be deleted.
 
-Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
-
-Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google Cloud Platform and YandexCloud**.
-
-**Best used as runner image for CI/CD in automation, as well as a consistent local run environment.**
-
-Please note focus of those images is to maintain availability of current versions of **Terraform, OpenTofu and Terragrunt**, not CLIs or other dependencies.  
-Hence, images are updated when new version of Terraform, OpenTofu or Terragrunt is released. Furthermore, versioning labels of images contain versions of said software to emphasize it.
-
-
-### Sources and Docker images
+## Sources and Docker images
 
 **Source code** at [devops-infra/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt).
 
@@ -23,7 +13,17 @@ Hence, images are updated when new version of Terraform, OpenTofu or Terragrunt 
 **GitHub Packages** images at [ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt/pkgs/container/docker-terragrunt)
 
 
-### Info
+# Info
+
+Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
+
+Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google Cloud Platform**.
+
+**Best used as runner image for CI/CD in automation, as well as a consistent local run environment.**
+
+Please note focus of those images is to maintain availability of current versions of **Terraform, OpenTofu and Terragrunt**, not CLIs or other dependencies.  
+Hence, images are updated when new version of Terraform, OpenTofu or Terragrunt is released. Furthermore, versioning labels of images contain versions of said software to emphasize it.
+
 
 Dockerfile was based on two images made
 by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt)
@@ -49,35 +49,13 @@ Infrastructure-as-a-Code.
 
 [
 ![GitHub](https://img.shields.io/badge/github-devops--infra%2Fdocker--terragrunt-brightgreen.svg?style=flat-square&logo=github)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/devops-infra/docker-terragrunt?color=brightgreen&label=Code%20size&style=flat-square&logo=github)
 ![GitHub last commit](https://img.shields.io/github/last-commit/devops-infra/docker-terragrunt?color=brightgreen&label=Last%20commit&style=flat-square&logo=github)
 ](https://github.com/devops-infra/docker-terragrunt "shields.io")
-<br>
+
 [
 ![DockerHub](https://img.shields.io/badge/docker-devopsinfra%2Fdocker--terragrunt-blue.svg?style=flat-square&logo=docker)
-![Dockerfile size](https://img.shields.io/github/size/devops-infra/docker-terragrunt/Dockerfile?label=Dockerfile%20size&style=flat-square&logo=docker)
 ![Docker Pulls](https://img.shields.io/docker/pulls/devopsinfra/docker-terragrunt?color=blue&label=Pulls&logo=docker&style=flat-square)
 ](https://hub.docker.com/r/devopsinfra/docker-terragrunt "shields.io")
-
-<!--
-[
-![DockerHub](https://img.shields.io/badge/docker-devopsinfra%2Fdocker--terragrunt:aws--latest-blue.svg?style=flat-square&logo=docker)
-![Docker version](https://img.shields.io/docker/v/devopsinfra/docker-terragrunt/aws-latest?color=blue&label=Version&logo=docker&style=flat-square)
-![Image size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/aws-latest?label=Image%20size&style=flat-square&logo=docker)
-](https://hub.docker.com/r/devopsinfra/docker-terragrunt "shields.io")
-<br>
-[
-![DockerHub](https://img.shields.io/badge/docker-devopsinfra%2Fdocker--terragrunt:azure--latest-blue.svg?style=flat-square&logo=docker)
-![Docker version](https://img.shields.io/docker/v/devopsinfra/docker-terragrunt/azure-latest?color=blue&label=Version&logo=docker&style=flat-square)
-![Image size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/azure-latest?label=Image%20size&style=flat-square&logo=docker)
-](https://hub.docker.com/r/devopsinfra/docker-terragrunt "shields.io")
-<br>
-[
-![DockerHub](https://img.shields.io/badge/docker-devopsinfra%2Fdocker--terragrunt:gcp--latest-blue.svg?style=flat-square&logo=docker)
-![Docker version](https://img.shields.io/docker/v/devopsinfra/docker-terragrunt/gcp-latest?color=blue&label=Version&logo=docker&style=flat-square)
-![Image size](https://img.shields.io/docker/image-size/devopsinfra/docker-terragrunt/gcp-latest?label=Image%20size&style=flat-square&logo=docker)
-](https://hub.docker.com/r/devopsinfra/docker-terragrunt "shields.io")
--->
 
 
 # Available source images
