@@ -29,7 +29,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_TAG }}
-          commit_message: Bump for ${{ env.VERSION_TAG }}
+          commit_message: ⬆️ Bump for ${{ env.VERSION_TAG }}
 
 
       - name: Download Pull Request template
@@ -44,7 +44,7 @@ jobs:
         uses: devops-infra/action-pull-request@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          title: Bump for ${{ env.VERSION_TAG }}
+          title: ⬆️ Bump for ${{ env.VERSION_TAG }}
           label: automatic,dependency
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
