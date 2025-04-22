@@ -117,50 +117,50 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
 	@export TF_LATEST=$(shell curl -LsS https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r .tag_name | sed 's/^v//') \
 		OT_LATEST=$(shell curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//') \
 		TG_LATEST=$(shell curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//') \
-		TF_TG_LATEST=tf-$$TF_LATEST-tg-$$TG_LATEST \
-		OT_TG_LATEST=ot-$$OT_LATEST-tg-$$TG_LATEST \
 		AWS_LATEST=$(shell curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r .[].name | head -1) \
 		GCP_LATEST=$(shell curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-*//') \
 		AZ_LATEST=$(shell curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info.version' | sed s'/azure-cli-//') ;\
+		VERSION_TAG="" ;\
 		echo -e "$(TXT_GREEN)Current Terraform:$(TXT_YELLOW)  $(TF_VERSION)$(TXT_RESET)" ;\
 		if [[ $(TF_VERSION) != $$TF_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Terraform:$(TXT_YELLOW)   $$TF_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(TF_VERSION)/$$TF_LATEST/g" Makefile ;\
 			sed -i "s/$(TF_VERSION)/$$TF_LATEST/g" README.md ;\
+			VERSION_TAG="$$VERSION_TAG tf-$$TF_LATEST" ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current Terragrunt:$(TXT_YELLOW) $(TG_VERSION)$(TXT_RESET)" ;\
 		if [[ $(TG_VERSION) != $$TG_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Terragrunt:$(TXT_YELLOW)  $$TG_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(TG_VERSION)/$$TG_LATEST/g" Makefile ;\
 			sed -i "s/$(TG_VERSION)/$$TG_LATEST/g" README.md ;\
+			VERSION_TAG="$$VERSION_TAG tg-$$TG_LATEST" ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current OpenTofu:$(TXT_YELLOW)   $(OT_VERSION)$(TXT_RESET)" ;\
 		if [[ $(OT_VERSION) != $$OT_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest OpenTofu:$(TXT_YELLOW) $$OT_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(OT_VERSION)/$$OT_LATEST/g" Makefile ;\
 			sed -i "s/$(OT_VERSION)/$$OT_LATEST/g" README.md ;\
+			VERSION_TAG="$$VERSION_TAG ot-$$OT_LATEST" ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current AWS CLI:$(TXT_YELLOW)    $(AWS_VERSION)$(TXT_RESET)" ;\
 		if [[ $(AWS_VERSION) != $$AWS_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest AWS CLI:$(TXT_YELLOW)     $$AWS_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(AWS_VERSION)/$$AWS_LATEST/g" Makefile ;\
+			VERSION_TAG="$$VERSION_TAG aws-$$AWS_LATEST" ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current GCP CLI:$(TXT_YELLOW)    $(GCP_VERSION)$(TXT_RESET)" ;\
 		if [[ $(GCP_VERSION) != $$GCP_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest GCP CLI:$(TXT_YELLOW)     $$GCP_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(GCP_VERSION)/$$GCP_LATEST/g" Makefile ;\
+			VERSION_TAG="$$VERSION_TAG gcp-$$GCP_LATEST" ;\
   		fi ;\
 		echo -e "$(TXT_GREEN)Current Azure CLI:$(TXT_YELLOW)  $(AZ_VERSION)$(TXT_RESET)" ;\
 		if [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
   			echo -e "$(TXT_RED)Latest Azure CLI:$(TXT_YELLOW)     $$AZ_LATEST$(TXT_RESET)" ;\
   			sed -i "s/$(AZ_VERSION)/$$AZ_LATEST/g" Makefile ;\
+			VERSION_TAG="$$VERSION_TAG az-$$AZ_LATEST" ;\
   		fi ;\
-		if [[ $(TF_VERSION) != $$TF_LATEST ]] || [[ $(TG_VERSION) != $$TG_LATEST ]] || [[ $(AWS_VERSION) != $$AWS_LATEST ]] || [[ $(GCP_VERSION) != $$GCP_LATEST ]] || [[ $(AZ_VERSION) != $$AZ_LATEST ]]; then \
-  			echo -e "\n$(TXT_YELLOW) == UPDATING VERSIONS ==$(TXT_RESET)" ;\
-  			echo "VERSION_TAG=tf-$$TF_LATEST-ot-$$OT_LATEST-tg-$$TG_LATEST-aws-$$AWS_LATEST-gcp-$$GCP_LATEST-az-$$AZ_LATEST" >> $(GITHUB_ENV) ;\
-  		else \
-	  	  	echo "VERSION_TAG=null" >> $(GITHUB_ENV) ;\
-  		fi
+  		echo "VERSION_TAG=null" >> $(GITHUB_ENV)
 
 
 .PHONY: login
