@@ -28,7 +28,7 @@ jobs:
         uses: devops-infra/action-commit-push@v0.10.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: dependency/${{ env.VERSION_TAG }}
+          target_branch: dependency/${{ env.VERSION_BRANCH }}
           commit_message: ⬆️ Bump for ${{ env.VERSION_TAG }}
 
 
