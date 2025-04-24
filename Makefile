@@ -160,7 +160,10 @@ update-versions: ## Check TF, OT, and TG versions and update if there's newer ve
   			sed -i "s/$(AZ_VERSION)/$$AZ_LATEST/g" Makefile ;\
 			VERSION_TAG="$$VERSION_TAG az-$$AZ_LATEST" ;\
   		fi ;\
-  		echo "VERSION_TAG=$$VERSION_TAG" >> $(GITHUB_ENV)
+		VERSION_TAG=$$(echo "$$VERSION_TAG" | sed 's/ //') ;\
+		VERSION_BRANCH=$$(echo "$$VERSION_TAG" | sed 's/ /-/g') ;\
+  		echo "VERSION_TAG=$$VERSION_TAG" >> $(GITHUB_ENV) ;\
+  		echo "VERSION_BRANCH=$$VERSION_BRANCH" >> $(GITHUB_ENV)
 
 
 .PHONY: login
