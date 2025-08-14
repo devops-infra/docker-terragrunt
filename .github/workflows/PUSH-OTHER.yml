@@ -117,7 +117,7 @@ jobs:
 
       - name: PR - bugfix (conditional)
         if: startsWith(github.ref, 'refs/heads/bug')
-        uses: devops-infra/action-pull-request@v0.6.0
+        uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -127,7 +127,7 @@ jobs:
 
       - name: PR - dependency (conditional)
         if: startsWith(github.ref, 'refs/heads/dep') && !startsWith(github.ref, 'refs/heads/dependabot')
-        uses: devops-infra/action-pull-request@v0.6.0
+        uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -137,7 +137,7 @@ jobs:
 
       - name: PR - documentation (conditional)
         if: startsWith(github.ref, 'refs/heads/doc')
-        uses: devops-infra/action-pull-request@v0.6.0
+        uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -147,7 +147,7 @@ jobs:
 
       - name: PR - feature (conditional)
         if: startsWith(github.ref, 'refs/heads/feat')
-        uses: devops-infra/action-pull-request@v0.6.0
+        uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -157,7 +157,7 @@ jobs:
 
       - name: PR - test (conditional)
         if: startsWith(github.ref, 'refs/heads/test')
-        uses: devops-infra/action-pull-request@v0.6.0
+        uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -169,7 +169,7 @@ jobs:
 
       - name: PR - test (conditional)
         if: "!startsWith(github.ref, 'refs/heads/bug') && !startsWith(github.ref, 'refs/heads/dep') && !startsWith(github.ref, 'refs/heads/doc')  && !startsWith(github.ref, 'refs/heads/feat') && !startsWith(github.ref, 'refs/heads/test')"
-        uses: devops-infra/action-pull-request@v0.6.0
+        uses: devops-infra/action-pull-request@v0.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
