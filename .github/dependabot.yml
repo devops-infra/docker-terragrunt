@@ -6,45 +6,33 @@ updates:
     directory: "/"
     target-branch: master
     schedule:
-      interval: daily
+      interval: weekly
     assignees:
       - ChristophShyper
-    labels:
-      - automatic
-      - dependency
 
   # Enable version updates for Docker
   - package-ecosystem: docker
     directory: "/"
     target-branch: master
     schedule:
-      interval: daily
+      interval: weekly
     assignees:
       - ChristophShyper
-    labels:
-      - automatic
-      - dependency
 
   # Enable version updates for pip
   - package-ecosystem: pip
     directory: "/pip/common/"
     target-branch: master
     schedule:
-      interval: daily
+      interval: weekly
     assignees:
       - ChristophShyper
-    labels:
-      - automatic
-      - dependency
 
   # Enable version updates for aws
   - package-ecosystem: pip
     directory: "/pip/aws/"
     target-branch: master
     schedule:
-      interval: daily
+      interval: weekly
     assignees:
       - ChristophShyper
-    labels:
-      - automatic
-      - dependency
