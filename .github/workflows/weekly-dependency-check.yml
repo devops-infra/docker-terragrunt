@@ -25,6 +25,12 @@ jobs:
           echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           echo "Testing dependencies for tag: $LATEST_TAG"
 
+      - name: Install Task
+        run: |
+          curl -sSL https://taskfile.dev/install.sh -o /tmp/install-task.sh
+          sudo bash /tmp/install-task.sh -b /usr/local/bin
+          task --version
+
       - name: Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
@@ -44,7 +50,9 @@ jobs:
           VERSION: ${{ steps.latest-tag.outputs.tag }}
           VERSION_PREFIX: test-
           TERM: xterm-256color
-        run: make push
+        run: |
+          docker buildx create --use
+          task push-parallel
 
   delete:
     name: Delete stale Docker images
@@ -53,11 +61,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      - name: Install Task
+        run: |
+          curl -sSL https://taskfile.dev/install.sh -o /tmp/install-task.sh
+          sudo bash /tmp/install-task.sh -b /usr/local/bin
+          task --version
+
       - name: Delete stale images
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: |
-          make login
-          make delete-stale-images
+          task login
+          task delete-stale-images

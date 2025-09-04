@@ -1,0 +1,829 @@
+version: '3'
+
+vars:
+  # Versions of the main dependencies to use with this Docker image
+  AWS_VERSION: '2.28.17'
+  GCP_VERSION: '535.0.0'
+  AZ_VERSION: '2.76.0'
+  TF_VERSION: '1.13.0'
+  OT_VERSION: '1.10.5'
+  TG_VERSION: '0.86.2'
+
+  TF_TG_VERSION: tf-{{.TF_VERSION}}-tg-{{.TG_VERSION}}
+  OT_TG_VERSION: ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
+  FULL_VERSION: tf-{{.TF_VERSION}}-ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
+
+  # CI-related and utility vars
+  GITHUB_REF: '{{.ENV.GITHUB_REF | default "refs/heads/null"}}'
+  GITHUB_SHA: '{{.ENV.GITHUB_SHA | default "aabbccddeeff"}}'
+  VERSION_PREFIX: '{{.ENV.VERSION_PREFIX | default ""}}'
+  GITHUB_SHORT_SHA:
+    sh: "echo {{.GITHUB_SHA}} | cut -c1-7"
+  BUILD_DATE:
+    sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
+
+  # Docker registries
+  DOCKER_USERNAME: 'christophshyper'
+  DOCKER_ORG_NAME: 'devopsinfra'
+  DOCKER_IMAGE: 'docker-terragrunt'
+  DOCKER_NAME: '{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}'
+  DOCKER_HUB_API: 'https://hub.docker.com/v2'
+
+  GITHUB_USERNAME: 'ChristophShyper'
+  GITHUB_ORG_NAME: 'devops-infra'
+  GITHUB_HUB_API: 'https://ghcr.io/v2'
+  GITHUB_NAME: 'ghcr.io/{{.GITHUB_ORG_NAME}}/{{.DOCKER_IMAGE}}'
+
+  # Cosmetic labels
+  LABEL_AUTHOR: 'Krzysztof ChristophShyper Szyper <biotyk@mail.com>'
+  LABEL_NAME: 'IaC dockerized framework for Terragrunt, Terraform and OpenTofu'
+  LABEL_DESCRIPTION: 'Docker image with Terragrunt v{{.TG_VERSION}}, Terraform v{{.TF_VERSION}} or OpenTofu v{{.OT_VERSION}}, together with all needed components to easily manage cloud infrastructure.'
+  LABEL_REPO_URL: 'https://github.com/devops-infra/docker-terragrunt'
+  LABEL_HOMEPAGE: 'https://shyper.pro'
+  LABEL_VENDOR: 'DevOps-Infra'
+
+  FLAVOURS: 'aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp'
+
+  LABEL_ARGS: |
+    --annotation "index:org.label-schema.build-date={{.BUILD_DATE}}" \
+    --annotation "index:org.label-schema.name={{.LABEL_NAME}}" \
+    --annotation "index:org.label-schema.description={{.LABEL_DESCRIPTION}}" \
+    --annotation "index:org.label-schema.usage={{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md" \
+    --annotation "index:org.label-schema.url={{.LABEL_HOMEPAGE}}" \
+    --annotation "index:org.label-schema.vcs-url={{.LABEL_REPO_URL}}" \
+    --annotation "index:org.label-schema.vcs-ref={{.GITHUB_SHORT_SHA}}" \
+    --annotation "index:org.label-schema.vendor={{.LABEL_VENDOR}}" \
+    --annotation "index:org.label-schema.version={{.FULL_VERSION}}" \
+    --annotation "index:org.label-schema.schema-version=1.0" \
+    --annotation "index:org.opencontainers.image.created={{.BUILD_DATE}}" \
+    --annotation "index:org.opencontainers.image.authors={{.LABEL_AUTHOR}}" \
+    --annotation "index:org.opencontainers.image.url={{.LABEL_HOMEPAGE}}" \
+    --annotation "index:org.opencontainers.image.documentation={{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md" \
+    --annotation "index:org.opencontainers.image.source={{.LABEL_REPO_URL}}" \
+    --annotation "index:org.opencontainers.image.version={{.FULL_VERSION}}" \
+    --annotation "index:org.opencontainers.image.revision={{.GITHUB_SHORT_SHA}}" \
+    --annotation "index:org.opencontainers.image.vendor={{.LABEL_VENDOR}}" \
+    --annotation "index:org.opencontainers.image.licenses=MIT" \
+    --annotation "index:org.opencontainers.image.title={{.LABEL_NAME}}" \
+    --annotation "index:org.opencontainers.image.description={{.LABEL_DESCRIPTION}}" \
+    --label org.label-schema.build-date="{{.BUILD_DATE}}" \
+    --label org.label-schema.name="{{.LABEL_NAME}}" \
+    --label org.label-schema.description="{{.LABEL_DESCRIPTION}}" \
+    --label org.label-schema.usage="{{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md" \
+    --label org.label-schema.url="{{.LABEL_HOMEPAGE}}" \
+    --label org.label-schema.vcs-url="{{.LABEL_REPO_URL}}" \
+    --label org.label-schema.vcs-ref="{{.GITHUB_SHORT_SHA}}" \
+    --label org.label-schema.vendor="{{.LABEL_VENDOR}}" \
+    --label org.label-schema.version="{{.FULL_VERSION}}" \
+    --label org.label-schema.schema-version="1.0" \
+    --label org.opencontainers.image.created="{{.BUILD_DATE}}" \
+    --label org.opencontainers.image.authors="{{.LABEL_AUTHOR}}" \
+    --label org.opencontainers.image.url="{{.LABEL_HOMEPAGE}}" \
+    --label org.opencontainers.image.documentation="{{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md" \
+    --label org.opencontainers.image.source="{{.LABEL_REPO_URL}}" \
+    --label org.opencontainers.image.version="{{.FULL_VERSION}}" \
+    --label org.opencontainers.image.revision="{{.GITHUB_SHORT_SHA}}" \
+    --label org.opencontainers.image.vendor="{{.LABEL_VENDOR}}" \
+    --label org.opencontainers.image.licenses="MIT" \
+    --label org.opencontainers.image.title="{{.LABEL_NAME}}" \
+    --label org.opencontainers.image.description="{{.LABEL_DESCRIPTION}}" \
+    --label maintainer="{{.LABEL_AUTHOR}}" \
+    --label repository="{{.LABEL_REPO_URL}}"
+
+  BASE_BUILD: |
+    docker buildx build \
+      --platform linux/amd64,linux/arm64 \
+      --file=Dockerfile \
+      {{.LABEL_ARGS}}
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task -l
+
+  help:
+    desc: Display help prompt
+    cmds:
+      - task -l
+
+  deps:
+    desc: Install/check required local dependencies (macOS: brew)
+    cmds:
+      - |
+        set -euo pipefail
+        need() { command -v "$1" >/dev/null 2>&1 || echo "$1"; }
+        MISSING=""
+        for bin in docker jq curl perl; do
+          if ! command -v "$bin" >/dev/null 2>&1; then MISSING="$MISSING $bin"; fi
+        done
+        if [ -n "${MISSING# }" ]; then
+          echo "Missing:$MISSING"
+          if command -v brew >/dev/null 2>&1; then
+            for bin in $MISSING; do
+              case "$bin" in
+                docker) echo "Install Docker Desktop manually: https://www.docker.com/products/docker-desktop" ;;
+                *) echo "brew install $bin" && brew install "$bin" || true ;;
+              esac
+            done
+          else
+            echo "Please install missing binaries:$MISSING"
+          fi
+        else
+          echo "All dependencies present."
+        fi
+
+  update-versions:
+    desc: Check TF, OT, TG, AWS, AZ, GCP versions and update Taskfile/README if newer are available
+    cmds:
+      - |
+        set -euo pipefail
+        TF_LATEST=$(curl -LsS https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r .tag_name | sed 's/^v//')
+        OT_LATEST=$(curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//')
+        TG_LATEST=$(curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//')
+        AWS_LATEST=$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[].name' | head -1)
+        GCP_LATEST=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-*//')
+        AZ_LATEST=$(curl -s https://pypi.org/pypi/azure-cli/json | jq -r '.info.version' | sed 's/azure-cli-//')
+        VERSION_TAG=""
+        bump() { # args: CURRENT LATEST
+          CUR=$1; NEW=$2
+          if [ "$CUR" != "$NEW" ]; then
+            echo "Updating $CUR -> $NEW"
+            sed -i.bak "s/$CUR/$NEW/g" Taskfile.yml README.md
+            rm -f Taskfile.yml.bak README.md.bak
+            return 0
+          fi
+          return 1
+        }
+        echo "Current Terraform:  {{.TF_VERSION}}" ; bump "{{.TF_VERSION}}" "$TF_LATEST" && VERSION_TAG="$VERSION_TAG tf-$TF_LATEST"
+        echo "Current Terragrunt: {{.TG_VERSION}}" ; bump "{{.TG_VERSION}}" "$TG_LATEST" && VERSION_TAG="$VERSION_TAG tg-$TG_LATEST"
+        echo "Current OpenTofu:   {{.OT_VERSION}}" ; bump "{{.OT_VERSION}}" "$OT_LATEST" && VERSION_TAG="$VERSION_TAG ot-$OT_LATEST"
+        echo "Current AWS CLI:    {{.AWS_VERSION}}" ; bump "{{.AWS_VERSION}}" "$AWS_LATEST" && VERSION_TAG="$VERSION_TAG aws-$AWS_LATEST"
+        echo "Current GCP CLI:    {{.GCP_VERSION}}" ; bump "{{.GCP_VERSION}}" "$GCP_LATEST" && VERSION_TAG="$VERSION_TAG gcp-$GCP_LATEST"
+        echo "Current Azure CLI:  {{.AZ_VERSION}}" ; bump "{{.AZ_VERSION}}" "$AZ_LATEST" && VERSION_TAG="$VERSION_TAG az-$AZ_LATEST"
+        VERSION_TAG=$(echo "$VERSION_TAG" | sed 's/^ *//')
+        VERSION_BRANCH=$(echo "$VERSION_TAG" | sed 's/ /-/g')
+        if [ -n "${GITHUB_ENV:-}" ]; then
+          echo "VERSION_TAG=$VERSION_TAG" >> "$GITHUB_ENV"
+          echo "VERSION_BRANCH=$VERSION_BRANCH" >> "$GITHUB_ENV"
+        fi
+        echo "VERSION_TAG=$VERSION_TAG"
+        echo "VERSION_BRANCH=$VERSION_BRANCH"
+
+  login:
+    desc: Log into Docker Hub and GitHub Packages
+    cmds:
+      - |
+        echo "\nLogging to: Docker Hub"
+        echo "${DOCKER_TOKEN:-}" | docker login -u {{.DOCKER_USERNAME}} --password-stdin
+        echo "\nLogging to: GitHub Packages"
+        echo "${GITHUB_TOKEN:-}" | docker login ghcr.io -u {{.GITHUB_USERNAME}} --password-stdin
+
+  delete-stale-images:
+    desc: Delete stale Docker images that haven't been pulled in 3 months (Docker Hub)
+    cmds:
+      - |
+        set -euo pipefail
+        PAGE=1
+        while true; do
+          echo "Fetching page $PAGE for DockerHub..."
+          RESPONSE=$(curl -s -u "{{.DOCKER_USERNAME}}:${DOCKER_TOKEN:-}" "{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/?page_size=1000&page=$PAGE")
+          TAGS=$(echo "$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name')
+          if [ -z "$TAGS" ]; then
+            echo "No more stale images found on page $PAGE."
+          else
+            echo -e "Deleting stale images on page $PAGE:\n$TAGS"
+            while IFS= read -r TAG; do
+              [ -z "$TAG" ] && continue
+              echo "Deleting tag: $TAG"
+              curl -s -u "{{.DOCKER_USERNAME}}:${DOCKER_TOKEN:-}" -X DELETE "{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/$TAG/" || true
+            done <<< "$TAGS"
+          fi
+          NEXT_PAGE=$(echo "$RESPONSE" | jq -r '.next')
+          if [ "$NEXT_PAGE" = "null" ]; then
+            echo "No more pages to process."
+            break
+          fi
+          PAGE=$((PAGE + 1))
+          sleep 3
+        done
+
+  build-all:
+    desc: Build all Docker images one by one
+    deps: [build-slim, build-plain, build-aws, build-azure, build-aws-azure, build-gcp, build-aws-gcp, build-azure-gcp, build-aws-azure-gcp]
+
+  build-parallel:
+    desc: Build all images in parallel (build slim and plain first)
+    cmds:
+      - task: build-slim
+        vars: { VERSION_PREFIX: '{{.VERSION_PREFIX}}' }
+      - task: build-plain
+        vars: { VERSION_PREFIX: '{{.VERSION_PREFIX}}' }
+      - |
+        set -e
+        for FL in {{.FLAVOURS}}; do
+          task build-$FL VERSION_PREFIX='{{.VERSION_PREFIX}}' &
+        done
+        wait
+
+  build-slim:
+    desc: Build slim image without cloud CLIs and any additional software
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg SLIM=yes \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg SLIM=yes \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-ot-latest .
+
+  build-plain:
+    desc: Build image without cloud CLIs
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}ot-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-ot-latest .
+
+  build-aws:
+    desc: Build image with AWS CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-ot-latest .
+
+  build-azure:
+    desc: Build image with Azure CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-ot-latest .
+
+  build-aws-azure:
+    desc: Build image with AWS and Azure CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-ot-latest .
+
+  build-gcp:
+    desc: Build image with GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-ot-latest .
+
+  build-aws-gcp:
+    desc: Build image with AWS and GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-ot-latest .
+
+  build-azure-gcp:
+    desc: Build image with Azure and GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-ot-latest .
+
+  build-aws-azure-gcp:
+    desc: Build image with AWS, Azure and GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-latest .
+      - |
+        {{.BASE_BUILD}} \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-ot-latest .
+
+  push-parallel:
+    desc: Push all images in parallel (build and push)
+    cmds:
+      - task: push-slim
+        vars: { VERSION_PREFIX: '{{.VERSION_PREFIX}}' }
+      - task: push-plain
+        vars: { VERSION_PREFIX: '{{.VERSION_PREFIX}}' }
+      - |
+        set -e
+        for FL in {{.FLAVOURS}}; do
+          task push-$FL VERSION_PREFIX='{{.VERSION_PREFIX}}' &
+        done
+        wait
+
+  push-slim:
+    desc: Push only slim images
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg SLIM=yes \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-latest .
+      - echo "\nPushed image: {{.DOCKER_IMAGE}}:{{.VERSION_PREFIX}}slim-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg SLIM=yes \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}slim-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}slim-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_IMAGE}}:{{.VERSION_PREFIX}}slim-{{.OT_TG_VERSION}}"
+
+  push-plain:
+    desc: Push only plain images
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-latest .
+      - echo "\nPushed image: {{.DOCKER_IMAGE}}:{{.VERSION_PREFIX}}{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}ot-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}plain-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}plain-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_IMAGE}}:{{.VERSION_PREFIX}}{{.OT_TG_VERSION}}"
+
+  push-aws:
+    desc: Push image with AWS CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-{{.OT_TG_VERSION}}"
+
+  push-azure:
+    desc: Push image with Azure CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-{{.OT_TG_VERSION}}"
+
+  push-aws-azure:
+    desc: Push image with AWS and Azure CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-{{.OT_TG_VERSION}}"
+
+  push-gcp:
+    desc: Push image with GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}gcp-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}gcp-{{.OT_TG_VERSION}}"
+
+  push-aws-gcp:
+    desc: Push image with AWS and GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-gcp-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-gcp-{{.OT_TG_VERSION}}"
+
+  push-azure-gcp:
+    desc: Push image with Azure and GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}azure-gcp-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}azure-gcp-{{.OT_TG_VERSION}}"
+
+  push-aws-azure-gcp:
+    desc: Push image with AWS, Azure and GCP CLI
+    cmds:
+      - |
+        echo "\nBuilding and pushing image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}} and {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}}\n"
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION={{.TF_VERSION}} \
+          --build-arg OT_VERSION=none \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-tf-latest \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-tf-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.TF_TG_VERSION}}"
+      - |
+        {{.BASE_BUILD}} --push \
+          --build-arg AWS=yes \
+          --build-arg AWS_VERSION={{.AWS_VERSION}} \
+          --build-arg AZURE=yes \
+          --build-arg AZ_VERSION={{.AZ_VERSION}} \
+          --build-arg GCP=yes \
+          --build-arg GCP_VERSION={{.GCP_VERSION}} \
+          --build-arg TF_VERSION=none \
+          --build-arg OT_VERSION={{.OT_VERSION}} \
+          --build-arg TG_VERSION={{.TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-ot-latest \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}} \
+          --tag={{.GITHUB_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-ot-latest .
+      - echo "\nPushed image: {{.DOCKER_NAME}}:{{.VERSION_PREFIX}}aws-azure-gcp-{{.OT_TG_VERSION}}"

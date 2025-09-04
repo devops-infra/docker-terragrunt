@@ -2,7 +2,7 @@
 
 ### Supporting `amd64` and `arm64` images!
 
-### Due to excessive size of the images and upcoming Docker Hub limits, I'm are currently working on reducing it. Please use the latest versions of the images to keep up with the most active versions. Images older than 3 month will be deleted.
+### Due to excessive size of the images and upcoming Docker Hub limits, I'm currently working on reducing it. Please use the latest versions of the images to keep up with the most active versions. Images older than 3 months will be deleted.
 
 ## Sources and Docker images
 
@@ -31,7 +31,7 @@ and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt)
 .  
 Original README files are included in this
 repository: [docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt.md)
-and [docker-terragrunt-fmt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md)
+and [docker-terragrunt-fmt](https://github.com/devops-infra/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md)
 . This project grew much bigger than the original ones and is intended to be a framework for cloud
 Infrastructure-as-a-Code.
 
@@ -190,6 +190,17 @@ docker run --rm \
 ```
 
 
+## Development
+
+This repo now uses Taskfile for orchestration. The legacy Makefile remains as a thin wrapper.
+
+Quickstart:
+- Install Task: brew install go-task/tap/go-task (or see https://taskfile.dev/#/installation)
+- List tasks: task -l
+- Build images: task build-plain (or any build-<flavour>)
+- Push images: task push-plain (or any push-<flavour>)
+
+
 # Additional software available in all images
 
 ### Scripts
@@ -233,7 +244,7 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | requests            | Python library | For sending HTTP requests, for example integration with Slack                                                                                                  | https://github.com/psf/requests                    |
 | slack_sdk           | Python library | For integration with Slack applications/bots, e.g. creating channels for notifications                                                                         | https://github.com/slackapi/python-slack-sdk       |
 | sops                | Binary         | For encrypting config files for Terragrunt's `sops_decrypt_file`.                                                                                              | https://github.com/mozilla/sops/                   |
-| terraform           | Binary         | For managing IaC. Dependency for [Terragrunt](https://github.com/gruntwork-io/terragrunt).                                                                     | https://github.com/hashicorp/terraform             |
+| terraform           | Binary         | For managing IaC. Dependency for [Terragrunt](https://github.com/hashicorp/terraform).                                                                     | https://github.com/hashicorp/terraform             |
 | terragrunt          | Binary         | For managing IaC. Wrapper over [Terraform](https://github.com/hashicorp/terraform).                                                                            | https://github.com/gruntwork-io/terragrunt         |
 | tflint              | Binary         | For linting Terraform files.                                                                                                                                   | https://github.com/terraform-linters/tflint        |
 | unzip               | Binary         | For extracting packages.                                                                                                                                       | http://infozip.sourceforge.net/                    |
