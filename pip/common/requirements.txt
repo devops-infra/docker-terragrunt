@@ -2,6 +2,6 @@ cloudflare==4.3.1
 PyGithub==2.8.1
 python-hcl2==7.3.1
 requests==2.32.5
-slack_sdk==3.36.0
+slack_sdk==3.37.0
 anyio>=4.4.0 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
