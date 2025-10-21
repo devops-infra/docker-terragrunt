@@ -62,7 +62,7 @@ jobs:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build and push test image
+      - name: Build and push
         env:
           BUILDX_NO_DEFAULT_ATTESTATIONS: 1
           DOCKER_BUILDKIT: 1
