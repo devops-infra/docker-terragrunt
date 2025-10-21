@@ -21,14 +21,14 @@ Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google
 
 **Best used as runner image for CI/CD in automation, as well as a consistent local run environment.**
 
-Please note focus of those images is to maintain availability of current versions of **Terraform, OpenTofu and Terragrunt**, not CLIs or other dependencies.  
+Please note focus of those images is to maintain availability of current versions of **Terraform, OpenTofu and Terragrunt**, not CLIs or other dependencies.
 Hence, images are updated when new version of Terraform, OpenTofu or Terragrunt is released. Furthermore, versioning labels of images contain versions of said software to emphasize it.
 
 
 Dockerfile was based on two images made
 by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com/cytopia/docker-terragrunt)
 and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt)
-.  
+.
 Original README files are included in this
 repository: [docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt.md)
 and [docker-terragrunt-fmt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md)
@@ -106,11 +106,11 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 # Usage
 
 * For working with local files - mount working directory under `/data`, e.g. `--volume $(pwd):/data`.
-* For working with cloud providers - pass their credentials as additional file or environment variables,  
+* For working with cloud providers - pass their credentials as additional file or environment variables,
   e.g. `--env AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}` or `--volume ~/.aws/credentials:/root/.aws/credentials`.
-* For running other Docker images - by sharing the socket,  
+* For running other Docker images - by sharing the socket,
   e.g. `--privileged --volume /var/run/docker.sock:/var/run/docker.sock`.
-* For configuring git - mount desired `.gitconfig` and/or SSH key (if needed),  
+* For configuring git - mount desired `.gitconfig` and/or SSH key (if needed),
   e.g. `--volume ~/.gitconfig:/root/.gitconfig --volume ~/.ssh/id_rsa_github:/root/.ssh/id_rsa`
 
 

@@ -3,11 +3,11 @@ schemaVersion: 2.0.0
 commandTests:
   - name: AWS CLI
     command: aws
-    args: ["--version"]
-    expectedOutput: ["aws-cli/.*"]
+    args: [--version]
+    expectedOutput: [aws-cli/.*]
 
   - name: Boto3 Python module
     command: pip3
-    args: ["list"]
+    args: [list]
     expectedOutput:
       - boto3

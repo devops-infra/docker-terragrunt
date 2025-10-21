@@ -1,0 +1,32 @@
+version: '3'
+
+silent: true
+
+env:
+  DOCKER_BUILDKIT: '1'
+  TERM: xterm-256color
+
+vars:
+  # System context
+  SED:
+    sh: |
+      if [ "$(uname -s)" = "Darwin" ]; then
+        if command -v gsed >/dev/null 2>&1; then
+          echo gsed
+        else
+          if command -v brew >/dev/null 2>&1; then
+            # Quietly ensure gnu-sed is installed
+            brew list gnu-sed >/dev/null 2>&1 || {
+              HOMEBREW_NO_ENV_HINTS=1 HOMEBREW_NO_ANALYTICS=1 brew update >/dev/null 2>&1 || true
+              HOMEBREW_NO_ENV_HINTS=1 HOMEBREW_NO_ANALYTICS=1 brew install gnu-sed >/dev/null 2>&1
+            }
+            echo gsed
+          else
+            echo sed
+          fi
+        fi
+      else
+        echo sed
+      fi
+  PROJECT_DIR_NAME:
+    sh: basename "$PWD"

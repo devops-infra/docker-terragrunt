@@ -1,0 +1,27 @@
+extends: default
+rules:
+  empty-lines:
+    max: 2
+  document-end:
+    present: false
+  document-start:
+    present: false
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+  line-length:
+    max: 140
+    allow-non-breakable-inline-mappings: true
+  new-line-at-end-of-file: enable
+  new-lines:
+    type: unix
+  quoted-strings:
+    required: only-when-needed
+    extra-allowed: ['true', 'false']
+  trailing-spaces: {}
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
+    check-keys: false
+ignore:
+  - node_modules/

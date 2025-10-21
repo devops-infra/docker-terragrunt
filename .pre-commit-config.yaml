@@ -1,0 +1,46 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-illegal-windows-names
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-xml
+      - id: check-yaml
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: no-commit-to-branch
+        args: [--branch, master, --branch, main]
+      - id: pretty-format-json
+        args: [--autofix]
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: actionlint
+        name: actionlint
+        entry: bash -lc 'docker run --rm -v "$PWD:/work" -w /work rhysd/actionlint:latest -color'
+        language: system
+        pass_filenames: false
+      - id: hadolint
+        name: hadolint
+        entry: bash -lc 'docker run --rm -v "$PWD:/work" -w /work hadolint/hadolint:latest-debian hadolint Dockerfile'
+        language: system
+        pass_filenames: false
+      - id: shellcheck
+        name: shellcheck
+        entry: bash -lc 'docker run --rm -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style show-versions.sh'
+        language: system
+        pass_filenames: false
+      - id: yamllint
+        name: yamllint
+        entry: bash -lc 'docker run --rm -v "$PWD:/work" -w /work cytopia/yamllint -c .yamllint.yml .'
+        language: system
+        pass_filenames: false

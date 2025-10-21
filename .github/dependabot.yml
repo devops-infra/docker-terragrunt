@@ -1,9 +1,8 @@
 version: 2
 updates:
-
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: /
     target-branch: master
     schedule:
       interval: weekly
@@ -12,7 +11,7 @@ updates:
 
   # Enable version updates for Docker
   - package-ecosystem: docker
-    directory: "/"
+    directory: /
     target-branch: master
     schedule:
       interval: weekly
@@ -21,7 +20,7 @@ updates:
 
   # Enable version updates for pip
   - package-ecosystem: pip
-    directory: "/pip/common/"
+    directory: /pip/common/
     target-branch: master
     schedule:
       interval: weekly
@@ -30,7 +29,7 @@ updates:
 
   # Enable version updates for aws
   - package-ecosystem: pip
-    directory: "/pip/aws/"
+    directory: /pip/aws/
     target-branch: master
     schedule:
       interval: weekly

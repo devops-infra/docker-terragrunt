@@ -1,10 +1,10 @@
-name: Manual Release
+name: (Manual) Create Release
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., tf-1.2.3-ot-1.2.3-tg-1.2.3)'
+        description: Release version (e.g., tf-1.2.3-ot-1.2.3-tg-1.2.3)
         required: true
         type: string
 
@@ -15,11 +15,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Hadolint
-        uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: Dockerfile
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Run linters
+        run: task lint
 
   release:
     name: Release
@@ -30,6 +36,11 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
 
       - name: Validate version format
         run: |
@@ -91,18 +102,23 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Docker Buildx
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Install Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           install: true
 
-      - name: QEMU
+      - name: Install QEMU
         uses: docker/setup-qemu-action@v3
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build & push
+      - name: Build and push
         env:
           BUILDX_NO_DEFAULT_ATTESTATIONS: 1
           DOCKER_BUILDKIT: 1

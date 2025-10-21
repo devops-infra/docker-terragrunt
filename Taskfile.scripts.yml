@@ -1,0 +1,88 @@
+version: '3'
+
+silent: true
+
+tasks:
+  help:
+    desc: Detailed help
+    cmds:
+      - |
+        echo "Tasks:"
+        task --list
+        echo DOCKER_BUILDKIT={{.DOCKER_BUILDKIT}} TERM={{.TERM}}
+
+  lint:actionlint:
+    desc: Lint GitHub Actions workflows with actionlint
+    cmds:
+      - |
+        echo "▶️ Running actionlint..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work rhysd/actionlint:latest -color
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ actionlint passed"
+        else
+          echo "❌ actionlint failed"
+          exit $rc
+        fi
+
+  lint:hadolint:
+    desc: Lint Dockerfile with hadolint
+    cmds:
+      - |
+        echo "▶️ Running hadolint..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work hadolint/hadolint:latest-debian < Dockerfile
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ hadolint passed"
+        else
+          echo "❌ hadolint failed"
+          exit $rc
+        fi
+
+  lint:shellcheck:
+    desc: Lint shell scripts with shellcheck
+    cmds:
+      - |
+        echo "▶️ Running shellcheck..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style show-versions.sh
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ shellcheck passed"
+        else
+          echo "❌ shellcheck failed"
+          exit $rc
+        fi
+
+  lint:yamllint:
+    desc: Lint YAML files with yamllint
+    cmds:
+      - |
+        echo "▶️ Running yamllint..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work cytopia/yamllint -c .yamllint.yml .
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ yamllint passed"
+        else
+          echo "❌ yamllint failed"
+          exit $rc
+        fi
+
+  git:get-pr-template:
+    desc: Get pull request template
+    cmds:
+      - mkdir -p .tmp
+      - curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
+
+  git:set-config:
+    desc: Set git user config
+    cmds:
+      - git config user.name "github-actions[bot]"
+      - git config user.email "github-actions[bot]@users.noreply.github.com"
