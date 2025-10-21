@@ -96,7 +96,7 @@ jobs:
           curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
 
       - name: Pull Request
-        uses: devops-infra/action-pull-request@v0.6
+        uses: devops-infra/action-pull-request@v1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
