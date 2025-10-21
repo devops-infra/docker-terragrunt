@@ -1,9 +1,16 @@
 # Intellij
 .idea/
 *.iml
-.tmp/
 
 # all-contributors-cli
 package.json
 yarn.lock
 node_modules/
+
+# Custom
+.tmp/
+.venv
+.venv/
+.envrc
+.env
+.tmp

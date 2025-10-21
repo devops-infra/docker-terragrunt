@@ -1,0 +1,5 @@
+# shellcheck configuration
+shell=bash
+check-sourced=true
+external-sources=true
+source-path=SCRIPTDIR

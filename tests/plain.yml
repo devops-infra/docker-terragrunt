@@ -3,13 +3,13 @@ schemaVersion: 2.0.0
 commandTests:
   - name: hcledit
     command: hcledit
-    args: ["version"]
-    expectedOutput: ["0.*"]
+    args: [version]
+    expectedOutput: [0.*]
 
   - name: sops
     command: sops
-    args: ["--version"]
-    expectedOutput: ["sops .*"]
+    args: [--version]
+    expectedOutput: [sops .*]
 
   - name: Other tools
     command: which
@@ -40,7 +40,7 @@ commandTests:
 
   - name: Python modules
     command: pip
-    args: ["list"]
+    args: [list]
     expectedOutput:
       - cloudflare
       - PyGithub

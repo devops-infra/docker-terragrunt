@@ -1,0 +1,66 @@
+version: '3'
+
+silent: true
+
+includes:
+  variables: ./Taskfile.variables.yml
+  scripts: ./Taskfile.scripts.yml
+
+tasks:
+  default:
+    desc: List tasks
+    cmds:
+      - task help
+
+  help:
+    desc: Detailed help
+    cmds:
+      - task: scripts:help
+
+  pre-commit:
+    desc: Run all pre-commit hooks
+    cmds:
+      - pre-commit run --all-files
+
+  pre-commit:install:
+    desc: Install pre-commit hooks
+    cmds:
+      - pre-commit install
+
+  lint:
+    desc: Run all linters (Dockerfile, shell scripts, workflows, YAML)
+    cmds:
+      - task: lint:actionlint
+      - task: lint:hadolint
+      - task: lint:shellcheck
+      - task: lint:yamllint
+
+  lint:actionlint:
+    desc: Lint GitHub Actions workflows with actionlint
+    cmds:
+      - task: scripts:lint:actionlint
+
+  lint:hadolint:
+    desc: Lint Dockerfile with hadolint
+    cmds:
+      - task: scripts:lint:hadolint
+
+  lint:shellcheck:
+    desc: Lint shell scripts with shellcheck
+    cmds:
+      - task: scripts:lint:shellcheck
+
+  lint:yamllint:
+    desc: Lint YAML files with yamllint
+    cmds:
+      - task: scripts:lint:yamllint
+
+  git:get-pr-template:
+    desc: Get pull request template
+    cmds:
+      - task: scripts:git:get-pr-template
+
+  git:set-config:
+    desc: Set git user config
+    cmds:
+      - task: scripts:git:set-config

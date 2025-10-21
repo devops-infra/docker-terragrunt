@@ -3,5 +3,5 @@ schemaVersion: 2.0.0
 commandTests:
   - name: Azure CLI
     command: az
-    args: ["--version"]
-    expectedOutput: ["azure-cli .*"]
+    args: [--version]
+    expectedOutput: [azure-cli .*]

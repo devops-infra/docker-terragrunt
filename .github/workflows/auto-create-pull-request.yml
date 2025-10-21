@@ -1,10 +1,15 @@
-name: Pull Request
+name: (Auto) Create Pull Request
 
 on:
   push:
     branches-ignore:
-      - 'master'
-      - 'dependabot**'
+      - master
+      - dependabot/**
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
 
 jobs:
   lint:
@@ -13,20 +18,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Hadolint
-        uses: hadolint/hadolint-action@v3.3.0
         with:
-          dockerfile: Dockerfile
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Run linters
+        run: task lint
 
   build-and-push:
-    name: Build & push
+    name: Build and push
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
+    needs: [lint]
     strategy:
       fail-fast: false
       matrix:
-        flavour: [slim, plain, aws, azure, gcp]
+        flavour: [plain, aws, azure, gcp]
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,18 +46,23 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Docker Buildx
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Install Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
           install: true
 
-      - name: QEMU
+      - name: Install QEMU
         uses: docker/setup-qemu-action@v3
         with:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
-      - name: Build & push
+      - name: Build and push test image
         env:
           BUILDX_NO_DEFAULT_ATTESTATIONS: 1
           DOCKER_BUILDKIT: 1
@@ -89,14 +106,16 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Template
-        shell: bash
-        run: |
-          mkdir -p .tmp
-          curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
 
-      - name: Pull Request
-        uses: devops-infra/action-pull-request@v0.6
+      - name: Get template
+        run: task git:get-pr-template
+
+      - name: Create Pull Request
+        uses: devops-infra/action-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
