@@ -1,7 +1,8 @@
-FROM ubuntu:questing-20251007
+FROM ubuntu:jammy-20251001
 
 # Disable interactive mode
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Multi-architecture from buildx
 ARG TARGETPLATFORM
@@ -76,7 +77,7 @@ RUN apt-get update -y ;\
       python-is-python3 \
       python3-pip \
       zip ;\
-    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt --break-system-packages ;\
+    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
   fi
 
 # Get Terraform by a specific version or search for the latest one
@@ -226,7 +227,7 @@ RUN if [ "${AWS}" = "yes" ]; then \
       echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
       exit 1 ;\
     fi ;\
-    xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir --break-system-packages ;\
+    xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir ;\
     DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}-${AWS_VERSION}.zip" ;\
     curl -sL "${DOWNLOAD_URL}" -o /tmp/awscli.zip ;\
     mkdir -p /usr/local/awscli ;\
