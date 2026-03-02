@@ -182,7 +182,7 @@ delete-stale-images: ## Delete stale Docker images that haven't been pulled in 3
 			echo "Fetching page $$PAGE for DockerHub..." ;\
 			RESPONSE=$$(curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
 				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE") ;\
-			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 1558.0.0))) | .name') ;\
+			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 15552000))) | .name') ;\
 			if [ -z "$$TAGS" ]; then \
 				echo "No more stale images found on page $$PAGE." ;\
 			else \
