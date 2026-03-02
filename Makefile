@@ -2,10 +2,10 @@
 phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
-AWS_VERSION := 2.33.27
-GCP_VERSION := 557.0.0
+AWS_VERSION := 2.34.0
+GCP_VERSION := 558.0.0
 AZ_VERSION = 2.83.0
-TF_VERSION := 1.14.5
+TF_VERSION := 1.14.6
 OT_VERSION := 1.11.5
 TG_VERSION := 0.99.4
 TF_TG_VERSION := tf-$(TF_VERSION)-tg-$(TG_VERSION)
@@ -182,7 +182,7 @@ delete-stale-images: ## Delete stale Docker images that haven't been pulled in 3
 			echo "Fetching page $$PAGE for DockerHub..." ;\
 			RESPONSE=$$(curl -s -u "$(DOCKER_USERNAME):$(DOCKER_TOKEN)" \
 				"$(DOCKER_HUB_API)/repositories/$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE)/tags/?page_size=1000&page=$$PAGE") ;\
-			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 1557.0.0))) | .name') ;\
+			TAGS=$$(echo "$$RESPONSE" | jq -r '.results[] | select(.tag_last_pulled == null or (.tag_last_pulled | sub("\\.[0-9]+Z$$"; "Z") | fromdateiso8601 < (now - 1558.0.0))) | .name') ;\
 			if [ -z "$$TAGS" ]; then \
 				echo "No more stale images found on page $$PAGE." ;\
 			else \
