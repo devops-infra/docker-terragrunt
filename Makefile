@@ -2,9 +2,9 @@
 phony: help
 
 # Provide versions of the main dependencies to use with this Docker image
-AWS_VERSION := 2.34.0
-GCP_VERSION := 558.0.0
-AZ_VERSION = 2.83.0
+AWS_VERSION := 2.34.4
+GCP_VERSION := 559.0.0
+AZ_VERSION = 2.84.0
 TF_VERSION := 1.14.6
 OT_VERSION := 1.11.5
 TG_VERSION := 0.99.4
