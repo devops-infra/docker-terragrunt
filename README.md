@@ -66,14 +66,14 @@ bundled with or not (see second table below).
 
 | Current release full tag version value |
 |:---------------------------------------|
-| `tf-1.14.6-ot-1.11.5-tg-0.99.4`         |
+| `tf-1.14.7-ot-1.11.5-tg-0.99.4`         |
 
 
 | Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
 |--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|------------------|--------------------|
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.14.6-tg-0.99.4`                            | `docker-terragrunt` | `tf-1.14.6-tg-0.99.4` | `1.14.6`           | `N/A`            | `0.99.4`           |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.14.7-tg-0.99.4`                            | `docker-terragrunt` | `tf-1.14.7-tg-0.99.4` | `1.14.7`           | `N/A`            | `0.99.4`           |
 | [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.11.5-tg-0.99.4`                            | `docker-terragrunt` | `ot-1.11.5-tg-0.99.4` | `N/A`             | `1.11.5`          | `0.99.4`           |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.14.6-tg-0.99.4` | `docker-terragrunt` | `tf-1.14.6-tg-0.99.4` | `1.14.6`           | `N/A`            | `0.99.4`           |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.14.7-tg-0.99.4` | `docker-terragrunt` | `tf-1.14.7-tg-0.99.4` | `1.14.7`           | `N/A`            | `0.99.4`           |
 | [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.11.5-tg-0.99.4` | `docker-terragrunt` | `ot-1.11.5-tg-0.99.4` | `N/A`             | `1.11.5`          | `0.99.4`           |
 
 
