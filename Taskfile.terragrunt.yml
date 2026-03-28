@@ -10,11 +10,11 @@ vars:
   AZ_VERSION:
     sh: echo "${AZ_VERSION:-2.84.0}"
   TF_VERSION:
-    sh: echo "${TF_VERSION:-1.14.7}"
+    sh: echo "${TF_VERSION:-{{.TF_VERSION_FROM_TAG}}}"
   OT_VERSION:
-    sh: echo "${OT_VERSION:-1.11.5}"
+    sh: echo "${OT_VERSION:-{{.OT_VERSION_FROM_TAG}}}"
   TG_VERSION:
-    sh: echo "${TG_VERSION:-0.99.4}"
+    sh: echo "${TG_VERSION:-{{.TG_VERSION_FROM_TAG}}}"
   GITHUB_REF:
     sh: echo "${GITHUB_REF:-refs/heads/null}"
   GITHUB_SHA:
@@ -55,6 +55,14 @@ vars:
         if [ -n "$suffix" ]; then
           printf "%s-" "$suffix"
         fi
+      fi
+
+  EFFECTIVE_PREFIX:
+    sh: |
+      if [ -n "${VERSION_PREFIX:-}" ]; then
+        printf "%s" "${VERSION_PREFIX}"
+      else
+        printf "%s" "{{.CI_VERSION_PREFIX}}"
       fi
 
 tasks:
@@ -187,7 +195,7 @@ tasks:
         flavour='{{.FLAVOUR}}'
         tool='{{.TOOL}}'
         push='{{default "false" .PUSH}}'
-        prefix='{{.VERSION_PREFIX}}'
+        prefix='{{.EFFECTIVE_PREFIX}}'
         tf_tg='{{.TF_TG_VERSION}}'
         ot_tg='{{.OT_TG_VERSION}}'
         full_version='{{.FULL_VERSION}}'
@@ -626,44 +634,3 @@ tasks:
     desc: Push image with AWS, Azure and GCP CLIs
     cmds:
       - task terragrunt:push:aws-azure-gcp
-
-  docker:cmds:
-    desc: Show docker build command for plain flavour
-    cmds:
-      - task terragrunt:build:plain --dry VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
-
-  docker:build:
-    desc: Build Docker image (plain flavour)
-    cmds:
-      - task terragrunt:build:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
-
-  docker:build:inspect:
-    desc: Inspect built Docker image (plain latest)
-    cmds:
-      - |
-        set -eu
-        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
-        echo "Inspecting image: ${image}"
-        docker image inspect "$image" | jq || true
-
-  docker:push:
-    desc: Build and push Docker images (plain flavour)
-    cmds:
-      - task terragrunt:push:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
-
-  docker:push:inspect:
-    desc: Inspect pushed Docker image (plain latest)
-    cmds:
-      - |
-        set -eu
-        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
-        echo "Inspecting pushed image: ${image}"
-        docker buildx imagetools inspect "$image" || docker manifest inspect "$image"
-
-  docker:login:
-    desc: Login to hub.docker.com and ghcr.io
-    cmds:
-      - echo "Logging into Docker Hub as {{.DOCKER_USERNAME}}"
-      - echo "${DOCKER_TOKEN}" | docker login -u "{{.DOCKER_USERNAME}}" --password-stdin
-      - echo "Logging into GHCR as {{.GITHUB_USERNAME}}"
-      - echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "{{.GITHUB_USERNAME}}" --password-stdin

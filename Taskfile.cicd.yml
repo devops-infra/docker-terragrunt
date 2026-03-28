@@ -29,145 +29,105 @@ tasks:
   lint:actionlint:
     desc: Lint GitHub Actions workflows with actionlint
     cmds:
-      - |
-        echo "▶️ Running actionlint..."
-        set +e
-        docker run --rm -i -v "$PWD:/work" -w /work rhysd/actionlint:latest -color
-        rc=$?
-        set -e
-        if [ "$rc" -eq 0 ]; then
-          echo "✅ actionlint passed"
-        else
-          echo "❌ actionlint failed"
-          exit $rc
-        fi
+      - task: scripts:lint:actionlint
 
   lint:hadolint:
     desc: Lint Dockerfile with hadolint
     cmds:
-      - |
-        echo "▶️ Running hadolint..."
-        set +e
-        docker run --rm -i -v "$PWD:/work" -w /work hadolint/hadolint:latest-debian < Dockerfile
-        rc=$?
-        set -e
-        if [ "$rc" -eq 0 ]; then
-          echo "✅ hadolint passed"
-        else
-          echo "❌ hadolint failed"
-          exit $rc
-        fi
+      - task: scripts:lint:hadolint
 
   lint:shellcheck:
     desc: Lint shell scripts with shellcheck
     cmds:
-      - |
-        echo "▶️ Running shellcheck..."
-        set +e
-        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style entrypoint.sh
-        rc=$?
-        set -e
-        if [ "$rc" -eq 0 ]; then
-          echo "✅ shellcheck passed"
-        else
-          echo "❌ shellcheck failed"
-          exit $rc
-        fi
+      - task: scripts:lint:shellcheck
 
   lint:yamllint:
     desc: Lint YAML files with yamllint
     cmds:
-      - |
-        echo "▶️ Running yamllint..."
-        set +e
-        docker run --rm -i -v "$PWD:/work" -w /work cytopia/yamllint -c .yamllint.yml .
-        rc=$?
-        set -e
-        if [ "$rc" -eq 0 ]; then
-          echo "✅ yamllint passed"
-        else
-          echo "❌ yamllint failed"
-          exit $rc
-        fi
+      - task: scripts:lint:yamllint
 
   version:get:
-    desc: Get current version
+    desc: Get current custom version (tf-*-ot-*-tg-*)
     cmds:
       - echo "{{.VERSION}}"
 
   version:set:
-    desc: Update version in README.md and action.yml
+    desc: Set custom version in README and taskfile defaults
+    requires:
+      vars: [VERSION]
     cmds:
       - |
-        # check if VERSION if different than VERSION_FROM_ACTION_YML
-        if [ "{{.VERSION}}" = "{{.VERSION_FROM_ACTION_YML}}" ]; then
-          echo "❌ ERROR: VERSION is same as VERSION_FROM_ACTION_YML ({{.VERSION}})"
+        set -eu
+        version='{{.VERSION}}'
+        if ! printf "%s" "$version" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "❌ ERROR: VERSION '$version' must match tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
           exit 1
         fi
-      - echo Updating full version from {{.VERSION_FROM_ACTION_YML}} to {{.VERSION}}
-      - echo Updating minor version from {{.MINOR_FROM_ACTION_YML}} to {{.VERSION_MINOR}}
-      - echo Updating major version from {{.MAJOR_FROM_ACTION_YML}} to {{.VERSION_MAJOR}}
-      - "{{.SED}} -i 's#{{.DOCKER_NAME}}:{{.VERSION_FROM_ACTION_YML}}#{{.DOCKER_NAME}}:{{.VERSION}}#g' action.yml"
-      - "{{.SED}} -i 's#{{.DOCKER_NAME}}@{{.VERSION_FROM_ACTION_YML}}#{{.DOCKER_NAME}}@{{.VERSION}}#g' README.md"
-      - "{{.SED}} -i 's#{{.GITHUB_NAME}}@{{.VERSION_FROM_ACTION_YML}}#{{.GITHUB_NAME}}@{{.VERSION}}#g' README.md"
-      - "{{.SED}} -i 's#{{.DOCKER_NAME}}@{{.MINOR_FROM_ACTION_YML}}#{{.DOCKER_NAME}}@{{.VERSION_MINOR}}#g' README.md"
-      - "{{.SED}} -i 's#{{.GITHUB_NAME}}@{{.MINOR_FROM_ACTION_YML}}#{{.GITHUB_NAME}}@{{.VERSION_MINOR}}#g' README.md"
-      - "{{.SED}} -i 's#{{.DOCKER_NAME}}@{{.MAJOR_FROM_ACTION_YML}}#{{.DOCKER_NAME}}@{{.VERSION_MAJOR}}#g' README.md"
-      - "{{.SED}} -i 's#{{.GITHUB_NAME}}@{{.MAJOR_FROM_ACTION_YML}}#{{.GITHUB_NAME}}@{{.VERSION_MAJOR}}#g' README.md"
 
-  version:update:patch:
-    desc: Increment patch version (e.g., 1.2.3 -> 1.2.4)
-    cmds:
-      - task version:set VERSION=v{{.MAJOR}}.{{.MINOR}}.{{.NEXT_PATCH}}
+        tf="$(printf "%s" "$version" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')"
+        ot="$(printf "%s" "$version" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\2/')"
+        tg="$(printf "%s" "$version" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/')"
 
-  version:update:minor:
-    desc: Increment minor version (e.g., 1.2.3 -> 1.3.0)
-    cmds:
-      - task version:set VERSION=v{{.MAJOR}}.{{.NEXT_MINOR}}.0
+        echo "Updating TF_VERSION -> $tf"
+        echo "Updating OT_VERSION -> $ot"
+        echo "Updating TG_VERSION -> $tg"
 
-  version:update:major:
-    desc: Increment major version (e.g., 1.2.3 -> 2.0.0)
-    cmds:
-      - task version:set VERSION=v{{.NEXT_MAJOR}}.0.0
+        {{.SED}} -i "s/\${TF_VERSION:-[0-9]\+\.[0-9]\+\.[0-9]\+}/\${TF_VERSION:-$tf}/g" Taskfile.terragrunt.yml
+        {{.SED}} -i "s/\${OT_VERSION:-[0-9]\+\.[0-9]\+\.[0-9]\+}/\${OT_VERSION:-$ot}/g" Taskfile.terragrunt.yml
+        {{.SED}} -i "s/\${TG_VERSION:-[0-9]\+\.[0-9]\+\.[0-9]\+}/\${TG_VERSION:-$tg}/g" Taskfile.terragrunt.yml
+
+        {{.SED}} -i "s/Terraform v[0-9]\+\.[0-9]\+\.[0-9]\+/Terraform v$tf/g" README.md
+        {{.SED}} -i "s/OpenTofu v[0-9]\+\.[0-9]\+\.[0-9]\+/OpenTofu v$ot/g" README.md
+        {{.SED}} -i "s/Terragrunt v[0-9]\+\.[0-9]\+\.[0-9]\+/Terragrunt v$tg/g" README.md
 
   version:resolve-next:
-    desc: Resolve next version from bump type and profile
+    desc: Resolve next custom version
     cmds:
       - |
         set -eu
         bump_type="${BUMP_TYPE:-patch}"
         input_version="${INPUT_VERSION:-}"
+        current="$(task version:get)"
 
-        normalize_version() {
-          candidate="${1#v}"
-          if ! printf "%s" "${candidate}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            return 1
-          fi
-          printf "v%s" "${candidate}"
+        if ! printf "%s" "$current" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "Current version not found or invalid. Expected tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
+          exit 1
+        fi
+
+        tf="$(printf "%s" "$current" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')"
+        ot="$(printf "%s" "$current" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\2/')"
+        tg="$(printf "%s" "$current" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/')"
+
+        bump_patch() {
+          v="$1"
+          ma="$(printf "%s" "$v" | awk -F. '{print $1}')"
+          mi="$(printf "%s" "$v" | awk -F. '{print $2}')"
+          pa="$(printf "%s" "$v" | awk -F. '{print $3}')"
+          printf "%s.%s.%s" "$ma" "$mi" "$((pa + 1))"
         }
-
-        current="$(task version:get 2>/dev/null || true)"
 
         case "$bump_type" in
           set)
             [ -n "$input_version" ] || { echo "Missing version for type=set"; exit 1; }
-            next="$(normalize_version "$input_version")" || {
-              echo "Invalid explicit version: $input_version. Expected vX.Y.Z or X.Y.Z"
+            if ! printf "%s" "$input_version" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
+              echo "Invalid explicit version: $input_version. Expected tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
               exit 1
-            }
+            fi
+            printf "%s" "$input_version"
             ;;
-          patch|minor|major)
-            [ -n "$current" ] || { echo "Current version not found or invalid. Expected vX.Y.Z"; exit 1; }
-            current="$(normalize_version "$current")" || { echo "Current version not found or invalid. Expected vX.Y.Z"; exit 1; }
-            no_v="${current#v}"
-            major="$(printf "%s" "$no_v" | awk -F. '{print $1}')"
-            minor="$(printf "%s" "$no_v" | awk -F. '{print $2}')"
-            patch="$(printf "%s" "$no_v" | awk -F. '{print $3}')"
-            case "$bump_type" in
-              patch) next="v${major}.${minor}.$((patch + 1))" ;;
-              minor) next="v${major}.$((minor + 1)).0" ;;
-              major) next="v$((major + 1)).0.0" ;;
-            esac
+          patch)
+            tf_n="$(bump_patch "$tf")"
+            ot_n="$(bump_patch "$ot")"
+            tg_n="$(bump_patch "$tg")"
+            printf "tf-%s-ot-%s-tg-%s" "$tf_n" "$ot_n" "$tg_n"
+            ;;
+          minor)
+            echo "Minor bump is not supported for custom versioning; use type=set"
+            exit 1
+            ;;
+          major)
+            echo "Major bump is not supported for custom versioning; use type=set"
+            exit 1
             ;;
           *)
             echo "Unknown type: $bump_type"
@@ -175,131 +135,169 @@ tasks:
             ;;
         esac
 
-        printf "%s" "$next"
-
   version:tag-release:
-    desc: Create set of git tags
+    desc: Create custom release tag only
     cmds:
       - |
         set -eu
-        if (set -o | grep -q pipefail) 2>/dev/null; then set -o pipefail; fi
-
-        REMOTE='origin'
-        FULL='{{.VERSION_FULL}}'
-        MINOR='{{.VERSION_MINOR}}'
-        MAJOR='{{.VERSION_MAJOR}}'
-
-        # Validate vX.Y.Z
-        if ! printf "%s" "$FULL" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
-          echo "❌ ERROR: VERSION '$FULL' must match vX.Y.Z" >&2
+        version='{{.VERSION}}'
+        if ! printf "%s" "$version" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "❌ ERROR: VERSION '$version' must match tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
           exit 1
         fi
 
-        tag_sha() { git rev-parse "refs/tags/$1" 2>/dev/null || true; }
-        remote_tag_sha() { git ls-remote --tags "$REMOTE" "refs/tags/$1" 2>/dev/null | awk '{print $1}' || true; }
-
-        echo "ℹ️ INFO: Tags - Full: $FULL | Minor: $MINOR | Major: $MAJOR"
-
-        # Full tag: must NOT exist on remote; fail fast if it does
-        full_remote_sha="$(remote_tag_sha "$FULL")"
-        if [ -n "$full_remote_sha" ]; then
-          echo "❌ ERROR: Full tag '$FULL' already exists on remote; aborting" >&2
+        if git ls-remote --tags origin "refs/tags/${version}" | grep -q .; then
+          echo "❌ ERROR: Tag '${version}' already exists on remote"
           exit 1
         fi
 
-        # Create full tag locally (if missing) and push
-        if git rev-parse --quiet --verify "refs/tags/$FULL" >/dev/null 2>&1; then
-          echo "ℹ️ INFO: Full tag '$FULL' exists locally but not on remote; pushing"
+        if git rev-parse --quiet --verify "refs/tags/${version}" >/dev/null 2>&1; then
+          echo "ℹ️ INFO: Tag '${version}' exists locally, pushing"
         else
-          echo "ℹ️ INFO: Creating full tag '$FULL'"
-          git tag --annotate "$FULL" --message "$FULL"
+          echo "ℹ️ INFO: Creating tag '${version}'"
+          git tag --annotate "${version}" --message "${version}"
         fi
-        git push "$REMOTE" "refs/tags/$FULL"
-        echo "✅ OK: Pushed full tag '$FULL'"
+        git push origin "refs/tags/${version}"
 
-        # Minor tag: create or update
-        git tag --force --annotate "$MINOR" --message "$FULL"
-        minor_local_sha="$(tag_sha "$MINOR")"
-        minor_remote_sha="$(remote_tag_sha "$MINOR")"
-        if [ -z "$minor_remote_sha" ]; then
-          git push "$REMOTE" "refs/tags/$MINOR"
-          echo "✅ OK: Created and pushed minor tag '$MINOR' -> $minor_local_sha"
-        else
-          if [ "$minor_local_sha" != "$minor_remote_sha" ]; then
-            echo "⚠️ WARN: Updating remote minor tag '$MINOR' to $minor_local_sha (was $minor_remote_sha)"
-            git push --force "$REMOTE" "refs/tags/$MINOR"
-          else
-            echo "ℹ️ INFO: Minor tag '$MINOR' already up-to-date"
-          fi
-        fi
+  version:update:patch:
+    desc: Increment custom version patch components and apply
+    cmds:
+      - |
+        next="$(task version:resolve-next BUMP_TYPE=patch)"
+        task version:set VERSION="$next"
 
-        # Major tag: create or update
-        git tag --force --annotate "$MAJOR" --message "$FULL"
-        major_local_sha="$(tag_sha "$MAJOR")"
-        major_remote_sha="$(remote_tag_sha "$MAJOR")"
-        if [ -z "$major_remote_sha" ]; then
-          git push "$REMOTE" "refs/tags/$MAJOR"
-          echo "✅ OK: Created and pushed major tag '$MAJOR' -> $major_local_sha"
-        else
-          if [ "$major_local_sha" != "$major_remote_sha" ]; then
-            echo "⚠️ WARN: Updating remote major tag '$MAJOR' to $major_local_sha (was $major_remote_sha)"
-            git push --force "$REMOTE" "refs/tags/$MAJOR"
-          else
-            echo "ℹ️ INFO: Major tag '$MAJOR' already up-to-date"
-          fi
-        fi
+  version:update:minor:
+    desc: Unsupported for custom versioning
+    cmds:
+      - |
+        echo "Minor bump is not supported for custom versioning; use version:set with explicit value"
+        exit 1
+
+  version:update:major:
+    desc: Unsupported for custom versioning
+    cmds:
+      - |
+        echo "Major bump is not supported for custom versioning; use version:set with explicit value"
+        exit 1
 
   git:get-pr-template:
     desc: Get pull request template
     cmds:
-      - mkdir -p .tmp
-      - curl -LsS {{.PR_TEMPLATE}} -o .tmp/PULL_REQUEST_TEMPLATE.md
+      - task: scripts:git:get-pr-template
 
   git:set-config:
     desc: Set git user config
     cmds:
-      - git config user.name "github-actions[bot]"
-      - git config user.email "github-actions[bot]@users.noreply.github.com"
+      - task: scripts:git:set-config
 
   sync:all:
-    desc: Sync all common files
+    desc: Sync common files (preserving terragrunt-specific taskfiles)
     cmds:
       - task sync:configs
       - task sync:ignores
       - task sync:taskfiles
 
   sync:configs:
-    desc: Sync configuration files with devops-infra/.github
+    desc: Sync config files from dockerized template, keep local pre-commit shellcheck target
     cmds:
       - |
+        set -eu
         echo "▶️ Syncing configuration files from devops-infra/.github..."
         curl -fsSL {{.CONFIGS_BASE_URL}}/.editorconfig -o ./.editorconfig
         curl -fsSL {{.CONFIGS_BASE_URL}}/.hadolint.yaml -o ./.hadolint.yaml
-        curl -fsSL {{.CONFIGS_BASE_URL}}/.pre-commit-config.yaml -o ./.pre-commit-config.yaml
         curl -fsSL {{.CONFIGS_BASE_URL}}/.shellcheckrc -o ./.shellcheckrc
         curl -fsSL {{.CONFIGS_BASE_URL}}/.yamllint.yml -o ./.yamllint.yml
+
+        if [ -f .pre-commit-config.yaml ]; then
+          cp .pre-commit-config.yaml .tmp.pre-commit-config.yaml
+        fi
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.pre-commit-config.yaml -o ./.pre-commit-config.yaml
+        if [ -f .tmp.pre-commit-config.yaml ]; then
+          mv .tmp.pre-commit-config.yaml .pre-commit-config.yaml
+        fi
+
         git add .editorconfig .hadolint.yaml .pre-commit-config.yaml .shellcheckrc .yamllint.yml
         echo "✅ Synced configuration files"
 
   sync:ignores:
-    desc: Sync ignore files with devops-infra/.github
+    desc: Sync ignore files from dockerized template, keep entrypoint include
     cmds:
       - |
+        set -eu
         echo "▶️ Syncing ignore files from devops-infra/.github..."
         curl -fsSL {{.CONFIGS_BASE_URL}}/.gitignore -o ./.gitignore
         curl -fsSL {{.CONFIGS_BASE_URL}}/.dockerignore -o ./.dockerignore
+        if ! grep -q '^!entrypoint.sh$' .dockerignore; then
+          {{.SED}} -i '/^!show-versions.sh$/d' .dockerignore || true
+          echo '!entrypoint.sh' >> .dockerignore
+        fi
         git add .gitignore .dockerignore
         echo "✅ Synced ignore files"
 
   sync:taskfiles:
-    desc: Sync Taskfiles with devops-infra/.github
+    desc: Sync taskfiles from dockerized template and restore terragrunt-specific files
     cmds:
       - |
+        set -eu
         echo "▶️ Syncing Taskfiles from devops-infra/.github..."
+        cp Taskfile.yml .Taskfile.yml.bak
+        cp Taskfile.cicd.yml .Taskfile.cicd.yml.bak
+        cp Taskfile.variables.yml .Taskfile.variables.yml.bak
+        cp Taskfile.scripts.yml .Taskfile.scripts.yml.bak
+        cp Taskfile.terragrunt.yml .Taskfile.terragrunt.yml.bak
+
         curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.yml -o ./Taskfile.yml
         curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.cicd.yml -o ./Taskfile.cicd.yml
         curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.scripts.yml -o ./Taskfile.scripts.yml
         curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.docker.yml -o ./Taskfile.docker.yml
         curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.variables.yml -o ./Taskfile.variables.yml
+
+        mv .Taskfile.yml.bak Taskfile.yml
+        mv .Taskfile.cicd.yml.bak Taskfile.cicd.yml
+        mv .Taskfile.variables.yml.bak Taskfile.variables.yml
+        mv .Taskfile.scripts.yml.bak Taskfile.scripts.yml
+        mv .Taskfile.terragrunt.yml.bak Taskfile.terragrunt.yml
+
         git add Taskfile*.yml
         echo "✅ Synced Taskfiles"
+
+  docker:cmds:
+    desc: Show docker build command for plain flavour
+    cmds:
+      - task terragrunt:build:plain --dry VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+
+  docker:build:
+    desc: Build Docker image (plain flavour)
+    cmds:
+      - task terragrunt:build:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+
+  docker:build:inspect:
+    desc: Inspect built Docker image (plain latest)
+    cmds:
+      - |
+        set -eu
+        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
+        echo "Inspecting image: ${image}"
+        docker image inspect "$image" | jq || true
+
+  docker:push:
+    desc: Build and push Docker images (plain flavour)
+    cmds:
+      - task terragrunt:push:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+
+  docker:push:inspect:
+    desc: Inspect pushed Docker image (plain latest)
+    cmds:
+      - |
+        set -eu
+        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
+        echo "Inspecting pushed image: ${image}"
+        docker buildx imagetools inspect "$image" || docker manifest inspect "$image"
+
+  docker:login:
+    desc: Login to hub.docker.com and ghcr.io
+    cmds:
+      - echo "Logging into Docker Hub as {{.DOCKER_USERNAME}}"
+      - echo "${DOCKER_TOKEN}" | docker login -u "{{.DOCKER_USERNAME}}" --password-stdin
+      - echo "Logging into GHCR as {{.GITHUB_USERNAME}}"
+      - echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "{{.GITHUB_USERNAME}}" --password-stdin
