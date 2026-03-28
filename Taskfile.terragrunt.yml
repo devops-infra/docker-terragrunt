@@ -46,6 +46,16 @@ vars:
   LABEL_REPO_URL: https://github.com/devops-infra/docker-terragrunt
   LABEL_HOMEPAGE: https://shyper.pro
   LABEL_VENDOR: DevOps-Infra
+  CI_VERSION_PREFIX:
+    sh: |
+      if [ -n "${VERSION_PREFIX:-}" ]; then
+        printf "%s" "${VERSION_PREFIX}"
+      elif [ -n "${VERSION_SUFFIX:-}" ]; then
+        suffix="${VERSION_SUFFIX#-}"
+        if [ -n "$suffix" ]; then
+          printf "%s-" "$suffix"
+        fi
+      fi
 
 tasks:
   terragrunt:help:
@@ -616,3 +626,44 @@ tasks:
     desc: Push image with AWS, Azure and GCP CLIs
     cmds:
       - task terragrunt:push:aws-azure-gcp
+
+  docker:cmds:
+    desc: Show docker build command for plain flavour
+    cmds:
+      - task terragrunt:build:plain --dry VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+
+  docker:build:
+    desc: Build Docker image (plain flavour)
+    cmds:
+      - task terragrunt:build:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+
+  docker:build:inspect:
+    desc: Inspect built Docker image (plain latest)
+    cmds:
+      - |
+        set -eu
+        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
+        echo "Inspecting image: ${image}"
+        docker image inspect "$image" | jq || true
+
+  docker:push:
+    desc: Build and push Docker images (plain flavour)
+    cmds:
+      - task terragrunt:push:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+
+  docker:push:inspect:
+    desc: Inspect pushed Docker image (plain latest)
+    cmds:
+      - |
+        set -eu
+        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
+        echo "Inspecting pushed image: ${image}"
+        docker buildx imagetools inspect "$image" || docker manifest inspect "$image"
+
+  docker:login:
+    desc: Login to hub.docker.com and ghcr.io
+    cmds:
+      - echo "Logging into Docker Hub as {{.DOCKER_USERNAME}}"
+      - echo "${DOCKER_TOKEN}" | docker login -u "{{.DOCKER_USERNAME}}" --password-stdin
+      - echo "Logging into GHCR as {{.GITHUB_USERNAME}}"
+      - echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "{{.GITHUB_USERNAME}}" --password-stdin
