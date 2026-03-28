@@ -147,9 +147,6 @@ tasks:
         }
 
         current="$(task version:get 2>/dev/null || true)"
-        if [ -z "$current" ] && [ -f .version ]; then
-          current="$(tr -d '\n' < .version)"
-        fi
 
         case "$bump_type" in
           set)
@@ -176,7 +173,7 @@ tasks:
             ;;
         esac
 
-        printf "%s" "$next" > .version
+        printf "%s" "$next"
 
   version:tag-release:
     desc: Create set of git tags
