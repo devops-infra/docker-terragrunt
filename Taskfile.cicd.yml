@@ -1,0 +1,305 @@
+version: '3'
+
+silent: true
+
+vars:
+  PR_TEMPLATE: https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/PULL_REQUEST_TEMPLATE.md
+  CONFIGS_BASE_URL: https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/templates/dockerized/configs
+  TASKFILES_BASE_URL: https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/templates/dockerized/taskfiles
+
+tasks:
+  pre-commit:
+    desc: Run all pre-commit hooks
+    cmds:
+      - pre-commit run --all-files
+
+  pre-commit:install:
+    desc: Install pre-commit hooks
+    cmds:
+      - pre-commit install
+
+  lint:
+    desc: Run all linters (Dockerfile, shell scripts, workflows, YAML)
+    cmds:
+      - task: lint:actionlint
+      - task: lint:hadolint
+      - task: lint:shellcheck
+      - task: lint:yamllint
+
+  lint:actionlint:
+    desc: Lint GitHub Actions workflows with actionlint
+    cmds:
+      - |
+        echo "▶️ Running actionlint..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work rhysd/actionlint:latest -color
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ actionlint passed"
+        else
+          echo "❌ actionlint failed"
+          exit $rc
+        fi
+
+  lint:hadolint:
+    desc: Lint Dockerfile with hadolint
+    cmds:
+      - |
+        echo "▶️ Running hadolint..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work hadolint/hadolint:latest-debian < Dockerfile
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ hadolint passed"
+        else
+          echo "❌ hadolint failed"
+          exit $rc
+        fi
+
+  lint:shellcheck:
+    desc: Lint shell scripts with shellcheck
+    cmds:
+      - |
+        echo "▶️ Running shellcheck..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style entrypoint.sh
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ shellcheck passed"
+        else
+          echo "❌ shellcheck failed"
+          exit $rc
+        fi
+
+  lint:yamllint:
+    desc: Lint YAML files with yamllint
+    cmds:
+      - |
+        echo "▶️ Running yamllint..."
+        set +e
+        docker run --rm -i -v "$PWD:/work" -w /work cytopia/yamllint -c .yamllint.yml .
+        rc=$?
+        set -e
+        if [ "$rc" -eq 0 ]; then
+          echo "✅ yamllint passed"
+        else
+          echo "❌ yamllint failed"
+          exit $rc
+        fi
+
+  version:get:
+    desc: Get current version
+    cmds:
+      - echo "{{.VERSION}}"
+
+  version:set:
+    desc: Update version in README.md and action.yml
+    cmds:
+      - |
+        # check if VERSION if different than VERSION_FROM_ACTION_YML
+        if [ "{{.VERSION}}" = "{{.VERSION_FROM_ACTION_YML}}" ]; then
+          echo "❌ ERROR: VERSION is same as VERSION_FROM_ACTION_YML ({{.VERSION}})"
+          exit 1
+        fi
+      - echo Updating full version from {{.VERSION_FROM_ACTION_YML}} to {{.VERSION}}
+      - echo Updating minor version from {{.MINOR_FROM_ACTION_YML}} to {{.VERSION_MINOR}}
+      - echo Updating major version from {{.MAJOR_FROM_ACTION_YML}} to {{.VERSION_MAJOR}}
+      - "{{.SED}} -i 's#{{.DOCKER_NAME}}:{{.VERSION_FROM_ACTION_YML}}#{{.DOCKER_NAME}}:{{.VERSION}}#g' action.yml"
+      - "{{.SED}} -i 's#{{.DOCKER_NAME}}@{{.VERSION_FROM_ACTION_YML}}#{{.DOCKER_NAME}}@{{.VERSION}}#g' README.md"
+      - "{{.SED}} -i 's#{{.GITHUB_NAME}}@{{.VERSION_FROM_ACTION_YML}}#{{.GITHUB_NAME}}@{{.VERSION}}#g' README.md"
+      - "{{.SED}} -i 's#{{.DOCKER_NAME}}@{{.MINOR_FROM_ACTION_YML}}#{{.DOCKER_NAME}}@{{.VERSION_MINOR}}#g' README.md"
+      - "{{.SED}} -i 's#{{.GITHUB_NAME}}@{{.MINOR_FROM_ACTION_YML}}#{{.GITHUB_NAME}}@{{.VERSION_MINOR}}#g' README.md"
+      - "{{.SED}} -i 's#{{.DOCKER_NAME}}@{{.MAJOR_FROM_ACTION_YML}}#{{.DOCKER_NAME}}@{{.VERSION_MAJOR}}#g' README.md"
+      - "{{.SED}} -i 's#{{.GITHUB_NAME}}@{{.MAJOR_FROM_ACTION_YML}}#{{.GITHUB_NAME}}@{{.VERSION_MAJOR}}#g' README.md"
+
+  version:update:patch:
+    desc: Increment patch version (e.g., 1.2.3 -> 1.2.4)
+    cmds:
+      - task version:set VERSION=v{{.MAJOR}}.{{.MINOR}}.{{.NEXT_PATCH}}
+
+  version:update:minor:
+    desc: Increment minor version (e.g., 1.2.3 -> 1.3.0)
+    cmds:
+      - task version:set VERSION=v{{.MAJOR}}.{{.NEXT_MINOR}}.0
+
+  version:update:major:
+    desc: Increment major version (e.g., 1.2.3 -> 2.0.0)
+    cmds:
+      - task version:set VERSION=v{{.NEXT_MAJOR}}.0.0
+
+  version:resolve-next:
+    desc: Resolve next version from bump type and profile
+    cmds:
+      - |
+        set -eu
+        bump_type="${BUMP_TYPE:-patch}"
+        input_version="${INPUT_VERSION:-}"
+
+        normalize_version() {
+          candidate="${1#v}"
+          if ! printf "%s" "${candidate}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            return 1
+          fi
+          printf "v%s" "${candidate}"
+        }
+
+        current="$(task version:get 2>/dev/null || true)"
+        if [ -z "$current" ] && [ -f .version ]; then
+          current="$(tr -d '\n' < .version)"
+        fi
+
+        case "$bump_type" in
+          set)
+            [ -n "$input_version" ] || { echo "Missing version for type=set"; exit 1; }
+            next="$(normalize_version "$input_version")" || {
+              echo "Invalid explicit version: $input_version. Expected vX.Y.Z or X.Y.Z"
+              exit 1
+            }
+            ;;
+          patch|minor|major)
+            [ -n "$current" ] || { echo "Current version not found or invalid. Expected vX.Y.Z"; exit 1; }
+            current="$(normalize_version "$current")" || { echo "Current version not found or invalid. Expected vX.Y.Z"; exit 1; }
+            no_v="${current#v}"
+            IFS='.' read -r major minor patch <<< "$no_v"
+            case "$bump_type" in
+              patch) next="v${major}.${minor}.$((patch + 1))" ;;
+              minor) next="v${major}.$((minor + 1)).0" ;;
+              major) next="v$((major + 1)).0.0" ;;
+            esac
+            ;;
+          *)
+            echo "Unknown type: $bump_type"
+            exit 1
+            ;;
+        esac
+
+        printf "%s" "$next" > .version
+
+  version:tag-release:
+    desc: Create set of git tags
+    cmds:
+      - |
+        set -eu
+        if (set -o | grep -q pipefail) 2>/dev/null; then set -o pipefail; fi
+
+        REMOTE='origin'
+        FULL='{{.VERSION_FULL}}'
+        MINOR='{{.VERSION_MINOR}}'
+        MAJOR='{{.VERSION_MAJOR}}'
+
+        # Validate vX.Y.Z
+        if ! printf "%s" "$FULL" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+          echo "❌ ERROR: VERSION '$FULL' must match vX.Y.Z" >&2
+          exit 1
+        fi
+
+        tag_sha() { git rev-parse "refs/tags/$1" 2>/dev/null || true; }
+        remote_tag_sha() { git ls-remote --tags "$REMOTE" "refs/tags/$1" 2>/dev/null | awk '{print $1}' || true; }
+
+        echo "ℹ️ INFO: Tags - Full: $FULL | Minor: $MINOR | Major: $MAJOR"
+
+        # Full tag: must NOT exist on remote; fail fast if it does
+        full_remote_sha="$(remote_tag_sha "$FULL")"
+        if [ -n "$full_remote_sha" ]; then
+          echo "❌ ERROR: Full tag '$FULL' already exists on remote; aborting" >&2
+          exit 1
+        fi
+
+        # Create full tag locally (if missing) and push
+        if git rev-parse --quiet --verify "refs/tags/$FULL" >/dev/null 2>&1; then
+          echo "ℹ️ INFO: Full tag '$FULL' exists locally but not on remote; pushing"
+        else
+          echo "ℹ️ INFO: Creating full tag '$FULL'"
+          git tag --annotate "$FULL" --message "$FULL"
+        fi
+        git push "$REMOTE" "refs/tags/$FULL"
+        echo "✅ OK: Pushed full tag '$FULL'"
+
+        # Minor tag: create or update
+        git tag --force --annotate "$MINOR" --message "$FULL"
+        minor_local_sha="$(tag_sha "$MINOR")"
+        minor_remote_sha="$(remote_tag_sha "$MINOR")"
+        if [ -z "$minor_remote_sha" ]; then
+          git push "$REMOTE" "refs/tags/$MINOR"
+          echo "✅ OK: Created and pushed minor tag '$MINOR' -> $minor_local_sha"
+        else
+          if [ "$minor_local_sha" != "$minor_remote_sha" ]; then
+            echo "⚠️ WARN: Updating remote minor tag '$MINOR' to $minor_local_sha (was $minor_remote_sha)"
+            git push --force "$REMOTE" "refs/tags/$MINOR"
+          else
+            echo "ℹ️ INFO: Minor tag '$MINOR' already up-to-date"
+          fi
+        fi
+
+        # Major tag: create or update
+        git tag --force --annotate "$MAJOR" --message "$FULL"
+        major_local_sha="$(tag_sha "$MAJOR")"
+        major_remote_sha="$(remote_tag_sha "$MAJOR")"
+        if [ -z "$major_remote_sha" ]; then
+          git push "$REMOTE" "refs/tags/$MAJOR"
+          echo "✅ OK: Created and pushed major tag '$MAJOR' -> $major_local_sha"
+        else
+          if [ "$major_local_sha" != "$major_remote_sha" ]; then
+            echo "⚠️ WARN: Updating remote major tag '$MAJOR' to $major_local_sha (was $major_remote_sha)"
+            git push --force "$REMOTE" "refs/tags/$MAJOR"
+          else
+            echo "ℹ️ INFO: Major tag '$MAJOR' already up-to-date"
+          fi
+        fi
+
+  git:get-pr-template:
+    desc: Get pull request template
+    cmds:
+      - mkdir -p .tmp
+      - curl -LsS {{.PR_TEMPLATE}} -o .tmp/PULL_REQUEST_TEMPLATE.md
+
+  git:set-config:
+    desc: Set git user config
+    cmds:
+      - git config user.name "github-actions[bot]"
+      - git config user.email "github-actions[bot]@users.noreply.github.com"
+
+  sync:all:
+    desc: Sync all common files
+    cmds:
+      - task sync:configs
+      - task sync:ignores
+      - task sync:taskfiles
+
+  sync:configs:
+    desc: Sync configuration files with devops-infra/.github
+    cmds:
+      - |
+        echo "▶️ Syncing configuration files from devops-infra/.github..."
+        curl -sL {{.CONFIGS_BASE_URL}}/.editorconfig -o ./.editorconfig
+        curl -sL {{.CONFIGS_BASE_URL}}/.hadolint.yaml -o ./.hadolint.yaml
+        curl -sL {{.CONFIGS_BASE_URL}}/.pre-commit-config.yaml -o ./.pre-commit-config.yaml
+        curl -sL {{.CONFIGS_BASE_URL}}/.shellcheckrc -o ./.shellcheckrc
+        curl -sL {{.CONFIGS_BASE_URL}}/.yamllint.yml -o ./.yamllint.yml
+        git add .editorconfig .hadolint.yaml .pre-commit-config.yaml .shellcheckrc .yamllint.yml
+        echo "✅ Synced configuration files"
+
+  sync:ignores:
+    desc: Sync ignore files with devops-infra/.github
+    cmds:
+      - |
+        echo "▶️ Syncing ignore files from devops-infra/.github..."
+        curl -sL {{.CONFIGS_BASE_URL}}/.gitignore -o ./.gitignore
+        curl -sL {{.CONFIGS_BASE_URL}}/.dockerignore -o ./.dockerignore
+        git add .gitignore .dockerignore
+        echo "✅ Synced ignore files"
+
+  sync:taskfiles:
+    desc: Sync Taskfiles with devops-infra/.github
+    cmds:
+      - |
+        echo "▶️ Syncing Taskfiles from devops-infra/.github..."
+        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.yml -o ./Taskfile.yml
+        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.cicd.yml -o ./Taskfile.cicd.yml
+        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.docker.yml -o ./Taskfile.docker.yml
+        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.variables.yml -o ./Taskfile.variables.yml
+        git add Taskfile*.yml
+        echo "✅ Synced Taskfiles"

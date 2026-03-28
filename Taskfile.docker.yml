@@ -1,0 +1,104 @@
+version: '3'
+
+silent: true
+
+tasks:
+  docker:login:
+    desc: Login to hub.docker.com and ghcr.io
+    cmds:
+      - echo "Logging into Docker Hub as {{.DOCKER_USERNAME}}"
+      - echo "${DOCKER_TOKEN}" | docker login -u "{{.DOCKER_USERNAME}}" --password-stdin
+      - echo "Logging into GHCR as {{.GITHUB_USERNAME}}"
+      - echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "{{.GITHUB_USERNAME}}" --password-stdin
+
+  docker:cmds:
+    desc: Show full docker build command
+    cmds:
+      - echo -e '{{.DOCKER_BUILD_START}} {{.DOCKER_BUILD_FINISH}}' | {{.SED}} 's/--/ \\\n  --/g'
+
+  docker:build:
+    desc: Build Docker image
+    cmds:
+      - docker buildx create --use
+      - '{{.DOCKER_BUILD_START}} {{.DOCKER_BUILD_FINISH}}'
+
+  docker:build:inspect:
+    desc: Inspect built Docker image
+    cmds:
+      - |
+        image_inspect_out=$(docker image inspect {{.DOCKER_NAME}}:{{.VERSION_FULL}}{{.VERSION_SUFFIX}} | jq -r)
+        echo -e "\nℹ️ Docker image inspect:"
+        echo "$image_inspect_out" | jq
+
+  docker:push:
+    desc: Build and push Docker images
+    deps:
+      - task: docker:login
+    cmds:
+      - docker buildx create --use
+      - '{{.DOCKER_BUILD_START}} --push {{.DOCKER_BUILD_FINISH}}'
+
+  docker:push:inspect:
+    desc: Inspect built Docker image
+    cmds:
+      - |
+        set -eu
+        image="{{.DOCKER_NAME}}:{{.VERSION_FULL}}{{.VERSION_SUFFIX}}"
+
+        echo -e "\nℹ️ Trying local image inspect: $image"
+        set +e
+        image_inspect_out=$(docker image inspect "$image" 2>/dev/null || true)
+        rc=$?
+        set -e
+
+        # Validate that docker inspect returned a non-empty array with an Id
+        has_local=0
+        if [ "$rc" -eq 0 ] && [ -n "$image_inspect_out" ]; then
+          if echo "$image_inspect_out" | jq -e 'type=="array" and (length > 0) and \
+              (.[0].Id != null and .[0].Id != "")' >/dev/null 2>&1; then
+            has_local=1
+          fi
+        fi
+
+        if [ "$has_local" -eq 1 ]; then
+          echo -e "\n✅ Local image found. Docker image inspect:"
+          echo "$image_inspect_out" | jq
+          image_sha=$(echo "$image_inspect_out" | jq -r '.[0].Id // empty')
+          if [ -n "$image_sha" ]; then
+            echo -e "\nℹ️ Docker manifest inspect (local):"
+            docker manifest inspect "${image}@${image_sha}" | jq || true
+          fi
+          exit 0
+        fi
+
+        echo -e "\nℹ️ Local image not found or inspect returned empty; inspecting remote with buildx imagetools..."
+        set +e
+        raw=$(docker buildx imagetools inspect --raw "$image" 2>/dev/null || true)
+        set -e
+
+        if [ -z "$raw" ]; then
+          echo "❌ Failed to inspect remote image with buildx imagetools: $image"
+          exit 1
+        fi
+
+        echo -e "\n✅ Remote manifest/index (raw):"
+        echo "$raw" | jq
+
+        echo -e "\nℹ️ Attempting to pull and inspect per-platform manifests:"
+        echo "$raw" | jq -r '.manifests[]?.digest' | while IFS= read -r digest; do
+          if [ -z "$digest" ] || [ "$digest" = "null" ]; then
+            continue
+          fi
+          ref="${image%@*}@${digest}"
+          echo -e "\nℹ️ Pulling $ref (may fail for some registries)..."
+          set +e
+          docker pull "$ref" >/dev/null 2>&1 || true
+          pulled_rc=$?
+          set -e
+          if [ "$pulled_rc" -eq 0 ]; then
+            echo "ℹ️ Inspecting pulled image $ref"
+            docker image inspect "$ref" | jq || true
+          else
+            echo "⚠️ Could not pull $ref; skipping image inspect"
+          fi
+        done
