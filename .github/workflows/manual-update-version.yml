@@ -26,6 +26,7 @@ on:
 permissions:
   contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   call:
@@ -35,5 +36,4 @@ jobs:
       explicit-version: ${{ inputs.version }}
       build-and-push-only: ${{ inputs.build_only }}
       profile: dockerized
-    secrets:
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    secrets: inherit

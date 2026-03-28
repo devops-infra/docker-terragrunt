@@ -179,14 +179,14 @@ docker run --rm \
     devopsinfra/docker-terragrunt:aws-latest terragrunt apply --terragrunt-working-dir some/module
 ```
 
-* Run a Makefile target as orchestration script.
+* Run a Taskfile target as orchestration script.
 
 ```bash
 docker run --rm \
     --tty --interactive \
     --user $(id -u):$(id -g) \
     --volume $(pwd):/data \
-    devopsinfra/docker-terragrunt:aws-latest make build
+    devopsinfra/docker-terragrunt:aws-latest task build-aws
 ```
 
 
@@ -222,7 +222,7 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | hub                 | Binary         | For interacting with [Github](https://github.com) APIs.                                                                                                        | https://github.com/github/hub                      |
 | jq                  | Binary         | For parsing JSON outputs of [awscli](https://github.com/aws/aws-cli).                                                                                          | https://stedolan.github.io/jq/                     |
 | hcledit             | Binary         | For reading and writing HCL files.                                                                                                                             | https://github.com/minamijoyo/hcledit              |
-| make                | Binary         | For using `Makefile` instead of scripts in deployment process.                                                                                                 | https://www.gnu.org/software/make/                 |
+| task                | Binary         | For using `Taskfile` task orchestration in deployment process.                                                                                                 | https://taskfile.dev/                              |
 | ncurses             | Binary         | For expanding `Makefile` with some colors.                                                                                                                     | https://invisible-island.net/ncurses/announce.html |
 | openssh             | Binary         | For allowing outgoing SSH connections.                                                                                                                         | https://www.openssh.com/                           |
 | openssl             | Binary         | For calculating BASE64SHA256 hash of Lambda packages. Assures updating Lambdas only when package hash changed.                                                 | https://github.com/openssl/openssl                 |

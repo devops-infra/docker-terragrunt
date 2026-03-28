@@ -17,5 +17,4 @@ jobs:
     uses: devops-infra/.github/.github/workflows/reusable-auto-create-pull-request.yml@v1
     with:
       profile: dockerized
-    secrets:
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    secrets: inherit

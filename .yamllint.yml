@@ -11,7 +11,7 @@ rules:
     indent-sequences: true
     check-multi-line-strings: false
   line-length:
-    max: 140
+    max: 220
     allow-non-breakable-inline-mappings: true
   new-line-at-end-of-file: enable
   new-lines:

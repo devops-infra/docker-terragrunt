@@ -24,3 +24,4 @@ jobs:
     with:
       sync-type: ${{ inputs.type }}
       template-profile: dockerized
+    secrets: inherit

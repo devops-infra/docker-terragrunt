@@ -64,7 +64,7 @@ tasks:
       - |
         echo "▶️ Running shellcheck..."
         set +e
-        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style entrypoint.sh
+        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style show-versions.sh
         rc=$?
         set -e
         if [ "$rc" -eq 0 ]; then
@@ -160,7 +160,9 @@ tasks:
             [ -n "$current" ] || { echo "Current version not found or invalid. Expected vX.Y.Z"; exit 1; }
             current="$(normalize_version "$current")" || { echo "Current version not found or invalid. Expected vX.Y.Z"; exit 1; }
             no_v="${current#v}"
-            IFS='.' read -r major minor patch <<< "$no_v"
+            major="$(printf "%s" "$no_v" | awk -F. '{print $1}')"
+            minor="$(printf "%s" "$no_v" | awk -F. '{print $2}')"
+            patch="$(printf "%s" "$no_v" | awk -F. '{print $3}')"
             case "$bump_type" in
               patch) next="v${major}.${minor}.$((patch + 1))" ;;
               minor) next="v${major}.$((minor + 1)).0" ;;
@@ -271,11 +273,11 @@ tasks:
     cmds:
       - |
         echo "▶️ Syncing configuration files from devops-infra/.github..."
-        curl -sL {{.CONFIGS_BASE_URL}}/.editorconfig -o ./.editorconfig
-        curl -sL {{.CONFIGS_BASE_URL}}/.hadolint.yaml -o ./.hadolint.yaml
-        curl -sL {{.CONFIGS_BASE_URL}}/.pre-commit-config.yaml -o ./.pre-commit-config.yaml
-        curl -sL {{.CONFIGS_BASE_URL}}/.shellcheckrc -o ./.shellcheckrc
-        curl -sL {{.CONFIGS_BASE_URL}}/.yamllint.yml -o ./.yamllint.yml
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.editorconfig -o ./.editorconfig
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.hadolint.yaml -o ./.hadolint.yaml
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.pre-commit-config.yaml -o ./.pre-commit-config.yaml
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.shellcheckrc -o ./.shellcheckrc
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.yamllint.yml -o ./.yamllint.yml
         git add .editorconfig .hadolint.yaml .pre-commit-config.yaml .shellcheckrc .yamllint.yml
         echo "✅ Synced configuration files"
 
@@ -284,8 +286,8 @@ tasks:
     cmds:
       - |
         echo "▶️ Syncing ignore files from devops-infra/.github..."
-        curl -sL {{.CONFIGS_BASE_URL}}/.gitignore -o ./.gitignore
-        curl -sL {{.CONFIGS_BASE_URL}}/.dockerignore -o ./.dockerignore
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.gitignore -o ./.gitignore
+        curl -fsSL {{.CONFIGS_BASE_URL}}/.dockerignore -o ./.dockerignore
         git add .gitignore .dockerignore
         echo "✅ Synced ignore files"
 
@@ -294,9 +296,10 @@ tasks:
     cmds:
       - |
         echo "▶️ Syncing Taskfiles from devops-infra/.github..."
-        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.yml -o ./Taskfile.yml
-        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.cicd.yml -o ./Taskfile.cicd.yml
-        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.docker.yml -o ./Taskfile.docker.yml
-        curl -sL {{.TASKFILES_BASE_URL}}/Taskfile.variables.yml -o ./Taskfile.variables.yml
+        curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.yml -o ./Taskfile.yml
+        curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.cicd.yml -o ./Taskfile.cicd.yml
+        curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.scripts.yml -o ./Taskfile.scripts.yml
+        curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.docker.yml -o ./Taskfile.docker.yml
+        curl -fsSL {{.TASKFILES_BASE_URL}}/Taskfile.variables.yml -o ./Taskfile.variables.yml
         git add Taskfile*.yml
         echo "✅ Synced Taskfiles"

@@ -79,7 +79,10 @@ tasks:
     desc: Get pull request template
     cmds:
       - mkdir -p .tmp
-      - curl -LsS https://raw.githubusercontent.com/devops-infra/.github/master/PULL_REQUEST_TEMPLATE.md -o .tmp/PULL_REQUEST_TEMPLATE.md
+      - >-
+        curl -LsS
+        https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/PULL_REQUEST_TEMPLATE.md
+        -o .tmp/PULL_REQUEST_TEMPLATE.md
 
   git:set-config:
     desc: Set git user config

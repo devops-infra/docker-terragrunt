@@ -1,0 +1,618 @@
+version: '3'
+
+silent: true
+
+vars:
+  AWS_VERSION:
+    sh: echo "${AWS_VERSION:-2.34.14}"
+  GCP_VERSION:
+    sh: echo "${GCP_VERSION:-561.0.0}"
+  AZ_VERSION:
+    sh: echo "${AZ_VERSION:-2.84.0}"
+  TF_VERSION:
+    sh: echo "${TF_VERSION:-1.14.7}"
+  OT_VERSION:
+    sh: echo "${OT_VERSION:-1.11.5}"
+  TG_VERSION:
+    sh: echo "${TG_VERSION:-0.99.4}"
+  GITHUB_REF:
+    sh: echo "${GITHUB_REF:-refs/heads/null}"
+  GITHUB_SHA:
+    sh: echo "${GITHUB_SHA:-aabbccddeeff}"
+  VERSION_PREFIX:
+    sh: echo "${VERSION_PREFIX:-}"
+  GITHUB_SHORT_SHA:
+    sh: printf "%s" "{{.GITHUB_SHA}}" | cut -c1-7
+  TF_TG_VERSION: tf-{{.TF_VERSION}}-tg-{{.TG_VERSION}}
+  OT_TG_VERSION: ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
+  FULL_VERSION: tf-{{.TF_VERSION}}-ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
+  DOCKER_USERNAME: christophshyper
+  DOCKER_ORG_NAME: devopsinfra
+  DOCKER_IMAGE: docker-terragrunt
+  DOCKER_NAME: '{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}'
+  DOCKER_HUB_API: https://hub.docker.com/v2
+  GITHUB_USERNAME: ChristophShyper
+  GITHUB_ORG_NAME: devops-infra
+  GITHUB_NAME: ghcr.io/{{.GITHUB_ORG_NAME}}/{{.DOCKER_IMAGE}}
+  BUILD_DATE:
+    sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
+  FLAVOURS: aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
+  LABEL_AUTHOR: Krzysztof ChristophShyper Szyper <biotyk@mail.com>
+  LABEL_NAME: IaaC dockerized framework for Terragrunt, Terraform and OpenTofu
+  LABEL_DESCRIPTION: >-
+    Docker image with Terragrunt v{{.TG_VERSION}}, Terraform v{{.TF_VERSION}}
+    or OpenTofu v{{.OT_VERSION}}, together with all needed components
+    to easily manage cloud infrastructure.
+  LABEL_REPO_URL: https://github.com/devops-infra/docker-terragrunt
+  LABEL_HOMEPAGE: https://shyper.pro
+  LABEL_VENDOR: DevOps-Infra
+
+tasks:
+  terragrunt:help:
+    desc: Display docker-terragrunt custom tasks
+    cmds:
+      - |
+        echo "Terragrunt migration tasks:"
+        echo "  update-versions, login, delete-stale-images"
+        echo "  build-all, build-parallel, build-slim, build-plain, build-aws"
+        echo "  build-azure, build-aws-azure, build-gcp, build-aws-gcp"
+        echo "  build-azure-gcp, build-aws-azure-gcp"
+        echo "  push-parallel, push-slim, push-plain, push-aws, push-azure"
+        echo "  push-aws-azure, push-gcp, push-aws-gcp, push-azure-gcp"
+        echo "  push-aws-azure-gcp"
+
+  terragrunt:login:
+    desc: Log into all registries
+    cmds:
+      - task: docker:login
+
+  terragrunt:delete-stale-images:
+    desc: List or delete stale Docker Hub images not pulled in 180 days
+    cmds:
+      - |
+        set -eu
+        dry_run="${DRY_RUN:-true}"
+        PAGE=1
+        while true; do
+          echo "Fetching page ${PAGE} for DockerHub..."
+          RESPONSE=$(curl -s -u "{{.DOCKER_USERNAME}}:${DOCKER_TOKEN}" \
+            "{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/?page_size=1000&page=${PAGE}")
+          TAGS=$(echo "$RESPONSE" | jq -r '
+            .results[]
+            | select(
+              .tag_last_pulled == null
+              or (
+                .tag_last_pulled
+                | sub("\\.[0-9]+Z$"; "Z")
+                | fromdateiso8601 < (now - 15552000)
+              )
+            )
+            | .name
+          ')
+          if [ -z "$TAGS" ]; then
+            echo "No stale images on page ${PAGE}."
+          else
+            echo "Deleting stale images on page ${PAGE}:"
+            echo "$TAGS"
+            for TAG in $TAGS; do
+              if [ "$dry_run" = "true" ]; then
+                echo "DRY_RUN=true: curl -s -u \"{{.DOCKER_USERNAME}}:***\""
+                echo "  -X DELETE \"{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/${TAG}/\""
+              else
+                echo "Deleting tag: $TAG"
+                curl -s -u "{{.DOCKER_USERNAME}}:${DOCKER_TOKEN}" -X DELETE \
+                  "{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/${TAG}/" >/dev/null || true
+              fi
+            done
+          fi
+          NEXT_PAGE=$(echo "$RESPONSE" | jq -r '.next')
+          if [ "$NEXT_PAGE" = "null" ]; then
+            echo "No more pages to process."
+            break
+          fi
+          PAGE=$((PAGE + 1))
+          sleep 3
+        done
+
+  terragrunt:update-versions:
+    desc: Check TF, OT, TG, AWS, GCP, AZ versions and update Taskfile/README
+    cmds:
+      - |
+        set -eu
+        tf_latest=$(curl -LsS https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r .tag_name | sed 's/^v//')
+        ot_latest=$(curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//')
+        tg_latest=$(curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//')
+        aws_latest=$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[0].name')
+        gcp_latest=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives \
+          | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-//')
+        az_latest=$(curl -LsS https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')
+
+        echo "Current Terraform: {{.TF_VERSION}} | Latest: $tf_latest"
+        echo "Current Terragrunt: {{.TG_VERSION}} | Latest: $tg_latest"
+        echo "Current OpenTofu: {{.OT_VERSION}} | Latest: $ot_latest"
+        echo "Current AWS CLI: {{.AWS_VERSION}} | Latest: $aws_latest"
+        echo "Current GCP CLI: {{.GCP_VERSION}} | Latest: $gcp_latest"
+        echo "Current Azure CLI: {{.AZ_VERSION}} | Latest: $az_latest"
+
+        update_file() {
+          file="$1"
+          from="$2"
+          to="$3"
+          if [ "$from" != "$to" ]; then
+            {{.SED}} -i "s/${from}/${to}/g" "$file"
+          fi
+        }
+
+        update_file Taskfile.terragrunt.yml "{{.TF_VERSION}}" "$tf_latest"
+        update_file Taskfile.terragrunt.yml "{{.TG_VERSION}}" "$tg_latest"
+        update_file Taskfile.terragrunt.yml "{{.OT_VERSION}}" "$ot_latest"
+        update_file Taskfile.terragrunt.yml "{{.AWS_VERSION}}" "$aws_latest"
+        update_file Taskfile.terragrunt.yml "{{.GCP_VERSION}}" "$gcp_latest"
+        update_file Taskfile.terragrunt.yml "{{.AZ_VERSION}}" "$az_latest"
+        update_file README.md "{{.TF_VERSION}}" "$tf_latest"
+        update_file README.md "{{.TG_VERSION}}" "$tg_latest"
+        update_file README.md "{{.OT_VERSION}}" "$ot_latest"
+
+        version_tag=""
+        [ "{{.TF_VERSION}}" = "$tf_latest" ] || version_tag="$version_tag tf-$tf_latest"
+        [ "{{.TG_VERSION}}" = "$tg_latest" ] || version_tag="$version_tag tg-$tg_latest"
+        [ "{{.OT_VERSION}}" = "$ot_latest" ] || version_tag="$version_tag ot-$ot_latest"
+        [ "{{.AWS_VERSION}}" = "$aws_latest" ] || version_tag="$version_tag aws-$aws_latest"
+        [ "{{.GCP_VERSION}}" = "$gcp_latest" ] || version_tag="$version_tag gcp-$gcp_latest"
+        [ "{{.AZ_VERSION}}" = "$az_latest" ] || version_tag="$version_tag az-$az_latest"
+        version_tag=$(echo "$version_tag" | sed 's/^ *//')
+        version_branch=$(echo "$version_tag" | sed 's/ /-/g')
+        if [ -n "${GITHUB_ENV:-}" ]; then
+          echo "VERSION_TAG=$version_tag" >> "$GITHUB_ENV"
+          echo "VERSION_BRANCH=$version_branch" >> "$GITHUB_ENV"
+        fi
+
+  terragrunt:build:_variant:
+    internal: true
+    requires:
+      vars: [FLAVOUR, TOOL]
+    cmds:
+      - |
+        set -eu
+        flavour='{{.FLAVOUR}}'
+        tool='{{.TOOL}}'
+        push='{{default "false" .PUSH}}'
+        prefix='{{.VERSION_PREFIX}}'
+        tf_tg='{{.TF_TG_VERSION}}'
+        ot_tg='{{.OT_TG_VERSION}}'
+        full_version='{{.FULL_VERSION}}'
+
+        if [ "$tool" = "tf" ]; then
+          tf_version='{{.TF_VERSION}}'
+          ot_version='none'
+          combo_version="$tf_tg"
+          tool_latest='tf-latest'
+        else
+          tf_version='none'
+          ot_version='{{.OT_VERSION}}'
+          combo_version="$ot_tg"
+          tool_latest='ot-latest'
+        fi
+
+        args=()
+        case "$flavour" in
+          slim)
+            args+=(--build-arg SLIM=yes)
+            tag_prefix='slim-'
+            include_global_latest='yes'
+            ;;
+          plain)
+            tag_prefix='plain-'
+            include_global_latest='yes'
+            ;;
+          aws)
+            args+=(--build-arg AWS=yes --build-arg AWS_VERSION='{{.AWS_VERSION}}')
+            tag_prefix='aws-'
+            include_global_latest='yes'
+            ;;
+          azure)
+            args+=(--build-arg AZURE=yes --build-arg AZ_VERSION='{{.AZ_VERSION}}')
+            tag_prefix='azure-'
+            include_global_latest='yes'
+            ;;
+          aws-azure)
+            args+=(--build-arg AWS=yes --build-arg AWS_VERSION='{{.AWS_VERSION}}')
+            args+=(--build-arg AZURE=yes --build-arg AZ_VERSION='{{.AZ_VERSION}}')
+            tag_prefix='aws-azure-'
+            include_global_latest='yes'
+            ;;
+          gcp)
+            args+=(--build-arg GCP=yes --build-arg GCP_VERSION='{{.GCP_VERSION}}')
+            tag_prefix='gcp-'
+            include_global_latest='yes'
+            ;;
+          aws-gcp)
+            args+=(--build-arg AWS=yes --build-arg AWS_VERSION='{{.AWS_VERSION}}')
+            args+=(--build-arg GCP=yes --build-arg GCP_VERSION='{{.GCP_VERSION}}')
+            tag_prefix='aws-gcp-'
+            include_global_latest='yes'
+            ;;
+          azure-gcp)
+            args+=(--build-arg AZURE=yes --build-arg AZ_VERSION='{{.AZ_VERSION}}')
+            args+=(--build-arg GCP=yes --build-arg GCP_VERSION='{{.GCP_VERSION}}')
+            tag_prefix='azure-gcp-'
+            include_global_latest='yes'
+            ;;
+          aws-azure-gcp)
+            args+=(--build-arg AWS=yes --build-arg AWS_VERSION='{{.AWS_VERSION}}')
+            args+=(--build-arg AZURE=yes --build-arg AZ_VERSION='{{.AZ_VERSION}}')
+            args+=(--build-arg GCP=yes --build-arg GCP_VERSION='{{.GCP_VERSION}}')
+            tag_prefix='aws-azure-gcp-'
+            include_global_latest='yes'
+            ;;
+          *)
+            echo "Unknown flavour: $flavour"
+            exit 1
+            ;;
+        esac
+
+        cmd=(docker buildx build --platform linux/amd64,linux/arm64 --file Dockerfile)
+        cmd+=(--annotation "index:org.label-schema.build-date={{.BUILD_DATE}}")
+        cmd+=(--annotation "index:org.label-schema.name={{.LABEL_NAME}}")
+        cmd+=(--annotation "index:org.label-schema.description={{.LABEL_DESCRIPTION}}")
+        cmd+=(--annotation "index:org.label-schema.usage={{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md")
+        cmd+=(--annotation "index:org.label-schema.url={{.LABEL_HOMEPAGE}}")
+        cmd+=(--annotation "index:org.label-schema.vcs-url={{.LABEL_REPO_URL}}")
+        cmd+=(--annotation "index:org.label-schema.vcs-ref={{.GITHUB_SHORT_SHA}}")
+        cmd+=(--annotation "index:org.label-schema.vendor={{.LABEL_VENDOR}}")
+        cmd+=(--annotation "index:org.label-schema.version=$full_version")
+        cmd+=(--annotation "index:org.label-schema.schema-version=1.0")
+        cmd+=(--annotation "index:org.opencontainers.image.created={{.BUILD_DATE}}")
+        cmd+=(--annotation "index:org.opencontainers.image.authors={{.LABEL_AUTHOR}}")
+        cmd+=(--annotation "index:org.opencontainers.image.url={{.LABEL_HOMEPAGE}}")
+        cmd+=(--annotation "index:org.opencontainers.image.documentation={{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md")
+        cmd+=(--annotation "index:org.opencontainers.image.source={{.LABEL_REPO_URL}}")
+        cmd+=(--annotation "index:org.opencontainers.image.version=$full_version")
+        cmd+=(--annotation "index:org.opencontainers.image.revision={{.GITHUB_SHORT_SHA}}")
+        cmd+=(--annotation "index:org.opencontainers.image.vendor={{.LABEL_VENDOR}}")
+        cmd+=(--annotation "index:org.opencontainers.image.licenses=MIT")
+        cmd+=(--annotation "index:org.opencontainers.image.title={{.LABEL_NAME}}")
+        cmd+=(--annotation "index:org.opencontainers.image.description={{.LABEL_DESCRIPTION}}")
+        cmd+=(--label "org.label-schema.build-date={{.BUILD_DATE}}")
+        cmd+=(--label "org.label-schema.name={{.LABEL_NAME}}")
+        cmd+=(--label "org.label-schema.description={{.LABEL_DESCRIPTION}}")
+        cmd+=(--label "org.label-schema.usage={{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md")
+        cmd+=(--label "org.label-schema.url={{.LABEL_HOMEPAGE}}")
+        cmd+=(--label "org.label-schema.vcs-url={{.LABEL_REPO_URL}}")
+        cmd+=(--label "org.label-schema.vcs-ref={{.GITHUB_SHORT_SHA}}")
+        cmd+=(--label "org.label-schema.vendor={{.LABEL_VENDOR}}")
+        cmd+=(--label "org.label-schema.version=$full_version")
+        cmd+=(--label "org.label-schema.schema-version=1.0")
+        cmd+=(--label "org.opencontainers.image.created={{.BUILD_DATE}}")
+        cmd+=(--label "org.opencontainers.image.authors={{.LABEL_AUTHOR}}")
+        cmd+=(--label "org.opencontainers.image.url={{.LABEL_HOMEPAGE}}")
+        cmd+=(--label "org.opencontainers.image.documentation={{.LABEL_REPO_URL}}/blob/{{.GITHUB_SHA}}/README.md")
+        cmd+=(--label "org.opencontainers.image.source={{.LABEL_REPO_URL}}")
+        cmd+=(--label "org.opencontainers.image.version=$full_version")
+        cmd+=(--label "org.opencontainers.image.revision={{.GITHUB_SHORT_SHA}}")
+        cmd+=(--label "org.opencontainers.image.vendor={{.LABEL_VENDOR}}")
+        cmd+=(--label "org.opencontainers.image.licenses=MIT")
+        cmd+=(--label "org.opencontainers.image.title={{.LABEL_NAME}}")
+        cmd+=(--label "org.opencontainers.image.description={{.LABEL_DESCRIPTION}}")
+        cmd+=(--label "maintainer={{.LABEL_AUTHOR}}")
+        cmd+=(--label "repository={{.LABEL_REPO_URL}}")
+        if [ "$push" = "true" ]; then
+          cmd+=(--push)
+        fi
+        cmd+=("${args[@]}")
+        cmd+=(--build-arg TF_VERSION="$tf_version" --build-arg OT_VERSION="$ot_version" --build-arg TG_VERSION='{{.TG_VERSION}}')
+        cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${combo_version}")
+        cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+        cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${combo_version}")
+        cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+        if [ "$include_global_latest" = "yes" ] && [ "$tool" = "tf" ]; then
+          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}latest")
+          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}latest")
+        fi
+        if [ "$flavour" = "plain" ]; then
+          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${combo_version}")
+          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tool_latest}")
+          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${combo_version}")
+          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tool_latest}")
+          if [ "$tool" = "tf" ]; then
+            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}latest")
+            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}latest")
+          fi
+        fi
+        cmd+=(.)
+
+        builder_name='terragrunt-buildx'
+        if docker buildx inspect "$builder_name" >/dev/null 2>&1; then
+          docker buildx use "$builder_name" >/dev/null 2>&1 || true
+        else
+          docker buildx create --name "$builder_name" --use >/dev/null
+        fi
+        docker buildx inspect --bootstrap >/dev/null 2>&1 || true
+        printf 'Building %s (%s)\n' "$flavour" "$tool"
+        "${cmd[@]}"
+
+  terragrunt:build:_flavour:
+    internal: true
+    requires:
+      vars: [FLAVOUR]
+    cmds:
+      - task: terragrunt:build:_variant
+        vars:
+          FLAVOUR: '{{.FLAVOUR}}'
+          TOOL: tf
+          PUSH: '{{default "false" .PUSH}}'
+      - task: terragrunt:build:_variant
+        vars:
+          FLAVOUR: '{{.FLAVOUR}}'
+          TOOL: ot
+          PUSH: '{{default "false" .PUSH}}'
+
+  terragrunt:build:all:
+    desc: Build all Docker images one by one
+    cmds:
+      - task terragrunt:build:slim
+      - task terragrunt:build:plain
+      - task terragrunt:build:aws
+      - task terragrunt:build:azure
+      - task terragrunt:build:aws-azure
+      - task terragrunt:build:gcp
+      - task terragrunt:build:aws-gcp
+      - task terragrunt:build:azure-gcp
+      - task terragrunt:build:aws-azure-gcp
+
+  terragrunt:build:parallel:
+    desc: Build all images in parallel
+    cmds:
+      - task terragrunt:build:slim
+      - task terragrunt:build:plain
+      - |
+        set -eu
+        for fl in {{.FLAVOURS}}; do
+          task "terragrunt:build:${fl}" &
+        done
+        wait
+
+  terragrunt:build:slim:
+    desc: Build slim image without cloud CLIs
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: slim
+  terragrunt:build:plain:
+    desc: Build image without cloud CLIs
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: plain
+  terragrunt:build:aws:
+    desc: Build image with AWS CLI
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: aws
+  terragrunt:build:azure:
+    desc: Build image with Azure CLI
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: azure
+  terragrunt:build:aws-azure:
+    desc: Build image with AWS and Azure CLIs
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: aws-azure
+  terragrunt:build:gcp:
+    desc: Build image with GCP CLI
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: gcp
+  terragrunt:build:aws-gcp:
+    desc: Build image with AWS and GCP CLIs
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: aws-gcp
+  terragrunt:build:azure-gcp:
+    desc: Build image with Azure and GCP CLIs
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: azure-gcp
+  terragrunt:build:aws-azure-gcp:
+    desc: Build image with AWS, Azure and GCP CLIs
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: aws-azure-gcp
+
+  terragrunt:push:parallel:
+    desc: Push all images in parallel
+    deps:
+      - task: terragrunt:login
+    cmds:
+      - task terragrunt:push:slim
+      - task terragrunt:push:plain
+      - |
+        set -eu
+        for fl in {{.FLAVOURS}}; do
+          task "terragrunt:push:${fl}" &
+        done
+        wait
+
+  terragrunt:push:_flavour:
+    internal: true
+    requires:
+      vars: [FLAVOUR]
+    deps:
+      - task: terragrunt:login
+    cmds:
+      - task: terragrunt:build:_flavour
+        vars:
+          FLAVOUR: '{{.FLAVOUR}}'
+          PUSH: true
+
+  terragrunt:push:slim:
+    desc: Push slim image
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: slim
+  terragrunt:push:plain:
+    desc: Push plain image
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: plain
+  terragrunt:push:aws:
+    desc: Push image with AWS CLI
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: aws
+  terragrunt:push:azure:
+    desc: Push image with Azure CLI
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: azure
+  terragrunt:push:aws-azure:
+    desc: Push image with AWS and Azure CLIs
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: aws-azure
+  terragrunt:push:gcp:
+    desc: Push image with GCP CLI
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: gcp
+  terragrunt:push:aws-gcp:
+    desc: Push image with AWS and GCP CLIs
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: aws-gcp
+  terragrunt:push:azure-gcp:
+    desc: Push image with Azure and GCP CLIs
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: azure-gcp
+  terragrunt:push:aws-azure-gcp:
+    desc: Push image with AWS, Azure and GCP CLIs
+    cmds:
+      - task: terragrunt:push:_flavour
+        vars:
+          FLAVOUR: aws-azure-gcp
+
+  help-terragrunt:
+    desc: Show docker-terragrunt custom task help
+    cmds:
+      - task terragrunt:help
+
+  update-versions:
+    desc: Check dependency versions and update files
+    cmds:
+      - task terragrunt:update-versions
+
+  login:
+    desc: Log into Docker Hub and GHCR
+    cmds:
+      - task terragrunt:login
+
+  delete-stale-images:
+    desc: Delete stale Docker Hub images
+    cmds:
+      - task terragrunt:delete-stale-images
+
+  build-all:
+    desc: Build all Docker images one by one
+    cmds:
+      - task terragrunt:build:all
+
+  build-parallel:
+    desc: Build all images in parallel
+    cmds:
+      - task terragrunt:build:parallel
+
+  build-slim:
+    desc: Build slim image without cloud CLIs
+    cmds:
+      - task terragrunt:build:slim
+  build-plain:
+    desc: Build image without cloud CLIs
+    cmds:
+      - task terragrunt:build:plain
+  build-aws:
+    desc: Build image with AWS CLI
+    cmds:
+      - task terragrunt:build:aws
+  build-azure:
+    desc: Build image with Azure CLI
+    cmds:
+      - task terragrunt:build:azure
+  build-aws-azure:
+    desc: Build image with AWS and Azure CLIs
+    cmds:
+      - task terragrunt:build:aws-azure
+  build-gcp:
+    desc: Build image with GCP CLI
+    cmds:
+      - task terragrunt:build:gcp
+  build-aws-gcp:
+    desc: Build image with AWS and GCP CLIs
+    cmds:
+      - task terragrunt:build:aws-gcp
+  build-azure-gcp:
+    desc: Build image with Azure and GCP CLIs
+    cmds:
+      - task terragrunt:build:azure-gcp
+  build-aws-azure-gcp:
+    desc: Build image with AWS, Azure and GCP CLIs
+    cmds:
+      - task terragrunt:build:aws-azure-gcp
+
+  push-parallel:
+    desc: Push all images in parallel
+    cmds:
+      - task terragrunt:push:parallel
+
+  push-slim:
+    desc: Push slim image
+    cmds:
+      - task terragrunt:push:slim
+  push-plain:
+    desc: Push plain image
+    cmds:
+      - task terragrunt:push:plain
+  push-aws:
+    desc: Push image with AWS CLI
+    cmds:
+      - task terragrunt:push:aws
+  push-azure:
+    desc: Push image with Azure CLI
+    cmds:
+      - task terragrunt:push:azure
+  push-aws-azure:
+    desc: Push image with AWS and Azure CLIs
+    cmds:
+      - task terragrunt:push:aws-azure
+  push-gcp:
+    desc: Push image with GCP CLI
+    cmds:
+      - task terragrunt:push:gcp
+  push-aws-gcp:
+    desc: Push image with AWS and GCP CLIs
+    cmds:
+      - task terragrunt:push:aws-gcp
+  push-azure-gcp:
+    desc: Push image with Azure and GCP CLIs
+    cmds:
+      - task terragrunt:push:azure-gcp
+  push-aws-azure-gcp:
+    desc: Push image with AWS, Azure and GCP CLIs
+    cmds:
+      - task terragrunt:push:aws-azure-gcp

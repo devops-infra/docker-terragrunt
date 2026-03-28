@@ -9,11 +9,11 @@ permissions:
   contents: read
   issues: write
   pull-requests: read
+  packages: write
 
 jobs:
   call:
     uses: devops-infra/.github/.github/workflows/reusable-cron-check-dependencies.yml@v1
     with:
       profile: dockerized
-    secrets:
-      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+    secrets: inherit
