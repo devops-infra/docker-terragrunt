@@ -198,7 +198,7 @@ docker run --rm \
 |---------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
 | `format-hcl`        | Yes                 | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/fmt/format-hcl)   |
 | `terragrunt-fmt.sh` | No                  | Dependency for `format-hcl`                                                                                                        | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) |
-| `show-versions.sh`  | Yes                 | Main CMD target for Docker image, just to show all installed binaries versions.                                                    | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/show-versions.sh) |
+| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show all installed binaries versions.                                                    | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/entrypoint.sh) |
 
 
 ### Binaries and Python libraries

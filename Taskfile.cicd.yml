@@ -64,7 +64,7 @@ tasks:
       - |
         echo "▶️ Running shellcheck..."
         set +e
-        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style show-versions.sh
+        docker run --rm -i -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style entrypoint.sh
         rc=$?
         set -e
         if [ "$rc" -eq 0 ]; then

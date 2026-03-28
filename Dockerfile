@@ -287,13 +287,13 @@ Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architect
   fi
 
 # Scripts, configs and cleanup
-COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh show-versions.sh /usr/bin/
+COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh entrypoint.sh /usr/bin/
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN chmod +x \
     /usr/bin/format-hcl \
     /usr/bin/fmt.sh \
     /usr/bin/terragrunt-fmt.sh \
-    /usr/bin/show-versions.sh ;\
+    /usr/bin/entrypoint.sh ;\
   apt-get clean ;\
   rm -rf /var/lib/apt/lists/* ;\
   rm -rf /var/cache/* ;\
@@ -301,4 +301,4 @@ RUN chmod +x \
   rm -rf /tmp/*
 
 WORKDIR /data
-CMD ["show-versions.sh"]
+CMD ["entrypoint.sh"]
