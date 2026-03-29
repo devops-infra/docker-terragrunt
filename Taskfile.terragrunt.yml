@@ -71,7 +71,7 @@ tasks:
     cmds:
       - |
         echo "Terragrunt migration tasks:"
-        echo "  update-versions, login, delete-stale-images"
+        echo "  update-versions, login"
         echo "  build-all, build-parallel, build-slim, build-plain, build-aws"
         echo "  build-azure, build-aws-azure, build-gcp, build-aws-gcp"
         echo "  build-azure-gcp, build-aws-azure-gcp"
@@ -83,54 +83,6 @@ tasks:
     desc: Log into all registries
     cmds:
       - task: docker:login
-
-  terragrunt:delete-stale-images:
-    desc: List or delete stale Docker Hub images not pulled in 180 days
-    cmds:
-      - |
-        set -eu
-        dry_run="${DRY_RUN:-true}"
-        PAGE=1
-        while true; do
-          echo "Fetching page ${PAGE} for DockerHub..."
-          RESPONSE=$(curl -s -u "{{.DOCKER_USERNAME}}:${DOCKER_TOKEN}" \
-            "{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/?page_size=1000&page=${PAGE}")
-          TAGS=$(echo "$RESPONSE" | jq -r '
-            .results[]
-            | select(
-              .tag_last_pulled == null
-              or (
-                .tag_last_pulled
-                | sub("\\.[0-9]+Z$"; "Z")
-                | fromdateiso8601 < (now - 15552000)
-              )
-            )
-            | .name
-          ')
-          if [ -z "$TAGS" ]; then
-            echo "No stale images on page ${PAGE}."
-          else
-            echo "Deleting stale images on page ${PAGE}:"
-            echo "$TAGS"
-            for TAG in $TAGS; do
-              if [ "$dry_run" = "true" ]; then
-                echo "DRY_RUN=true: curl -s -u \"{{.DOCKER_USERNAME}}:***\""
-                echo "  -X DELETE \"{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/${TAG}/\""
-              else
-                echo "Deleting tag: $TAG"
-                curl -s -u "{{.DOCKER_USERNAME}}:${DOCKER_TOKEN}" -X DELETE \
-                  "{{.DOCKER_HUB_API}}/repositories/{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}/tags/${TAG}/" >/dev/null || true
-              fi
-            done
-          fi
-          NEXT_PAGE=$(echo "$RESPONSE" | jq -r '.next')
-          if [ "$NEXT_PAGE" = "null" ]; then
-            echo "No more pages to process."
-            break
-          fi
-          PAGE=$((PAGE + 1))
-          sleep 3
-        done
 
   terragrunt:update-versions:
     desc: Check TF, OT, TG, AWS, GCP, AZ versions and update Taskfile/README
@@ -542,11 +494,6 @@ tasks:
     desc: Log into Docker Hub and GHCR
     cmds:
       - task terragrunt:login
-
-  delete-stale-images:
-    desc: Delete stale Docker Hub images
-    cmds:
-      - task terragrunt:delete-stale-images
 
   build-all:
     desc: Build all Docker images one by one
