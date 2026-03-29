@@ -142,7 +142,7 @@ tasks:
         tg_latest=$(curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//')
         aws_latest=$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[0].name')
         gcp_latest=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives \
-          | grep -o 'google-cloud-sdk-[0-9.]\+' | head -1 | sed 's/google-cloud-sdk-//')
+          | grep -Eo 'google-cloud-sdk-[0-9.]+' | head -1 | sed 's/google-cloud-sdk-//')
         az_latest=$(curl -LsS https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')
 
         echo "Current Terraform: {{.TF_VERSION}} | Latest: $tf_latest"
@@ -157,7 +157,9 @@ tasks:
           from="$2"
           to="$3"
           if [ "$from" != "$to" ]; then
-            {{.SED}} -i "s/${from}/${to}/g" "$file"
+            from_escaped=$(printf '%s\n' "$from" | sed 's/[][\\.^$*&/]/\\&/g')
+            to_escaped=$(printf '%s\n' "$to" | sed 's/[&/\\]/\\&/g')
+            {{.SED}} -i "s/${from_escaped}/${to_escaped}/g" "$file"
           fi
         }
 
