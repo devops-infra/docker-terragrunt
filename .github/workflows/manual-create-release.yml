@@ -34,6 +34,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-24.04-arm
+    needs: lint
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -95,6 +96,7 @@ jobs:
     name: Build & push
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
+    needs: release
     strategy:
       fail-fast: false
       matrix:
@@ -132,6 +134,24 @@ jobs:
           docker buildx create --use || true
           task login
           task push-${{ matrix.flavour }} VERSION_OVERRIDE="${VERSION}"
-          docker pull ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavour }}-latest
-          docker pull ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavour }}-tf-latest
-          docker pull ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavour }}-ot-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:${VERSION}-${{ matrix.flavour }}-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:${VERSION}-${{ matrix.flavour }}-tf-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:${VERSION}-${{ matrix.flavour }}-ot-latest
+
+      - name: Cont.Struc.Test - ${{ matrix.flavour }}
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:${{ github.event.inputs.version }}-${{ matrix.flavour }}-latest
+          config: tests/${{ matrix.flavour }}.yml
+
+      - name: Cont.Struc.Test - Terraform
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:${{ github.event.inputs.version }}-${{ matrix.flavour }}-tf-latest
+          config: tests/tf.yml
+
+      - name: Cont.Struc.Test - OpenTofu
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:${{ github.event.inputs.version }}-${{ matrix.flavour }}-ot-latest
+          config: tests/ot.yml
