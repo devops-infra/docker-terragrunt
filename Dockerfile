@@ -18,6 +18,7 @@ ARG YC=no
 ARG AWS_VERSION
 ARG GCP_VERSION
 ARG AZ_VERSION
+ARG TASK_VERSION=3.45.4
 ARG TF_VERSION=none
 ARG OT_VERSION=none
 ARG TG_VERSION=none
@@ -56,6 +57,7 @@ RUN apt-get update -y ;\
     curl \
     git \
     jq \
+    make \
     vim \
     wget \
     unzip ;\
@@ -69,7 +71,6 @@ RUN apt-get update -y ;\
       graphviz \
       hub \
       lsb-release \
-      make \
       ncurses-base \
       openssh-client \
       openssl \
@@ -79,6 +80,23 @@ RUN apt-get update -y ;\
       zip ;\
     pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
   fi
+
+# Install Task binary
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+    ARCHITECTURE=amd64 ;\
+  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+    ARCHITECTURE=arm64 ;\
+  else \
+    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+    exit 1 ;\
+  fi ;\
+  DOWNLOAD_URL="https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_linux_${ARCHITECTURE}.tar.gz" ;\
+  curl -sL "${DOWNLOAD_URL}" -o /tmp/task.tar.gz ;\
+  tar -xzf /tmp/task.tar.gz -C /tmp task ;\
+  install -m 0755 /tmp/task /usr/bin/task ;\
+  rm -f /tmp/task.tar.gz /tmp/task
 
 # Get Terraform by a specific version or search for the latest one
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
