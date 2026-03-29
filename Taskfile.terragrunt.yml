@@ -3,6 +3,13 @@ version: '3'
 silent: true
 
 vars:
+  TF_VERSION_FROM_TAG:
+    sh: printf "%s" "{{.VERSION}}" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/'
+  OT_VERSION_FROM_TAG:
+    sh: printf "%s" "{{.VERSION}}" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\2/'
+  TG_VERSION_FROM_TAG:
+    sh: printf "%s" "{{.VERSION}}" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/'
+
   AWS_VERSION:
     sh: echo "${AWS_VERSION:-2.34.14}"
   GCP_VERSION:
@@ -71,7 +78,6 @@ tasks:
     cmds:
       - |
         echo "Terragrunt migration tasks:"
-        echo "  update-versions, login"
         echo "  build-all, build-parallel, build-slim, build-plain, build-aws"
         echo "  build-azure, build-aws-azure, build-gcp, build-aws-gcp"
         echo "  build-azure-gcp, build-aws-azure-gcp"
@@ -293,12 +299,7 @@ tasks:
         fi
         cmd+=(.)
 
-        builder_name='terragrunt-buildx'
-        if docker buildx inspect "$builder_name" >/dev/null 2>&1; then
-          docker buildx use "$builder_name" >/dev/null 2>&1 || true
-        else
-          docker buildx create --name "$builder_name" --use >/dev/null
-        fi
+        docker buildx create --use || true
         docker buildx inspect --bootstrap >/dev/null 2>&1 || true
         printf 'Building %s (%s)\n' "$flavour" "$tool"
         "${cmd[@]}"

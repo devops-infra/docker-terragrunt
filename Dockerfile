@@ -18,7 +18,6 @@ ARG YC=no
 ARG AWS_VERSION
 ARG GCP_VERSION
 ARG AZ_VERSION
-ARG TASK_VERSION=3.45.4
 ARG TF_VERSION=none
 ARG OT_VERSION=none
 ARG TG_VERSION=none
@@ -79,25 +78,6 @@ RUN apt-get update -y ;\
       python3-pip \
       zip ;\
     pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
-  fi
-
-# Install Task binary
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${SLIM}" = "no" ]; then \
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-      ARCHITECTURE=amd64 ;\
-    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-      ARCHITECTURE=arm64 ;\
-    else \
-      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-      exit 1 ;\
-    fi ;\
-    DOWNLOAD_URL="https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_linux_${ARCHITECTURE}.tar.gz" ;\
-    curl -sL "${DOWNLOAD_URL}" -o /tmp/task.tar.gz ;\
-    tar -xzf /tmp/task.tar.gz -C /tmp task ;\
-    install -m 0755 /tmp/task /usr/bin/task ;\
-    rm -f /tmp/task.tar.gz /tmp/task ;\
   fi
 
 # Get Terraform by a specific version or search for the latest one
@@ -211,6 +191,31 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
   chmod +x ./hcledit ;\
   chown "$(id -u):$(id -g)" ./hcledit ;\
   mv ./hcledit /usr/bin/hcledit
+
+# Get latest Task
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${SLIM}" = "no" ]; then \
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+      ARCHITECTURE=amd64 ;\
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+      ARCHITECTURE=arm64 ;\
+    else \
+      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+      exit 1 ;\
+    fi ;\
+    DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/go-task/task/releases/latest | jq -r \
+      ".assets[] | select(.name | endswith(\"linux_${ARCHITECTURE}.tar.gz\")) | .browser_download_url")" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for Task" ;\
+      exit 1 ;\
+    fi ;\
+    curl -sL "${DOWNLOAD_URL}" -o ./task.tar.gz ;\
+    tar -xf ./task.tar.gz ;\
+    rm -f ./task.tar.gz ;\
+    chmod +x ./task ;\
+    mv ./task /usr/bin/task ;\
+  fi
 
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]

@@ -83,65 +83,6 @@ tasks:
         {{.SED}} -i "s/OpenTofu v[0-9]\+\.[0-9]\+\.[0-9]\+/OpenTofu v$ot/g" README.md
         {{.SED}} -i "s/Terragrunt v[0-9]\+\.[0-9]\+\.[0-9]\+/Terragrunt v$tg/g" README.md
 
-  version:resolve-next:
-    desc: Resolve next custom version
-    cmds:
-      - |
-        set -eu
-        bump_type="${BUMP_TYPE:-patch}"
-        input_version="${INPUT_VERSION:-}"
-        current="$(task version:get)"
-
-        if ! printf "%s" "$current" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
-          echo "Current version not found or invalid. Expected tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
-          exit 1
-        fi
-
-        tf="$(printf "%s" "$current" | sed -E \
-          's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')"
-        ot="$(printf "%s" "$current" | sed -E \
-          's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\2/')"
-        tg="$(printf "%s" "$current" | sed -E \
-          's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/')"
-
-        bump_patch() {
-          v="$1"
-          ma="$(printf "%s" "$v" | awk -F. '{print $1}')"
-          mi="$(printf "%s" "$v" | awk -F. '{print $2}')"
-          pa="$(printf "%s" "$v" | awk -F. '{print $3}')"
-          printf "%s.%s.%s" "$ma" "$mi" "$((pa + 1))"
-        }
-
-        case "$bump_type" in
-          set)
-            [ -n "$input_version" ] || { echo "Missing version for type=set"; exit 1; }
-            if ! printf "%s" "$input_version" | grep -Eq \
-              '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
-              echo "Invalid explicit version: $input_version. Expected tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
-              exit 1
-            fi
-            printf "%s" "$input_version"
-            ;;
-          patch)
-            tf_n="$(bump_patch "$tf")"
-            ot_n="$(bump_patch "$ot")"
-            tg_n="$(bump_patch "$tg")"
-            printf "tf-%s-ot-%s-tg-%s" "$tf_n" "$ot_n" "$tg_n"
-            ;;
-          minor)
-            echo "Minor bump is not supported for custom versioning; use type=set"
-            exit 1
-            ;;
-          major)
-            echo "Major bump is not supported for custom versioning; use type=set"
-            exit 1
-            ;;
-          *)
-            echo "Unknown type: $bump_type"
-            exit 1
-            ;;
-        esac
-
   version:tag-release:
     desc: Create custom release tag only
     cmds:
@@ -165,27 +106,6 @@ tasks:
           git tag --annotate "${version}" --message "${version}"
         fi
         git push origin "refs/tags/${version}"
-
-  version:update:patch:
-    desc: Increment custom version patch components and apply
-    cmds:
-      - |
-        next="$(task version:resolve-next BUMP_TYPE=patch)"
-        task version:set VERSION="$next"
-
-  version:update:minor:
-    desc: Unsupported for custom versioning
-    cmds:
-      - |
-        echo "Minor bump is not supported for custom versioning; use version:set with explicit value"
-        exit 1
-
-  version:update:major:
-    desc: Unsupported for custom versioning
-    cmds:
-      - |
-        echo "Major bump is not supported for custom versioning; use version:set with explicit value"
-        exit 1
 
   git:get-pr-template:
     desc: Get pull request template
@@ -267,44 +187,3 @@ tasks:
 
         git add Taskfile*.yml
         echo "✅ Synced Taskfiles"
-
-  docker:cmds:
-    desc: Show docker build command for plain flavour
-    cmds:
-      - task terragrunt:build:plain --dry VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
-
-  docker:build:
-    desc: Build Docker image (plain flavour)
-    cmds:
-      - task terragrunt:build:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
-
-  docker:build:inspect:
-    desc: Inspect built Docker image (plain latest)
-    cmds:
-      - |
-        set -eu
-        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
-        echo "Inspecting image: ${image}"
-        docker image inspect "$image" | jq || true
-
-  docker:push:
-    desc: Build and push Docker images (plain flavour)
-    cmds:
-      - task terragrunt:push:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
-
-  docker:push:inspect:
-    desc: Inspect pushed Docker image (plain latest)
-    cmds:
-      - |
-        set -eu
-        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
-        echo "Inspecting pushed image: ${image}"
-        docker buildx imagetools inspect "$image" || docker manifest inspect "$image"
-
-  docker:login:
-    desc: Login to hub.docker.com and ghcr.io
-    cmds:
-      - echo "Logging into Docker Hub as {{.DOCKER_USERNAME}}"
-      - echo "${DOCKER_TOKEN}" | docker login -u "{{.DOCKER_USERNAME}}" --password-stdin
-      - echo "Logging into GHCR as {{.GITHUB_USERNAME}}"
-      - echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "{{.GITHUB_USERNAME}}" --password-stdin

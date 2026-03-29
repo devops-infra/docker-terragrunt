@@ -54,14 +54,6 @@ fileExistenceTests:
     shouldExist: true
     permissions: -rwxr-xr-x
 
-  - name: make missing in slim
-    path: /usr/bin/make
-    shouldExist: false
-
-  - name: task missing in slim
-    path: /usr/bin/task
-    shouldExist: false
-
 metadataTest:
   cmd: [entrypoint.sh]
   entrypoint: []

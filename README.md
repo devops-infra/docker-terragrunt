@@ -179,14 +179,14 @@ docker run --rm \
     devopsinfra/docker-terragrunt:aws-latest terragrunt apply --terragrunt-working-dir some/module
 ```
 
-* Run a Taskfile target as orchestration script.
+* Run a Makefile target as orchestration script.
 
 ```bash
 docker run --rm \
     --tty --interactive \
     --user $(id -u):$(id -g) \
     --volume $(pwd):/data \
-    devopsinfra/docker-terragrunt:aws-latest task build-aws
+    devopsinfra/docker-terragrunt:latest make build
 ```
 
 
@@ -198,7 +198,7 @@ docker run --rm \
 |---------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
 | `format-hcl`        | Yes                 | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/fmt/format-hcl)   |
 | `terragrunt-fmt.sh` | No                  | Dependency for `format-hcl`                                                                                                        | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) |
-| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show all installed binaries versions.                                                    | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/entrypoint.sh) |
+| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show main installed binaries versions.                                                   | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/entrypoint.sh) |
 
 
 ### Binaries and Python libraries
@@ -222,7 +222,7 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | hub                 | Binary         | For interacting with [Github](https://github.com) APIs.                                                                                                        | https://github.com/github/hub                      |
 | jq                  | Binary         | For parsing JSON outputs of [awscli](https://github.com/aws/aws-cli).                                                                                          | https://stedolan.github.io/jq/                     |
 | hcledit             | Binary         | For reading and writing HCL files.                                                                                                                             | https://github.com/minamijoyo/hcledit              |
-| *make**             | Binary         | For running legacy/compatibility make targets when needed in automation scripts.                                                                               | https://www.gnu.org/software/make/                 |
+| *make**             | Binary         | For using `Makefile` task orchestration in deployment process.                                                                                                  | https://www.gnu.org/software/make/                 |
 | *task**             | Binary         | For using `Taskfile` task orchestration in deployment process.                                                                                                 | https://taskfile.dev/                              |
 | ncurses             | Binary         | For expanding `Makefile` with some colors.                                                                                                                     | https://invisible-island.net/ncurses/announce.html |
 | openssh             | Binary         | For allowing outgoing SSH connections.                                                                                                                         | https://www.openssh.com/                           |
