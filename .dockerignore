@@ -5,5 +5,5 @@
 !fmt
 !LICENSE
 !README.md
-!show-versions.sh
+!entrypoint.sh
 !pip

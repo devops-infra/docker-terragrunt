@@ -64,7 +64,7 @@ jobs:
           fi
           echo "✅ Version $VERSION is available"
 
-      - name: Push respo tag
+      - name: Push repo tag
         run: |
           VERSION="${{ github.event.inputs.version }}"
           git config user.name "github-actions[bot]"
@@ -127,11 +127,12 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-          VERSION: ${{ github.event.inputs.version }}
         run: |
-          docker buildx create --use
-          make login
-          make push-${{ matrix.flavour }}
-          docker pull ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavour }}-latest
-          docker pull ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavour }}-tf-latest
-          docker pull ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavour }}-ot-latest
+          VERSION="${{ github.event.inputs.version }}"
+          version_prefix="${VERSION}-"
+          docker buildx create --use || true
+          task login
+          task push-${{ matrix.flavour }} VERSION_PREFIX="${version_prefix}" VERSION_OVERRIDE="${VERSION}"
+          docker pull ghcr.io/devops-infra/docker-terragrunt:${version_prefix}${{ matrix.flavour }}-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:${version_prefix}${{ matrix.flavour }}-tf-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:${version_prefix}${{ matrix.flavour }}-ot-latest
