@@ -36,7 +36,7 @@ repos:
         pass_filenames: false
       - id: shellcheck
         name: shellcheck
-        entry: bash -lc 'docker run --rm -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style show-versions.sh'
+        entry: bash -lc 'docker run --rm -v "$PWD:/work" -w /work koalaman/shellcheck:stable -x -S style entrypoint.sh'
         language: system
         pass_filenames: false
       - id: yamllint

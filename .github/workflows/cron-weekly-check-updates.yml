@@ -2,8 +2,8 @@ name: (Cron) Check for Updates
 
 on:
   schedule:
-    # Run every Monday at 08:00 UTC
-    - cron: 0 8 * * 1
+    - cron: 0 5 * * 1
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -26,47 +26,28 @@ jobs:
         with:
           version: 3.x
 
-      - name: Check for new TF and TG
+      - name: Check for new versions
         env:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           TERM: xterm-256color
-        run: make update-versions
-
-      # env.VERSION_TAG is set by 'make update-versions'
+        run: task update-versions
 
       - name: Commit and push changes (conditional)
-        if: env.VERSION_TAG != 'null'
+        if: env.VERSION_TAG != ''
         uses: devops-infra/action-commit-push@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_BRANCH }}
           commit_message: ⬆️ Bump for ${{ env.VERSION_TAG }}
 
-
       - name: Get template
         run: task git:get-pr-template
 
       - name: Create pull request
-        if: env.VERSION_TAG != 'null'
+        if: env.VERSION_TAG != ''
         uses: devops-infra/action-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           title: ⬆️ Bump for ${{ env.VERSION_TAG }}
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-
-  delete:
-    name: Delete stale Docker images
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
-
-      - name: Run delete-stale-images
-        env:
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TERM: xterm-256color
-        run: |
-          make login
-          make delete-stale-images

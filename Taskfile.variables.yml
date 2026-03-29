@@ -3,11 +3,9 @@ version: '3'
 silent: true
 
 env:
-  DOCKER_BUILDKIT: '1'
   TERM: xterm-256color
 
 vars:
-  # System context
   SED:
     sh: |
       if [ "$(uname -s)" = "Darwin" ]; then
@@ -15,7 +13,6 @@ vars:
           echo gsed
         else
           if command -v brew >/dev/null 2>&1; then
-            # Quietly ensure gnu-sed is installed
             brew list gnu-sed >/dev/null 2>&1 || {
               HOMEBREW_NO_ENV_HINTS=1 HOMEBREW_NO_ANALYTICS=1 brew update >/dev/null 2>&1 || true
               HOMEBREW_NO_ENV_HINTS=1 HOMEBREW_NO_ANALYTICS=1 brew install gnu-sed >/dev/null 2>&1
@@ -28,5 +25,40 @@ vars:
       else
         echo sed
       fi
+
   PROJECT_DIR_NAME:
     sh: basename "$PWD"
+
+  VERSION_OVERRIDE:
+    sh: echo "${VERSION_OVERRIDE:-}"
+
+  VERSION:
+    sh: |
+      override="{{.VERSION_OVERRIDE}}"
+      if [ -n "$override" ]; then
+        echo "$override"
+        exit 0
+      fi
+
+      latest_tag="$(git tag --sort=-v:refname 2>/dev/null | \
+        grep -E '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$' | head -1)"
+      if [ -n "$latest_tag" ]; then
+        echo "$latest_tag"
+      else
+        echo "tf-1.14.7-ot-1.11.5-tg-0.99.4"
+      fi
+
+  VERSION_FULL:
+    sh: echo "{{.VERSION}}"
+
+  GIT_SHA:
+    sh: git rev-parse HEAD 2>/dev/null || echo 0000000000000000000000000000000000000000
+  GIT_SHORT_SHA:
+    sh: git rev-parse --short HEAD 2>/dev/null || echo 0000000
+  GIT_BRANCH:
+    sh: |
+      if [ -n "${GITHUB_REF:-}" ]; then
+        echo "${GITHUB_REF#refs/heads/}"
+      else
+        git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown"
+      fi

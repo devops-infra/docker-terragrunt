@@ -19,8 +19,8 @@ commandTests:
       - /usr/bin/curl
       - /usr/bin/git
       - /usr/bin/jq
-      - /usr/bin/jq
       - /usr/bin/vim
+      - /usr/bin/wget
       - /usr/bin/unzip
 
   - name: Terragrunt
@@ -34,8 +34,8 @@ commandTests:
     expectedOutput: [TFLint version .*]
 
 fileExistenceTests:
-  - name: show-versions.sh
-    path: /usr/bin/show-versions.sh
+  - name: entrypoint.sh
+    path: /usr/bin/entrypoint.sh
     shouldExist: true
     permissions: -rwxr-xr-x
 
@@ -55,7 +55,7 @@ fileExistenceTests:
     permissions: -rwxr-xr-x
 
 metadataTest:
-  cmd: [show-versions.sh]
+  cmd: [entrypoint.sh]
   entrypoint: []
   exposedPorts: []
   workdir: /data

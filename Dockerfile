@@ -192,6 +192,31 @@ RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
   chown "$(id -u):$(id -g)" ./hcledit ;\
   mv ./hcledit /usr/bin/hcledit
 
+# Get latest Task
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
+# hadolint ignore=SC2015,SC2034
+RUN if [ "${SLIM}" = "no" ]; then \
+    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
+      ARCHITECTURE=amd64 ;\
+    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
+      ARCHITECTURE=arm64 ;\
+    else \
+      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
+      exit 1 ;\
+    fi ;\
+    DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/go-task/task/releases/latest | jq -r \
+      ".assets[] | select(.name | endswith(\"linux_${ARCHITECTURE}.tar.gz\")) | .browser_download_url")" ;\
+    if [ -z "${DOWNLOAD_URL}" ]; then \
+      echo "Empty download URL for Task" ;\
+      exit 1 ;\
+    fi ;\
+    curl -sL "${DOWNLOAD_URL}" -o ./task.tar.gz ;\
+    tar -xf ./task.tar.gz ;\
+    rm -f ./task.tar.gz ;\
+    chmod +x ./task ;\
+    mv ./task /usr/bin/task ;\
+  fi
+
 # Get latest sops
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2015,SC2034
@@ -287,13 +312,13 @@ Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architect
   fi
 
 # Scripts, configs and cleanup
-COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh show-versions.sh /usr/bin/
+COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh entrypoint.sh /usr/bin/
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN chmod +x \
     /usr/bin/format-hcl \
     /usr/bin/fmt.sh \
     /usr/bin/terragrunt-fmt.sh \
-    /usr/bin/show-versions.sh ;\
+    /usr/bin/entrypoint.sh ;\
   apt-get clean ;\
   rm -rf /var/lib/apt/lists/* ;\
   rm -rf /var/cache/* ;\
@@ -301,4 +326,4 @@ RUN chmod +x \
   rm -rf /tmp/*
 
 WORKDIR /data
-CMD ["show-versions.sh"]
+CMD ["entrypoint.sh"]

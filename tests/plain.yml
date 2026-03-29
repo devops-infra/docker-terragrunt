@@ -14,28 +14,46 @@ commandTests:
   - name: Other tools
     command: which
     args:
+      - curl
       - bc
       - docker
+      - git
+      - go
       - gpg
       - dot
       - hub
+      - hcledit
+      - jq
       - make
+      - task
+      - tput
       - ssh
       - openssl
       - python3
       - pip3
+      - unzip
+      - wget
       - zip
     expectedOutput:
+      - /usr/bin/curl
       - /usr/bin/bc
       - /usr/bin/docker
+      - /usr/bin/git
+      - /usr/bin/go
       - /usr/bin/gpg
       - /usr/bin/dot
       - /usr/bin/hub
+      - /usr/bin/hcledit
+      - /usr/bin/jq
       - /usr/bin/make
+      - /usr/bin/task
+      - /usr/bin/tput
       - /usr/bin/ssh
       - /usr/bin/openssl
       - /usr/bin/python3
       - /usr/bin/pip3
+      - /usr/bin/unzip
+      - /usr/bin/wget
       - /usr/bin/zip
 
   - name: Python modules
