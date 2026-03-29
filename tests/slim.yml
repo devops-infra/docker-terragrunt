@@ -19,8 +19,8 @@ commandTests:
       - /usr/bin/curl
       - /usr/bin/git
       - /usr/bin/jq
-      - /usr/bin/jq
       - /usr/bin/vim
+      - /usr/bin/wget
       - /usr/bin/unzip
 
   - name: Terragrunt
@@ -53,6 +53,14 @@ fileExistenceTests:
     path: /usr/bin/terragrunt-fmt.sh
     shouldExist: true
     permissions: -rwxr-xr-x
+
+  - name: make missing in slim
+    path: /usr/bin/make
+    shouldExist: false
+
+  - name: task missing in slim
+    path: /usr/bin/task
+    shouldExist: false
 
 metadataTest:
   cmd: [entrypoint.sh]
