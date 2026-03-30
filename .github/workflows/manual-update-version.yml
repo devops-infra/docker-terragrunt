@@ -1,0 +1,274 @@
+name: (Manual) Update Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version (e.g., tf-1.2.3-ot-1.2.3-tg-1.2.3)
+        required: false
+        type: string
+      build-and-push-only:
+        description: Skip release steps and only build/push images
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  lint:
+    name: Lint
+    if: ${{ !inputs.build-and-push-only }}
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Run linters
+        run: task lint
+
+  release:
+    name: Release
+    if: ${{ !inputs.build-and-push-only }}
+    runs-on: ubuntu-24.04-arm
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            echo "❌ Version is required when build-and-push-only is false"
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version format. Use format: tf-1.2.3-ot-1.2.3-tg-1.2.3"
+            exit 1
+          fi
+          echo "✅ Version format is valid: $VERSION"
+
+      - name: Check if version already exists
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if git rev-parse -q --verify "refs/tags/${VERSION}" >/dev/null; then
+            echo "❌ Version $VERSION already exists"
+            exit 1
+          fi
+          echo "✅ Version $VERSION is available"
+
+      - name: Push repo tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$VERSION" -m "$VERSION"
+          git push origin "$VERSION"
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: ${{ github.event.inputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          repository: ${{ vars.DOCKER_ORG_NAME }}/${{ github.event.repository.name }}
+          short-description: ${{ github.event.repository.description }}
+
+  build-and-push:
+    name: Build & push
+    if: ${{ !inputs.build-and-push-only }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Install Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v4
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: amd64,arm64
+
+      - name: Build and push
+        env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
+          DOCKER_BUILDKIT: 1
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERM: xterm-256color
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          TF_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          OT_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+          FLAVOUR="${{ matrix.flavour }}"
+          GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
+          DOCKER_IMAGE="devopsinfra/docker-terragrunt"
+          docker buildx create --use || true
+          task login
+          task push-${{ matrix.flavour }} VERSION_OVERRIDE="${VERSION}"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-latest"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-latest"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-latest"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-latest"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-latest"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-latest"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+
+      - name: Cont.Struc.Test - ${{ matrix.flavour }}
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-latest
+          config: tests/${{ matrix.flavour }}.yml
+
+      - name: Cont.Struc.Test - Terraform
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-latest
+          config: tests/tf.yml
+
+      - name: Cont.Struc.Test - OpenTofu
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-ot-latest
+          config: tests/ot.yml
+
+  build-and-push-only:
+    name: Build & push only
+    if: ${{ inputs.build-and-push-only }}
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Validate version format
+        run: |
+          VERSION="$(task version:get)"
+          if [[ ! "$VERSION" =~ ^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "❌ Invalid version format. Use format: tf-1.2.3-ot-1.2.3-tg-1.2.3"
+            exit 1
+          fi
+          echo "✅ Version format is valid: $VERSION"
+
+      - name: Install Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v4
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: amd64,arm64
+
+      - name: Build and push
+        env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
+          DOCKER_BUILDKIT: 1
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERM: xterm-256color
+        run: |
+          VERSION="$(task version:get)"
+          TF_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          OT_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+          FLAVOUR="${{ matrix.flavour }}"
+          GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
+          DOCKER_IMAGE="devopsinfra/docker-terragrunt"
+          docker buildx create --use || true
+          task login
+          task push-${{ matrix.flavour }} VERSION_OVERRIDE="${VERSION}"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-latest"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-latest"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-latest"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-latest"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-latest"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-latest"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+
+      - name: Cont.Struc.Test - ${{ matrix.flavour }}
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-latest
+          config: tests/${{ matrix.flavour }}.yml
+
+      - name: Cont.Struc.Test - Terraform
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-latest
+          config: tests/tf.yml
+
+      - name: Cont.Struc.Test - OpenTofu
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-ot-latest
+          config: tests/ot.yml
