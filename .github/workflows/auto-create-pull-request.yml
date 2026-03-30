@@ -110,17 +110,17 @@ jobs:
       - name: Cont.Struc.Test - ${{ matrix.flavour }}
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: ghcr.io/devops-infra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest
+          image: devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest
           config: tests/${{ matrix.flavour }}.yml
 
       - name: Cont.Struc.Test - Terraform
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: ghcr.io/devops-infra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest
+          image: devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest
           config: tests/tf.yml
 
       - name: Cont.Struc.Test - OpenTofu
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: ghcr.io/devops-infra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest
+          image: devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest
           config: tests/ot.yml
