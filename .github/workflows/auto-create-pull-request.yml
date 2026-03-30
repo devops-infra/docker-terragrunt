@@ -61,6 +61,8 @@ jobs:
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     needs: [pull-request, lint]
+    env:
+      VERSION_PREFIX: test-
     strategy:
       fail-fast: false
       matrix:
@@ -93,19 +95,18 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
-          VERSION_PREFIX: test-
         run: |
           docker buildx create --use || true
           task login
           task push-${{ matrix.flavour }}
           GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
           DOCKER_IMAGE="devopsinfra/docker-terragrunt"
-          docker pull "${GHCR_IMAGE}:${VERSION_PREFIX}${{ matrix.flavour }}-latest"
-          docker pull "${GHCR_IMAGE}:${VERSION_PREFIX}${{ matrix.flavour }}-tf-latest"
-          docker pull "${GHCR_IMAGE}:${VERSION_PREFIX}${{ matrix.flavour }}-ot-latest"
-          docker pull "${DOCKER_IMAGE}:${VERSION_PREFIX}${{ matrix.flavour }}-latest"
-          docker pull "${DOCKER_IMAGE}:${VERSION_PREFIX}${{ matrix.flavour }}-tf-latest"
-          docker pull "${DOCKER_IMAGE}:${VERSION_PREFIX}${{ matrix.flavour }}-ot-latest"
+          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest"
+          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest"
+          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest"
+          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest"
+          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest"
+          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest"
 
       - name: Cont.Struc.Test - ${{ matrix.flavour }}
         uses: plexsystems/container-structure-test-action@v0.3.0
