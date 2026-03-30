@@ -32,6 +32,9 @@ jobs:
           TERM: xterm-256color
         run: task update-versions
 
+      - name: Run linters
+        run: task lint
+
       - name: Commit and push changes (conditional)
         if: env.VERSION_TAG != ''
         uses: devops-infra/action-commit-push@v1
@@ -51,3 +54,67 @@ jobs:
           title: ⬆️ Bump for ${{ env.VERSION_TAG }}
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
+
+  build-and-push:
+    name: Build and push
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    needs: [check]
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: [slim, plain, aws-azure-gcp]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: arduino/setup-task@v2.0.0
+        with:
+          version: 3.x
+
+      - name: Install Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v4
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: amd64,arm64
+
+      - name: Build and push
+        env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
+          DOCKER_BUILDKIT: 1
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERM: xterm-256color
+          VERSION_PREFIX: test-
+        run: |
+          docker buildx create --use || true
+          task login
+          task push-${{ matrix.flavour }}
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+
+      - name: Cont.Struc.Test - ${{ matrix.flavour }}
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
+          config: tests/${{ matrix.flavour }}.yml
+
+      - name: Cont.Struc.Test - Terraform
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
+          config: tests/tf.yml
+
+      - name: Cont.Struc.Test - OpenTofu
+        uses: plexsystems/container-structure-test-action@v0.3.0
+        with:
+          image: ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+          config: tests/ot.yml
