@@ -70,7 +70,7 @@ jobs:
       - name: Check if version already exists
         run: |
           VERSION="${{ github.event.inputs.version }}"
-          if git tag -l | grep -q "^${VERSION}$"; then
+          if git rev-parse -q --verify "refs/tags/${VERSION}" >/dev/null; then
             echo "❌ Version $VERSION already exists"
             exit 1
           fi
