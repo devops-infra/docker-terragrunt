@@ -98,9 +98,14 @@ jobs:
           docker buildx create --use || true
           task login
           task push-${{ matrix.flavour }}
-          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-latest
-          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-tf-latest
-          docker pull ghcr.io/devops-infra/docker-terragrunt:test-${{ matrix.flavour }}-ot-latest
+          GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
+          DOCKER_IMAGE="devopsinfra/docker-terragrunt"
+          docker pull "${GHCR_IMAGE}:${VERSION_PREFIX}-${{ matrix.flavour }}-latest"
+          docker pull "${GHCR_IMAGE}:${VERSION_PREFIX}-${{ matrix.flavour }}-tf-latest"
+          docker pull "${GHCR_IMAGE}:${VERSION_PREFIX}-${{ matrix.flavour }}-ot-latest"
+          docker pull "${DOCKER_IMAGE}:${VERSION_PREFIX}-${{ matrix.flavour }}-latest"
+          docker pull "${DOCKER_IMAGE}:${VERSION_PREFIX}-${{ matrix.flavour }}-tf-latest"
+          docker pull "${DOCKER_IMAGE}:${VERSION_PREFIX}-${{ matrix.flavour }}-ot-latest"
 
       - name: Cont.Struc.Test - ${{ matrix.flavour }}
         uses: plexsystems/container-structure-test-action@v0.3.0
