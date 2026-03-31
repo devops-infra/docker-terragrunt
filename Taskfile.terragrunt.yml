@@ -279,12 +279,14 @@ tasks:
         fi
         cmd+=("${args[@]}")
         cmd+=(--build-arg TF_VERSION="$tf_version" --build-arg OT_VERSION="$ot_version" --build-arg TG_VERSION='{{.TG_VERSION}}')
+        docker_username='{{.DOCKER_USERNAME}}'
+        github_username='{{.GITHUB_USERNAME}}'
         has_dockerhub=false
         has_ghcr=false
-        if [ -n "${DOCKER_USERNAME:-}" ] && [ -n "${DOCKER_TOKEN:-}" ]; then
+        if [ -n "$docker_username" ] && [ -n "${DOCKER_TOKEN:-}" ]; then
           has_dockerhub=true
         fi
-        if [ -n "${GITHUB_USERNAME:-}" ] && [ -n "${GITHUB_TOKEN:-}" ]; then
+        if [ -n "$github_username" ] && [ -n "${GITHUB_TOKEN:-}" ]; then
           has_ghcr=true
         fi
         if [ "$has_dockerhub" = false ] && [ "$has_ghcr" = false ]; then
