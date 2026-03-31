@@ -13,6 +13,42 @@
 **GitHub Packages** images at [ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt/pkgs/container/docker-terragrunt)
 
 
+## Forking
+
+To publish images from a fork, set these variables so Task uses your registry identities:
+`DOCKER_USERNAME`, `DOCKER_ORG_NAME`, `DOCKER_TOKEN`, `GITHUB_USERNAME`, `GITHUB_ORG_NAME`, `GITHUB_TOKEN`.
+
+Two supported options (environment variables take precedence over `.env`):
+```bash
+# .env (local only, not committed)
+DOCKER_USERNAME=your-dockerhub-user
+DOCKER_ORG_NAME=your-dockerhub-org
+DOCKER_TOKEN=your-docker-token
+GITHUB_USERNAME=your-github-user
+GITHUB_ORG_NAME=your-github-org
+GITHUB_TOKEN=your-github-token
+```
+
+```bash
+# Shell override
+DOCKER_USERNAME=your-dockerhub-user \
+  DOCKER_ORG_NAME=your-dockerhub-org \
+  DOCKER_TOKEN=your-docker-token \
+  GITHUB_USERNAME=your-github-user \
+  GITHUB_ORG_NAME=your-github-org \
+  GITHUB_TOKEN=your-github-token \
+  task docker:build
+```
+
+Recommended setup:
+- Local development: use a `.env` file.
+- GitHub Actions: set repo secrets for `DOCKER_TOKEN` and `GITHUB_TOKEN` and variables for the rest.
+- For personal repositories use values for `DOCKER_ORG_NAME` as for `DOCKER_USERNAME`, and the same for Docker.
+
+Publish images without a release:
+- Run the `(Manual) Update Version` workflow with `build-and-push-only: true` to build and push images without tagging a release.
+
+
 # Info
 
 Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.

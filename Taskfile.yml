@@ -2,6 +2,9 @@ version: '3'
 
 silent: true
 
+dotenv:
+  - .env
+
 includes:
   variables: ./Taskfile.variables.yml
   scripts: ./Taskfile.scripts.yml

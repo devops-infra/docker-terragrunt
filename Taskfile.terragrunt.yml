@@ -33,13 +33,17 @@ vars:
   TF_TG_VERSION: tf-{{.TF_VERSION}}-tg-{{.TG_VERSION}}
   OT_TG_VERSION: ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
   FULL_VERSION: tf-{{.TF_VERSION}}-ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
-  DOCKER_USERNAME: christophshyper
-  DOCKER_ORG_NAME: devopsinfra
+  DOCKER_USERNAME:
+    sh: echo "${DOCKER_USERNAME:-christophshyper}"
+  DOCKER_ORG_NAME:
+    sh: echo "${DOCKER_ORG_NAME:-devopsinfra}"
   DOCKER_IMAGE: docker-terragrunt
   DOCKER_NAME: '{{.DOCKER_ORG_NAME}}/{{.DOCKER_IMAGE}}'
   DOCKER_HUB_API: https://hub.docker.com/v2
-  GITHUB_USERNAME: ChristophShyper
-  GITHUB_ORG_NAME: devops-infra
+  GITHUB_USERNAME:
+    sh: echo "${GITHUB_USERNAME:-ChristophShyper}"
+  GITHUB_ORG_NAME:
+    sh: echo "${GITHUB_ORG_NAME:-devops-infra}"
   GITHUB_NAME: ghcr.io/{{.GITHUB_ORG_NAME}}/{{.DOCKER_IMAGE}}
   BUILD_DATE:
     sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
