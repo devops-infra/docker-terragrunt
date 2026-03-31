@@ -24,13 +24,13 @@ tasks:
         fi
         if [ "$has_dockerhub" = true ]; then
           echo "Logging into Docker Hub as $docker_username"
-          echo "${DOCKER_TOKEN}" | docker login -u "$docker_username" --password-stdin
+          printf '%s' "${DOCKER_TOKEN}" | docker login -u "$docker_username" --password-stdin
         else
           echo "⚠️  Skipping Docker Hub login (missing DOCKER_USERNAME/DOCKER_TOKEN)"
         fi
         if [ "$has_ghcr" = true ]; then
           echo "Logging into GHCR as $github_username"
-          echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "$github_username" --password-stdin
+          printf '%s' "${GITHUB_TOKEN}" | docker login ghcr.io -u "$github_username" --password-stdin
         else
           echo "⚠️  Skipping GHCR login (missing GITHUB_USERNAME/GITHUB_TOKEN)"
         fi

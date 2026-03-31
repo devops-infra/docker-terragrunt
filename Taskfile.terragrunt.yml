@@ -283,15 +283,24 @@ tasks:
         github_username='{{.GITHUB_USERNAME}}'
         has_dockerhub=false
         has_ghcr=false
-        if [ -n "$docker_username" ] && [ -n "${DOCKER_TOKEN:-}" ]; then
-          has_dockerhub=true
-        fi
-        if [ -n "$github_username" ] && [ -n "${GITHUB_TOKEN:-}" ]; then
-          has_ghcr=true
-        fi
-        if [ "$has_dockerhub" = false ] && [ "$has_ghcr" = false ]; then
-          echo "❌ No registry credentials provided. Set DOCKER_USERNAME/DOCKER_TOKEN or GITHUB_USERNAME/GITHUB_TOKEN."
-          exit 1
+        if [ "$push" = "true" ]; then
+          if [ -n "$docker_username" ] && [ -n "${DOCKER_TOKEN:-}" ]; then
+            has_dockerhub=true
+          fi
+          if [ -n "$github_username" ] && [ -n "${GITHUB_TOKEN:-}" ]; then
+            has_ghcr=true
+          fi
+          if [ "$has_dockerhub" = false ] && [ "$has_ghcr" = false ]; then
+            echo "❌ No registry credentials provided. Set DOCKER_USERNAME/DOCKER_TOKEN or GITHUB_USERNAME/GITHUB_TOKEN."
+            exit 1
+          fi
+        else
+          if [ -n "$docker_username" ]; then
+            has_dockerhub=true
+          fi
+          if [ -n "$github_username" ]; then
+            has_ghcr=true
+          fi
         fi
         if [ "$has_dockerhub" = true ]; then
           cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${combo_version}")
