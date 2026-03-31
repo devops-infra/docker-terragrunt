@@ -279,22 +279,61 @@ tasks:
         fi
         cmd+=("${args[@]}")
         cmd+=(--build-arg TF_VERSION="$tf_version" --build-arg OT_VERSION="$ot_version" --build-arg TG_VERSION='{{.TG_VERSION}}')
-        cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${combo_version}")
-        cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${tool_latest}")
-        cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${combo_version}")
-        cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+        docker_username='{{.DOCKER_USERNAME}}'
+        github_username='{{.GITHUB_USERNAME}}'
+        has_dockerhub=false
+        has_ghcr=false
+        if [ "$push" = "true" ]; then
+          if [ -n "$docker_username" ] && [ -n "${DOCKER_TOKEN:-}" ]; then
+            has_dockerhub=true
+          fi
+          if [ -n "$github_username" ] && [ -n "${GITHUB_TOKEN:-}" ]; then
+            has_ghcr=true
+          fi
+          if [ "$has_dockerhub" = false ] && [ "$has_ghcr" = false ]; then
+            echo "❌ No registry credentials provided. Set DOCKER_USERNAME/DOCKER_TOKEN or GITHUB_USERNAME/GITHUB_TOKEN."
+            exit 1
+          fi
+        else
+          if [ -n "$docker_username" ]; then
+            has_dockerhub=true
+          fi
+          if [ -n "$github_username" ]; then
+            has_ghcr=true
+          fi
+        fi
+        if [ "$has_dockerhub" = true ]; then
+          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${combo_version}")
+          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+        fi
+        if [ "$has_ghcr" = true ]; then
+          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${combo_version}")
+          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+        fi
         if [ "$include_global_latest" = "yes" ] && [ "$tool" = "tf" ]; then
-          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}latest")
-          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}latest")
+          if [ "$has_dockerhub" = true ]; then
+            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}latest")
+          fi
+          if [ "$has_ghcr" = true ]; then
+            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}latest")
+          fi
         fi
         if [ "$flavour" = "plain" ]; then
-          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${combo_version}")
-          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tool_latest}")
-          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${combo_version}")
-          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tool_latest}")
+          if [ "$has_dockerhub" = true ]; then
+            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${combo_version}")
+            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tool_latest}")
+          fi
+          if [ "$has_ghcr" = true ]; then
+            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${combo_version}")
+            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tool_latest}")
+          fi
           if [ "$tool" = "tf" ]; then
-            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}latest")
-            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}latest")
+            if [ "$has_dockerhub" = true ]; then
+              cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}latest")
+            fi
+            if [ "$has_ghcr" = true ]; then
+              cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}latest")
+            fi
           fi
         fi
         cmd+=(.)

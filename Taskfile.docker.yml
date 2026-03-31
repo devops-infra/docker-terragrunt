@@ -6,10 +6,34 @@ tasks:
   docker:login:
     desc: Login to hub.docker.com and ghcr.io
     cmds:
-      - echo "Logging into Docker Hub as {{.DOCKER_USERNAME}}"
-      - echo "${DOCKER_TOKEN}" | docker login -u "{{.DOCKER_USERNAME}}" --password-stdin
-      - echo "Logging into GHCR as {{.GITHUB_USERNAME}}"
-      - echo "${GITHUB_TOKEN}" | docker login ghcr.io -u "{{.GITHUB_USERNAME}}" --password-stdin
+      - |
+        set -eu
+        docker_username='{{.DOCKER_USERNAME}}'
+        github_username='{{.GITHUB_USERNAME}}'
+        has_dockerhub=false
+        has_ghcr=false
+        if [ -n "$docker_username" ] && [ -n "${DOCKER_TOKEN:-}" ]; then
+          has_dockerhub=true
+        fi
+        if [ -n "$github_username" ] && [ -n "${GITHUB_TOKEN:-}" ]; then
+          has_ghcr=true
+        fi
+        if [ "$has_dockerhub" = false ] && [ "$has_ghcr" = false ]; then
+          echo "❌ No registry credentials provided. Set DOCKER_USERNAME/DOCKER_TOKEN or GITHUB_USERNAME/GITHUB_TOKEN."
+          exit 1
+        fi
+        if [ "$has_dockerhub" = true ]; then
+          echo "Logging into Docker Hub as $docker_username"
+          printf '%s' "${DOCKER_TOKEN}" | docker login -u "$docker_username" --password-stdin
+        else
+          echo "⚠️  Skipping Docker Hub login (missing DOCKER_USERNAME/DOCKER_TOKEN)"
+        fi
+        if [ "$has_ghcr" = true ]; then
+          echo "Logging into GHCR as $github_username"
+          printf '%s' "${GITHUB_TOKEN}" | docker login ghcr.io -u "$github_username" --password-stdin
+        else
+          echo "⚠️  Skipping GHCR login (missing GITHUB_USERNAME/GITHUB_TOKEN)"
+        fi
 
   docker:cmds:
     desc: Show docker build command for plain flavour
