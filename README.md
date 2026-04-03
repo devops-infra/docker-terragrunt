@@ -13,42 +13,6 @@
 **GitHub Packages** images at [ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt](https://github.com/devops-infra/docker-terragrunt/pkgs/container/docker-terragrunt)
 
 
-## Forking
-
-To publish images from a fork, set these variables so Task uses your registry identities:
-`DOCKER_USERNAME`, `DOCKER_ORG_NAME`, `DOCKER_TOKEN`, `GITHUB_USERNAME`, `GITHUB_ORG_NAME`, `GITHUB_TOKEN`.
-
-Two supported options (environment variables take precedence over `.env`):
-```bash
-# .env (local only, not committed)
-DOCKER_USERNAME=your-dockerhub-user
-DOCKER_ORG_NAME=your-dockerhub-org
-DOCKER_TOKEN=your-docker-token
-GITHUB_USERNAME=your-github-user
-GITHUB_ORG_NAME=your-github-org
-GITHUB_TOKEN=your-github-token
-```
-
-```bash
-# Shell override
-DOCKER_USERNAME=your-dockerhub-user \
-  DOCKER_ORG_NAME=your-dockerhub-org \
-  DOCKER_TOKEN=your-docker-token \
-  GITHUB_USERNAME=your-github-user \
-  GITHUB_ORG_NAME=your-github-org \
-  GITHUB_TOKEN=your-github-token \
-  task docker:build
-```
-
-Recommended setup:
-- Local development: use a `.env` file.
-- GitHub Actions: set repo secrets for `DOCKER_TOKEN` and `GITHUB_TOKEN` and variables for the rest.
-- For personal repositories use values for `DOCKER_ORG_NAME` as for `DOCKER_USERNAME`, and the same for Docker.
-
-Publish images without a release:
-- Run the `(Manual) Update Version` workflow with `build-and-push-only: true` to build and push images without tagging a release.
-
-
 # Info
 
 Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
@@ -105,12 +69,12 @@ bundled with or not (see second table below).
 | `tf-1.14.8-ot-1.11.5-tg-0.99.5`         |
 
 
-| Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
-|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|------------------|--------------------|
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.14.8-tg-0.99.5`                            | `docker-terragrunt` | `tf-1.14.8-tg-0.99.5` | `1.14.8`           | `N/A`            | `0.99.5`           |
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.11.5-tg-0.99.5`                            | `docker-terragrunt` | `ot-1.11.5-tg-0.99.5` | `N/A`             | `1.11.5`          | `0.99.5`           |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.14.8-tg-0.99.5` | `docker-terragrunt` | `tf-1.14.8-tg-0.99.5` | `1.14.8`           | `N/A`            | `0.99.5`           |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.11.5-tg-0.99.5` | `docker-terragrunt` | `ot-1.11.5-tg-0.99.5` | `N/A`             | `1.11.5`          | `0.99.5`           |
+| Registry                                                                             | Example full image name                                                        | Image name          | Image version         | Terraform version | OpenTofu version | Terragrunt version |
+|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|---------------------|-----------------------|-------------------|------------------|--------------------|
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.14.8-tg-0.99.5`                            | `docker-terragrunt` | `tf-1.14.8-tg-0.99.5` | `1.14.8`          | `N/A`            | `0.99.5`           |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.11.5-tg-0.99.5`                            | `docker-terragrunt` | `ot-1.11.5-tg-0.99.5` | `N/A`             | `1.11.5`         | `0.99.5`           |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.14.8-tg-0.99.5` | `docker-terragrunt` | `tf-1.14.8-tg-0.99.5` | `1.14.8`          | `N/A`            | `0.99.5`           |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.11.5-tg-0.99.5` | `docker-terragrunt` | `ot-1.11.5-tg-0.99.5` | `N/A`             | `1.11.5`         | `0.99.5`           |
 
 
 # Available flavours
@@ -234,7 +198,7 @@ docker run --rm \
 |---------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
 | `format-hcl`        | Yes                 | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/fmt/format-hcl)   |
 | `terragrunt-fmt.sh` | No                  | Dependency for `format-hcl`                                                                                                        | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) |
-| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show main installed binaries versions.                                                   | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/entrypoint.sh) |
+| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show main installed binaries versions.                                                   | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/entrypoint.sh)    |
 
 
 ### Binaries and Python libraries
@@ -258,8 +222,8 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | hub                 | Binary         | For interacting with [Github](https://github.com) APIs.                                                                                                        | https://github.com/github/hub                      |
 | jq                  | Binary         | For parsing JSON outputs of [awscli](https://github.com/aws/aws-cli).                                                                                          | https://stedolan.github.io/jq/                     |
 | hcledit             | Binary         | For reading and writing HCL files.                                                                                                                             | https://github.com/minamijoyo/hcledit              |
-| *make**             | Binary         | For using `Makefile` task orchestration in deployment process.                                                                                                  | https://www.gnu.org/software/make/                 |
-| *task**             | Binary         | For using `Taskfile` task orchestration in deployment process.                                                                                                 | https://taskfile.dev/                              |
+| make                | Binary         | For using `Makefile` task orchestration in deployment process.                                                                                                 | https://www.gnu.org/software/make/                 |
+| task                | Binary         | For using `Taskfile` task orchestration in deployment process.                                                                                                 | https://taskfile.dev/                              |
 | ncurses             | Binary         | For expanding `Makefile` with some colors.                                                                                                                     | https://invisible-island.net/ncurses/announce.html |
 | openssh             | Binary         | For allowing outgoing SSH connections.                                                                                                                         | https://www.openssh.com/                           |
 | openssl             | Binary         | For calculating BASE64SHA256 hash of Lambda packages. Assures updating Lambdas only when package hash changed.                                                 | https://github.com/openssl/openssl                 |
@@ -275,6 +239,42 @@ Some are conditional, depending on the selected flavour, marked with `*`
 | tflint              | Binary         | For linting Terraform files.                                                                                                                                   | https://github.com/terraform-linters/tflint        |
 | unzip               | Binary         | For extracting packages.                                                                                                                                       | http://infozip.sourceforge.net/                    |
 | zip                 | Binary         | For creating packages for Lambdas.                                                                                                                             | http://infozip.sourceforge.net/                    |
+
+
+# Forking
+
+To publish images from a fork, set these variables so Task uses your registry identities:
+`DOCKER_USERNAME`, `DOCKER_ORG_NAME`, `DOCKER_TOKEN`, `GITHUB_USERNAME`, `GITHUB_ORG_NAME`, `GITHUB_TOKEN`.
+
+Two supported options (environment variables take precedence over `.env`):
+```bash
+# .env (local only, not committed)
+DOCKER_USERNAME=your-dockerhub-user
+DOCKER_ORG_NAME=your-dockerhub-org
+DOCKER_TOKEN=your-docker-token
+GITHUB_USERNAME=your-github-user
+GITHUB_ORG_NAME=your-github-org
+GITHUB_TOKEN=your-github-token
+```
+
+```bash
+# Shell override
+DOCKER_USERNAME=your-dockerhub-user \
+  DOCKER_ORG_NAME=your-dockerhub-org \
+  DOCKER_TOKEN=your-docker-token \
+  GITHUB_USERNAME=your-github-user \
+  GITHUB_ORG_NAME=your-github-org \
+  GITHUB_TOKEN=your-github-token \
+  task docker:build
+```
+
+Recommended setup:
+- Local development: use a `.env` file.
+- GitHub Actions: set repo secrets for `DOCKER_TOKEN` and `GITHUB_TOKEN` and variables for the rest.
+- For personal repositories use values for `DOCKER_ORG_NAME` as for `DOCKER_USERNAME`, and the same for Docker.
+
+Publish images without a release:
+- Run the `(Manual) Update Version` workflow with `build-and-push-only: true` to build and push images without tagging a release.
 
 
 ## Contributors ✨
