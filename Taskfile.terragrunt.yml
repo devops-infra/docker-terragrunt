@@ -11,9 +11,9 @@ vars:
     sh: printf "%s" "{{.VERSION}}" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/'
 
   AWS_VERSION:
-    sh: echo "${AWS_VERSION:-2.34.19}"
+    sh: echo "${AWS_VERSION:-2.34.24}"
   GCP_VERSION:
-    sh: echo "${GCP_VERSION:-562.0.0}"
+    sh: echo "${GCP_VERSION:-563.0.0}"
   AZ_VERSION:
     sh: echo "${AZ_VERSION:-2.84.0}"
   TF_VERSION:
