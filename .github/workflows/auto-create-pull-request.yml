@@ -17,21 +17,21 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           fetch-tags: true
 
       - name: Install Task
-        uses: arduino/setup-task@v2.0.0
+        uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
         with:
-          version: 3.x
+          version: 3.49.1
 
       - name: Get template
         run: task git:get-pr-template
 
       - name: Create Pull Request
-        uses: devops-infra/action-pull-request@v1
+        uses: devops-infra/action-pull-request@b2895bff2ff66579f6704d717a1ea75fad919e84
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           assignee: ${{ github.actor }}
@@ -43,15 +43,15 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           fetch-tags: true
 
       - name: Install Task
-        uses: arduino/setup-task@v2.0.0
+        uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
         with:
-          version: 3.x
+          version: 3.49.1
 
       - name: Run linters
         run: task lint
@@ -69,23 +69,23 @@ jobs:
         flavour: [slim, plain, aws-azure-gcp]
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           fetch-tags: true
 
       - name: Install Task
-        uses: arduino/setup-task@v2.0.0
+        uses: arduino/setup-task@b91d5d2c96a56797b48ac1e0e89220bf64044611
         with:
-          version: 3.x
+          version: 3.49.1
 
       - name: Install Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd
 
       - name: Install QEMU
-        uses: docker/setup-qemu-action@v4
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a
         with:
-          image: tonistiigi/binfmt:latest
+          image: tonistiigi/binfmt@sha256:d3b963f787999e6c0219a48dba02978769286ff61a5f4d26245cb6a6e5567ea3
           platforms: amd64,arm64
 
       - name: Build and push
@@ -96,32 +96,45 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: |
+          VERSION="$(task version:get)"
+          TF_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          OT_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+          {
+            echo "TF_VERSION=${TF_VERSION}"
+            echo "OT_VERSION=${OT_VERSION}"
+            echo "TG_VERSION=${TG_VERSION}"
+          } >> "$GITHUB_ENV"
           docker buildx create --use || true
           task login
           task push-${{ matrix.flavour }}
           GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
           DOCKER_IMAGE="devopsinfra/docker-terragrunt"
-          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest"
-          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest"
-          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest"
-          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest"
-          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest"
-          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest"
+          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
       - name: Cont.Struc.Test - ${{ matrix.flavour }}
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: plexsystems/container-structure-test-action@c0a028aa96e8e82ae35be556040340cbb3e280ca
         with:
-          image: devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-latest
+          image: >-
+            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/${{ matrix.flavour }}.yml
 
       - name: Cont.Struc.Test - Terraform
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: plexsystems/container-structure-test-action@c0a028aa96e8e82ae35be556040340cbb3e280ca
         with:
-          image: devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-latest
+          image: >-
+            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/tf.yml
 
       - name: Cont.Struc.Test - OpenTofu
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: plexsystems/container-structure-test-action@c0a028aa96e8e82ae35be556040340cbb3e280ca
         with:
-          image: devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-latest
+          image: >-
+            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavour }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/ot.yml

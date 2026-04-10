@@ -31,7 +31,19 @@ commandTests:
   - name: TFLint
     command: tflint
     args: [--version]
-    expectedOutput: [TFLint version .*]
+    expectedOutput: [TFLint version 0.59.1]
+
+  - name: APT lists cleaned
+    command: bash
+    args:
+      - -lc
+      - test -z "$(find /var/lib/apt/lists -mindepth 1 -maxdepth 1 2>/dev/null)"
+
+  - name: APT cache cleaned
+    command: bash
+    args:
+      - -lc
+      - test -z "$(find /var/cache/apt -mindepth 1 -maxdepth 1 2>/dev/null)"
 
 fileExistenceTests:
   - name: entrypoint.sh

@@ -4,12 +4,12 @@ commandTests:
   - name: hcledit
     command: hcledit
     args: [version]
-    expectedOutput: [0.*]
+    expectedOutput: [0.2.17]
 
   - name: sops
     command: sops
     args: [--version]
-    expectedOutput: [sops .*]
+    expectedOutput: [sops 3.10.2]
 
   - name: Other tools
     command: which
@@ -56,6 +56,11 @@ commandTests:
       - /usr/bin/wget
       - /usr/bin/zip
 
+  - name: Task version
+    command: task
+    args: [--version]
+    expectedOutput: [Task version: v3.45.4]
+
   - name: Python modules
     command: pip
     args: [list]
@@ -67,3 +72,15 @@ commandTests:
       - slack_sdk
       - anyio
       - zipp
+
+  - name: APT lists cleaned
+    command: bash
+    args:
+      - -lc
+      - test -z "$(find /var/lib/apt/lists -mindepth 1 -maxdepth 1 2>/dev/null)"
+
+  - name: APT cache cleaned
+    command: bash
+    args:
+      - -lc
+      - test -z "$(find /var/cache/apt -mindepth 1 -maxdepth 1 2>/dev/null)"

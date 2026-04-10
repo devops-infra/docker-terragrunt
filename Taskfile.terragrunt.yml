@@ -22,6 +22,14 @@ vars:
     sh: echo "${OT_VERSION:-{{.OT_VERSION_FROM_TAG}}}"
   TG_VERSION:
     sh: echo "${TG_VERSION:-{{.TG_VERSION_FROM_TAG}}}"
+  TFLINT_VERSION:
+    sh: echo "${TFLINT_VERSION:-0.59.1}"
+  HCLEDIT_VERSION:
+    sh: echo "${HCLEDIT_VERSION:-0.2.17}"
+  SOPS_VERSION:
+    sh: echo "${SOPS_VERSION:-3.10.2}"
+  TASK_VERSION:
+    sh: echo "${TASK_VERSION:-3.45.4}"
   GITHUB_REF:
     sh: echo "${GITHUB_REF:-refs/heads/null}"
   GITHUB_SHA:
@@ -283,6 +291,8 @@ tasks:
         fi
         cmd+=("${args[@]}")
         cmd+=(--build-arg TF_VERSION="$tf_version" --build-arg OT_VERSION="$ot_version" --build-arg TG_VERSION='{{.TG_VERSION}}')
+        cmd+=(--build-arg TFLINT_VERSION='{{.TFLINT_VERSION}}' --build-arg HCLEDIT_VERSION='{{.HCLEDIT_VERSION}}')
+        cmd+=(--build-arg SOPS_VERSION='{{.SOPS_VERSION}}' --build-arg TASK_VERSION='{{.TASK_VERSION}}')
         docker_username='{{.DOCKER_USERNAME}}'
         github_username='{{.GITHUB_USERNAME}}'
         has_dockerhub=false
