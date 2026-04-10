@@ -9,44 +9,27 @@ ARG TARGETARCH
 
 # Which flavour of image to build
 ARG SLIM=no
+ARG TF=yes
+ARG OT=no
+ARG TG=yes
 ARG AZURE=no
 ARG AWS=no
 ARG GCP=no
 ARG YC=no
 
-# Versions of dependencies, GCP has no default handler
-ARG AWS_VERSION
-ARG GCP_VERSION
-ARG AZ_VERSION
-ARG TF_VERSION=none
-ARG OT_VERSION=none
-ARG TG_VERSION=none
+# Versions of dependencies
+ARG AWS_VERSION=2.34.24
+ARG GCP_VERSION=563.0.0
+ARG AZ_VERSION=2.84.0
+ARG TF_VERSION=1.14.8
+ARG OT_VERSION=1.11.5
+ARG TG_VERSION=1.0.0
 
 # Pinned tool versions (override via --build-arg if needed)
 ARG TFLINT_VERSION=0.59.1
 ARG HCLEDIT_VERSION=0.2.17
 ARG SOPS_VERSION=3.10.2
 ARG TASK_VERSION=3.45.4
-
-# Artifact checksums for deterministic, verified downloads
-ARG TF_SHA256_AMD64=56a5d12f47cbc1c6bedb8f5426ae7d5df984d1929572c24b56f4c82e9f9bf709
-ARG TF_SHA256_ARM64=c953171cde6b25ca0448c3b29a90d2f46c0310121e18742ec8f89631768e770c
-ARG OT_DEB_SHA256_AMD64=6453ce40a165e174971b0214f1d190861fcec1e22bf930504d06747474503c1e
-ARG OT_DEB_SHA256_ARM64=f43917a89f76a68e629133463c027ad25ecbf310378e456033b1839bd841d8f4
-ARG TG_SHA256_AMD64=98bffc93e6f8a07809842cd402f2b66b2935139911e7c513d38425a352c777b2
-ARG TG_SHA256_ARM64=e4c80367ed82fe2b79dc9a865e82fcaa6be225dd8b1895eb386df2b5f9f4320d
-ARG TFLINT_SHA256_AMD64=6108d84282292f11d793dc8038ce08fbc629dcd25324d6f13c63d8100b52e01f
-ARG TFLINT_SHA256_ARM64=426f998f9cbd0d738164ed0fb52e9ee268139dc52d8622c8c7a40afbea2c2811
-ARG HCLEDIT_SHA256_AMD64=5e085bd319c84c74e87b915ab2c1f95afccb2d4326be481fbe19c1d7a0eb5fee
-ARG HCLEDIT_SHA256_ARM64=a1d052a5bbfd4c97c82946bd40097f61b5e7dbf7e43d39d52950633487b7bec4
-ARG SOPS_SHA256_AMD64=79b0f844237bd4b0446e4dc884dbc1765fc7dedc3968f743d5949c6f2e701739
-ARG SOPS_SHA256_ARM64=e91ddc04e6a78f5aed9e4fc347a279b539c43b74d99e6b8078e2f2f6f5b309f5
-ARG TASK_SHA256_AMD64=4e7d24f1bf38218aec8f244eb7ba671f898830f9f87b3c9b30ff1c09e3135576
-ARG TASK_SHA256_ARM64=aa6732c9c66397c5380ec2b60c070fd599075b2a8538dba03f3a21edc99ab0cb
-ARG AWSCLI_SHA256_X86_64=cbc6978c4126440db18df7154db6ca2f5327f5282325d196e9faa9f7a3898bb4
-ARG AWSCLI_SHA256_AARCH64=5818d17ce4973ebe99618ed0dcb37c7884260f98f688fdd9850cadd64a9bce4b
-ARG GCP_SHA256_X86_64=2cde419f91fa3f62edbd18841ecadac070772c52ec1ebaac99987412bd66cd01
-ARG GCP_SHA256_ARM=c503d48fb346c67ba7b9e03dfb520371e189eabc79ff2cb85fcc018b1670d8e6
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
@@ -57,6 +40,9 @@ RUN echo Debug information: ;\
   if [ "${AWS}" = "yes" ]; then echo AWS_VERSION = "${AWS_VERSION}"; fi ;\
   if [ "${GCP}" = "yes" ]; then echo GCP_VERSION = "${GCP_VERSION}"; fi ;\
   if [ "${AZURE}" = "yes" ]; then echo AZ_VERSION = "${AZ_VERSION}"; fi ;\
+  echo TF = "${TF}" ;\
+  echo OT = "${OT}" ;\
+  echo TG = "${TG}" ;\
   echo TF_VERSION = "${TF_VERSION}" ;\
   echo OT_VERSION = "${OT_VERSION}" ;\
   echo TG_VERSION = "${TG_VERSION}" ;\
@@ -117,10 +103,6 @@ RUN if [ "${SLIM}" = "no" ]; then \
 # Install Terraform/OpenTofu/Terragrunt in one layer
 # hadolint ignore=SC2155
 RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; esac ;\
-  case "${ARCHITECTURE}" in \
-    amd64) TF_SHA256="${TF_SHA256_AMD64}"; OT_DEB_SHA256="${OT_DEB_SHA256_AMD64}"; TG_SHA256="${TG_SHA256_AMD64}" ;; \
-    arm64) TF_SHA256="${TF_SHA256_ARM64}"; OT_DEB_SHA256="${OT_DEB_SHA256_ARM64}"; TG_SHA256="${TG_SHA256_ARM64}" ;; \
-  esac ;\
   TMP_DIR="$(mktemp -d)" ;\
   install_zip_binary() { \
     local url="$1" ;\
@@ -133,33 +115,43 @@ RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo
     chmod +x "${TMP_DIR}/${binary_name}" ;\
     mv "${TMP_DIR}/${binary_name}" "/usr/bin/${binary_name}" ;\
   } ;\
-  if [ "${TF_VERSION}" != "none" ]; then \
+  if [ "${TF}" = "yes" ]; then \
+    TF_SHA256=$(curl -fsSL "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS" | awk '/terraform_[0-9.]+_linux_'"${ARCHITECTURE}"'\.zip$/ {print $1; exit}') ;\
+    [ -n "${TF_SHA256}" ] || { echo "Missing Terraform checksum for ${TF_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
     install_zip_binary "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_${ARCHITECTURE}.zip" terraform "${TF_SHA256}" ;\
   else \
-    echo "No Terraform version specified..." ;\
+    echo "Skipping Terraform installation" ;\
   fi ;\
-  if [ "${OT_VERSION}" != "none" ]; then \
+  if [ "${OT}" = "yes" ]; then \
+    OT_DEB_SHA256=$(curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_SHA256SUMS" | awk '/tofu_[0-9.]+_'"${ARCHITECTURE}"'\.deb$/ {print $1; exit}') ;\
+    [ -n "${OT_DEB_SHA256}" ] || { echo "Missing OpenTofu checksum for ${OT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
     curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_${ARCHITECTURE}.deb" -o "${TMP_DIR}/tofu.deb" ;\
     echo "${OT_DEB_SHA256}  ${TMP_DIR}/tofu.deb" | sha256sum -c - ;\
     dpkg -i "${TMP_DIR}/tofu.deb" ;\
   else \
-    echo "No OpenTofu version specified..." ;\
+    echo "Skipping OpenTofu installation" ;\
   fi ;\
-  if [ "${TG_VERSION}" = "none" ]; then \
-    echo "No Terragrunt version specified..." ;\
-    exit 1 ;\
+  if [ "${TG}" = "yes" ]; then \
+    TG_SHA256=$(curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/SHA256SUMS" | awk '/terragrunt_linux_'"${ARCHITECTURE}"'$/ {print $1; exit}') ;\
+    [ -n "${TG_SHA256}" ] || { echo "Missing Terragrunt checksum for ${TG_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+    curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_${ARCHITECTURE}" -o /usr/bin/terragrunt ;\
+    echo "${TG_SHA256}  /usr/bin/terragrunt" | sha256sum -c - ;\
+    chmod +x /usr/bin/terragrunt ;\
+  else \
+    echo "Skipping Terragrunt installation" ;\
   fi ;\
-  curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_${ARCHITECTURE}" -o /usr/bin/terragrunt ;\
-  echo "${TG_SHA256}  /usr/bin/terragrunt" | sha256sum -c - ;\
-  chmod +x /usr/bin/terragrunt ;\
   rm -rf "${TMP_DIR}"
 
 # Install helper binaries in a dedicated layer for better cache locality
 RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; esac ;\
-  case "${ARCHITECTURE}" in \
-    amd64) TFLINT_SHA256="${TFLINT_SHA256_AMD64}"; HCLEDIT_SHA256="${HCLEDIT_SHA256_AMD64}"; SOPS_SHA256="${SOPS_SHA256_AMD64}"; TASK_SHA256="${TASK_SHA256_AMD64}" ;; \
-    arm64) TFLINT_SHA256="${TFLINT_SHA256_ARM64}"; HCLEDIT_SHA256="${HCLEDIT_SHA256_ARM64}"; SOPS_SHA256="${SOPS_SHA256_ARM64}"; TASK_SHA256="${TASK_SHA256_ARM64}" ;; \
-  esac ;\
+  TFLINT_SHA256=$(curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt" | awk '/tflint_linux_'"${ARCHITECTURE}"'\.zip$/ {print $1; exit}') ;\
+  [ -n "${TFLINT_SHA256}" ] || { echo "Missing TFLint checksum for ${TFLINT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  HCLEDIT_SHA256=$(curl -fsSL "https://github.com/minamijoyo/hcledit/releases/download/v${HCLEDIT_VERSION}/hcledit_${HCLEDIT_VERSION}_checksums.txt" | awk '/hcledit_[0-9.]+_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}') ;\
+  [ -n "${HCLEDIT_SHA256}" ] || { echo "Missing hcledit checksum for ${HCLEDIT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  SOPS_SHA256=$(curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.checksums.txt" | awk '/sops-v[0-9.]+\.linux\.'"${ARCHITECTURE}"'$/ {print $1; exit}') ;\
+  [ -n "${SOPS_SHA256}" ] || { echo "Missing sops checksum for ${SOPS_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  TASK_SHA256=$(curl -fsSL "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_checksums.txt" | awk '/task_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}') ;\
+  [ -n "${TASK_SHA256}" ] || { echo "Missing task checksum for ${TASK_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
   TMP_DIR="$(mktemp -d)" ;\
   install_zip_binary() { \
     local url="$1" ;\
@@ -194,48 +186,45 @@ RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo
 
 # AWS
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
+COPY awscli_pgp_public_key.asc /tmp/awscli_pgp_public_key.asc
 # hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
     case "${TARGETARCH}" in \
-      amd64) AWS_ARCHITECTURE=x86_64; AWSCLI_SHA256="${AWSCLI_SHA256_X86_64}" ;; \
-      arm64) AWS_ARCHITECTURE=aarch64; AWSCLI_SHA256="${AWSCLI_SHA256_AARCH64}" ;; \
+      amd64) AWS_ARCHITECTURE=x86_64 ;; \
+      arm64) AWS_ARCHITECTURE=aarch64 ;; \
       *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
     esac ;\
     xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir ;\
     curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_ARCHITECTURE}-${AWS_VERSION}.zip" -o /tmp/awscli.zip ;\
-    echo "${AWSCLI_SHA256}  /tmp/awscli.zip" | sha256sum -c - ;\
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_ARCHITECTURE}-${AWS_VERSION}.zip.sig" -o /tmp/awscli.zip.sig ;\
+    GNUPGHOME="$(mktemp -d)" ;\
+    export GNUPGHOME ;\
+    gpg --batch --import /tmp/awscli_pgp_public_key.asc ;\
+    AWS_GPG_FINGERPRINT="" ;\
+    AWS_GPG_FINGERPRINT="$(gpg --batch --with-colons --fingerprint "aws-cli@amazon.com" | awk -F: '/^fpr:/ {print $10; exit}')" ;\
+    [ "${AWS_GPG_FINGERPRINT}" = "FB5DB77FD5C118B80511ADA8A6310ACC4672475C" ] ;\
+    gpg --batch --verify /tmp/awscli.zip.sig /tmp/awscli.zip ;\
+    rm -rf "${GNUPGHOME}" ;\
     mkdir -p /tmp/awscli ;\
     unzip -q /tmp/awscli.zip -d /tmp/awscli ;\
     /tmp/awscli/aws/install ;\
-    rm -rf /tmp/awscli /tmp/awscli.zip ;\
+    rm -rf /tmp/awscli /tmp/awscli.zip /tmp/awscli.zip.sig /tmp/awscli_pgp_public_key.asc ;\
   fi ;\
-  rm -f /tmp/pip_aws_requirements.txt
+  rm -f /tmp/pip_aws_requirements.txt /tmp/awscli_pgp_public_key.asc
 
 # GCP
 # hadolint ignore=SC1091,SC2129
 RUN if [ "${GCP}" = "yes" ]; then \
-    case "${TARGETARCH}" in \
-      amd64) GCP_ARCHITECTURE=x86_64; GCP_SHA256="${GCP_SHA256_X86_64}" ;; \
-      arm64) GCP_ARCHITECTURE=arm; GCP_SHA256="${GCP_SHA256_ARM}" ;; \
-      *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
-    esac ;\
-    curl -fsSL "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${GCP_ARCHITECTURE}.tar.gz" -o google-cloud-sdk.tar.gz ;\
-    echo "${GCP_SHA256}  google-cloud-sdk.tar.gz" | sha256sum -c - ;\
-    tar -xf google-cloud-sdk.tar.gz ;\
-    rm -f google-cloud-sdk.tar.gz ;\
-    ./google-cloud-sdk/install.sh \
-      --usage-reporting false \
-      --command-completion true \
-      --path-update true \
-      --quiet ;\
-    /google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check true ;\
-    /google-cloud-sdk/bin/gcloud config set metrics/environment github_docker_image ;\
-    echo -e "\n# Add Google Cloud SDK" >> /etc/bash.bashrc ;\
-    echo "source /google-cloud-sdk/path.bash.inc" >> /etc/bash.bashrc ;\
-    echo "source /google-cloud-sdk/completion.bash.inc" >> /etc/bash.bashrc ;\
+    mkdir -p /usr/share/keyrings ;\
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor > /usr/share/keyrings/cloud.google.gpg ;\
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list ;\
+    apt-get update -y ;\
+    apt-get install --no-install-recommends -y google-cloud-cli="${GCP_VERSION}-0" ;\
+    apt-get clean ;\
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* ;\
+    gcloud config set component_manager/disable_update_check true ;\
+    gcloud config set metrics/environment github_docker_image ;\
   fi
-
-ENV PATH="$PATH:/google-cloud-sdk/bin"
 
 # Azure
 # hadolint ignore=DL3009
