@@ -6,4 +6,5 @@
 !LICENSE
 !README.md
 !entrypoint.sh
+!awscli_pgp_public_key.asc
 !pip

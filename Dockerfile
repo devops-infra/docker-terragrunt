@@ -5,38 +5,52 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Multi-architecture from buildx
-ARG TARGETPLATFORM
+ARG TARGETARCH
 
 # Which flavour of image to build
 ARG SLIM=no
+ARG TF=yes
+ARG OT=no
+ARG TG=yes
 ARG AZURE=no
 ARG AWS=no
 ARG GCP=no
 ARG YC=no
 
-# Versions of dependecies, GCP has no default handler
-ARG AWS_VERSION
-ARG GCP_VERSION
-ARG AZ_VERSION
-ARG TF_VERSION=none
-ARG OT_VERSION=none
-ARG TG_VERSION=none
+# Versions of dependencies
+ARG AWS_VERSION=2.34.24
+ARG GCP_VERSION=563.0.0
+ARG AZ_VERSION=2.84.0
+ARG TF_VERSION=1.14.8
+ARG OT_VERSION=1.11.5
+ARG TG_VERSION=1.0.0
 
-# List of Python packages
-COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
-COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
+# Pinned tool versions (override via --build-arg if needed)
+ARG TFLINT_VERSION=0.59.1
+ARG HCLEDIT_VERSION=0.2.17
+ARG SOPS_VERSION=3.10.2
+ARG TASK_VERSION=3.45.4
+
+SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
 # Debug information
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3008,SC2015,SC2129
 RUN echo Debug information: ;\
-  echo TARGETPLATFORM = "${TARGETPLATFORM}" ;\
-  if [ "${AWS}" == "yes" ]; then echo AWS_VERSION = "${AWS_VERSION}"; fi ;\
-  if [ "${GCP}" == "yes" ]; then echo GCP_VERSION = "${GCP_VERSION}"; fi ;\
-  if [ "${AZURE}" == "yes" ]; then echo AZ_VERSION = "${AZ_VERSION}"; fi ;\
+  echo TARGETARCH = "${TARGETARCH}" ;\
+  if [ "${AWS}" = "yes" ]; then echo AWS_VERSION = "${AWS_VERSION}"; fi ;\
+  if [ "${GCP}" = "yes" ]; then echo GCP_VERSION = "${GCP_VERSION}"; fi ;\
+  if [ "${AZURE}" = "yes" ]; then echo AZ_VERSION = "${AZ_VERSION}"; fi ;\
+  echo TF = "${TF}" ;\
+  echo OT = "${OT}" ;\
+  echo TG = "${TG}" ;\
   echo TF_VERSION = "${TF_VERSION}" ;\
   echo OT_VERSION = "${OT_VERSION}" ;\
   echo TG_VERSION = "${TG_VERSION}" ;\
+  echo TFLINT_VERSION = "${TFLINT_VERSION}" ;\
+  echo HCLEDIT_VERSION = "${HCLEDIT_VERSION}" ;\
+  echo SOPS_VERSION = "${SOPS_VERSION}" ;\
+  echo TASK_VERSION = "${TASK_VERSION}" ;\
+  case "${TARGETARCH}" in amd64|arm64) ;; *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; esac ;\
   echo 'path-exclude /usr/share/doc/*' > /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
   echo 'path-exclude /usr/share/man/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
   echo 'path-exclude /usr/share/groff/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
@@ -45,12 +59,10 @@ RUN echo Debug information: ;\
   echo 'path-exclude /usr/share/linda/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
   echo 'path-exclude /usr/share/locale/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal
 
-# Install apt prerequisits, retry since ubuntu archive is failing a lot
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3008,SC2015,DL3009,SC2034
+# Install apt prerequisites and clean apt metadata in the same layer
+# hadolint ignore=DL3008,DL3009
 RUN apt-get update -y ;\
   echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections ;\
-  echo "Installing apt packages" ;\
   apt-get install --no-install-recommends -y \
     ca-certificates \
     curl \
@@ -77,253 +89,170 @@ RUN apt-get update -y ;\
       python-is-python3 \
       python3-pip \
       zip ;\
-    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
-  fi
+  fi ;\
+  apt-get clean ;\
+  rm -rf /var/lib/apt/lists/* /var/cache/apt/*
 
-# Get Terraform by a specific version or search for the latest one
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-    ARCHITECTURE=amd64 ;\
-  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-    ARCHITECTURE=arm64 ;\
-  else \
-    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-    exit 1 ;\
-  fi ;\
-  if [ "${TF_VERSION}" = "none" ]; then \
-    echo "No Terraform version specified..." ;\
-  else \
-    echo "Installing Terraform v${TF_VERSION}" ;\
-    DOWNLOAD_URL="https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_${ARCHITECTURE}.zip" ;\
-    curl -sL "${DOWNLOAD_URL}" -o ./terraform.zip ;\
-    unzip ./terraform.zip ;\
-    rm -f ./terraform.zip ;\
-    chmod +x ./terraform ;\
-    mv ./terraform /usr/bin/terraform ;\
-  fi
-
-# Get OpenTofu by a specific version or search for the latest one
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-    ARCHITECTURE=amd64 ;\
-  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-    ARCHITECTURE=arm64 ;\
-  else \
-    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-    exit 1 ;\
-  fi ;\
-  if [ "${OT_VERSION}" = "none" ]; then \
-    echo "No OpenTofu version specified..." ;\
-  else \
-    echo "Installing OpenTofu v${OT_VERSION}" ;\
-    DOWNLOAD_URL="https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_${ARCHITECTURE}.deb" ;\
-    curl -sL "${DOWNLOAD_URL}" -o ./tofu.deb ;\
-    dpkg -i ./tofu.deb ;\
-    rm -f ./tofu.deb ;\
-  fi
-
-# Get Terragrunt by a specific version or search for the latest one
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-    ARCHITECTURE=amd64 ;\
-  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-    ARCHITECTURE=arm64 ;\
-  else \
-    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-    exit 1 ;\
-  fi ;\
-  if [ "${TG_VERSION}" = "none" ]; then \
-    echo "No Terragrunt version specified..." ;\
-    exit 1 ;\
-  else \
-    echo "Installing Terragrunt v${TG_VERSION}" ;\
-    DOWNLOAD_URL="https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_${ARCHITECTURE}" ;\
-    curl -sL "${DOWNLOAD_URL}" -o /usr/bin/terragrunt ;\
-    chmod +x /usr/bin/terragrunt ;\
-  fi
-
-# Get latest TFLint
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-    ARCHITECTURE=amd64 ;\
-  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-    ARCHITECTURE=arm64 ;\
-  else \
-    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-    exit 1 ;\
-  fi ;\
-  echo "Installing TFLint" ;\
-  DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/terraform-linters/tflint/releases/latest | jq -r ".assets[] | select(.name | endswith(\"linux_${ARCHITECTURE}.zip\")) | .browser_download_url")" ;\
-  if [ -z "${DOWNLOAD_URL}" ]; then \
-    echo "Empty download URL for TFLint" ;\
-    exit 1 ;\
-  fi ;\
-  curl -sL "${DOWNLOAD_URL}" -o ./tflint.zip ;\
-  unzip ./tflint.zip ;\
-  rm -f ./tflint.zip ;\
-  chmod +x ./tflint ;\
-  mv ./tflint /usr/bin/tflint
-
-# Get latest hcledit
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-    ARCHITECTURE=amd64 ;\
-  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-    ARCHITECTURE=arm64 ;\
-  else \
-    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-    exit 1 ;\
-  fi ;\
-  echo "Installing hcledit" ;\
-  DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/minamijoyo/hcledit/releases/latest | jq -r ".assets[] | select(.name | endswith(\"linux_${ARCHITECTURE}.tar.gz\")) | .browser_download_url")" ;\
-  if [ -z "${DOWNLOAD_URL}" ]; then \
-    echo "Empty download URL for hcledit" ;\
-    exit 1 ;\
-  fi ;\
-  curl -sL "${DOWNLOAD_URL}" -o ./hcledit.tar.gz ;\
-  tar -xf ./hcledit.tar.gz ;\
-  rm -f ./hcledit.tar.gz ;\
-  chmod +x ./hcledit ;\
-  chown "$(id -u):$(id -g)" ./hcledit ;\
-  mv ./hcledit /usr/bin/hcledit
-
-# Get latest Task
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
+# Keep requirements copy right before pip install for better cache reuse
+COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 RUN if [ "${SLIM}" = "no" ]; then \
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-      ARCHITECTURE=amd64 ;\
-    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-      ARCHITECTURE=arm64 ;\
-    else \
-      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-      exit 1 ;\
-    fi ;\
-    DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/go-task/task/releases/latest | jq -r \
-      ".assets[] | select(.name | endswith(\"linux_${ARCHITECTURE}.tar.gz\")) | .browser_download_url")" ;\
-    if [ -z "${DOWNLOAD_URL}" ]; then \
-      echo "Empty download URL for Task" ;\
-      exit 1 ;\
-    fi ;\
-    curl -sL "${DOWNLOAD_URL}" -o ./task.tar.gz ;\
-    tar -xf ./task.tar.gz ;\
-    rm -f ./task.tar.gz ;\
-    chmod +x ./task ;\
-    mv ./task /usr/bin/task ;\
-  fi
+    pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt ;\
+  fi ;\
+  rm -f /tmp/pip_common_requirements.txt
 
-# Get latest sops
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC2015,SC2034
-RUN if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-    ARCHITECTURE=amd64 ;\
-  elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-    ARCHITECTURE=arm64 ;\
+# Install Terraform/OpenTofu/Terragrunt in one layer
+# hadolint ignore=SC2155
+RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; esac ;\
+  TMP_DIR="$(mktemp -d)" ;\
+  install_zip_binary() { \
+    local url="$1" ;\
+    local binary_name="$2" ;\
+    local sha256="$3" ;\
+    local zip_path="${TMP_DIR}/${binary_name}.zip" ;\
+    curl -fsSL "${url}" -o "${zip_path}" ;\
+    echo "${sha256}  ${zip_path}" | sha256sum -c - ;\
+    unzip -q "${zip_path}" -d "${TMP_DIR}" ;\
+    chmod +x "${TMP_DIR}/${binary_name}" ;\
+    mv "${TMP_DIR}/${binary_name}" "/usr/bin/${binary_name}" ;\
+  } ;\
+  if [ "${TF}" = "yes" ]; then \
+    TF_SHA256=$(curl -fsSL "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS" | awk '/terraform_[0-9.]+_linux_'"${ARCHITECTURE}"'\.zip$/ {print $1; exit}') ;\
+    [ -n "${TF_SHA256}" ] || { echo "Missing Terraform checksum for ${TF_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+    install_zip_binary "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_${ARCHITECTURE}.zip" terraform "${TF_SHA256}" ;\
   else \
-    echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-    exit 1 ;\
+    echo "Skipping Terraform installation" ;\
   fi ;\
-  echo "Installing sops" ;\
-  DOWNLOAD_URL="$(curl -sL https://api.github.com/repos/getsops/sops/releases/latest | jq -r ".assets[] | select(.name | endswith(\"linux.${ARCHITECTURE}\")) | .browser_download_url")" ;\
-  if [ -z "${DOWNLOAD_URL}" ]; then \
-    echo "Empty download URL for sops" ;\
-    exit 1 ;\
+  if [ "${OT}" = "yes" ]; then \
+    OT_DEB_SHA256=$(curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_SHA256SUMS" | awk '/tofu_[0-9.]+_'"${ARCHITECTURE}"'\.deb$/ {print $1; exit}') ;\
+    [ -n "${OT_DEB_SHA256}" ] || { echo "Missing OpenTofu checksum for ${OT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+    curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_${ARCHITECTURE}.deb" -o "${TMP_DIR}/tofu.deb" ;\
+    echo "${OT_DEB_SHA256}  ${TMP_DIR}/tofu.deb" | sha256sum -c - ;\
+    dpkg -i "${TMP_DIR}/tofu.deb" ;\
+  else \
+    echo "Skipping OpenTofu installation" ;\
   fi ;\
-  curl -sL "${DOWNLOAD_URL}" -o /usr/bin/sops ;\
-  chmod +x /usr/bin/sops
+  if [ "${TG}" = "yes" ]; then \
+    TG_SHA256=$(curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/SHA256SUMS" | awk '/terragrunt_linux_'"${ARCHITECTURE}"'$/ {print $1; exit}') ;\
+    [ -n "${TG_SHA256}" ] || { echo "Missing Terragrunt checksum for ${TG_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+    curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_${ARCHITECTURE}" -o /usr/bin/terragrunt ;\
+    echo "${TG_SHA256}  /usr/bin/terragrunt" | sha256sum -c - ;\
+    chmod +x /usr/bin/terragrunt ;\
+  else \
+    echo "Skipping Terragrunt installation" ;\
+  fi ;\
+  rm -rf "${TMP_DIR}"
+
+# Install helper binaries in a dedicated layer for better cache locality
+RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; esac ;\
+  TFLINT_SHA256=$(curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt" | awk '/tflint_linux_'"${ARCHITECTURE}"'\.zip$/ {print $1; exit}') ;\
+  [ -n "${TFLINT_SHA256}" ] || { echo "Missing TFLint checksum for ${TFLINT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  HCLEDIT_SHA256=$(curl -fsSL "https://github.com/minamijoyo/hcledit/releases/download/v${HCLEDIT_VERSION}/hcledit_${HCLEDIT_VERSION}_checksums.txt" | awk '/hcledit_[0-9.]+_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}') ;\
+  [ -n "${HCLEDIT_SHA256}" ] || { echo "Missing hcledit checksum for ${HCLEDIT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  SOPS_SHA256=$(curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.checksums.txt" | awk '/sops-v[0-9.]+\.linux\.'"${ARCHITECTURE}"'$/ {print $1; exit}') ;\
+  [ -n "${SOPS_SHA256}" ] || { echo "Missing sops checksum for ${SOPS_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  TASK_SHA256=$(curl -fsSL "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_checksums.txt" | awk '/task_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}') ;\
+  [ -n "${TASK_SHA256}" ] || { echo "Missing task checksum for ${TASK_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
+  TMP_DIR="$(mktemp -d)" ;\
+  install_zip_binary() { \
+    local url="$1" ;\
+    local binary_name="$2" ;\
+    local sha256="$3" ;\
+    local zip_path="${TMP_DIR}/${binary_name}.zip" ;\
+    curl -fsSL "${url}" -o "${zip_path}" ;\
+    echo "${sha256}  ${zip_path}" | sha256sum -c - ;\
+    unzip -q "${zip_path}" -d "${TMP_DIR}" ;\
+    chmod +x "${TMP_DIR}/${binary_name}" ;\
+    mv "${TMP_DIR}/${binary_name}" "/usr/bin/${binary_name}" ;\
+  } ;\
+  install_zip_binary "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_${ARCHITECTURE}.zip" tflint "${TFLINT_SHA256}" ;\
+  curl -fsSL "https://github.com/minamijoyo/hcledit/releases/download/v${HCLEDIT_VERSION}/hcledit_${HCLEDIT_VERSION}_linux_${ARCHITECTURE}.tar.gz" -o "${TMP_DIR}/hcledit.tar.gz" ;\
+  echo "${HCLEDIT_SHA256}  ${TMP_DIR}/hcledit.tar.gz" | sha256sum -c - ;\
+  tar -xf "${TMP_DIR}/hcledit.tar.gz" -C "${TMP_DIR}" ;\
+  chmod +x "${TMP_DIR}/hcledit" ;\
+  mv "${TMP_DIR}/hcledit" /usr/bin/hcledit ;\
+  curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.${ARCHITECTURE}" -o /usr/bin/sops ;\
+  echo "${SOPS_SHA256}  /usr/bin/sops" | sha256sum -c - ;\
+  chmod +x /usr/bin/sops ;\
+  if [ "${SLIM}" = "no" ]; then \
+    curl -fsSL "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_linux_${ARCHITECTURE}.tar.gz" -o "${TMP_DIR}/task.tar.gz" ;\
+    echo "${TASK_SHA256}  ${TMP_DIR}/task.tar.gz" | sha256sum -c - ;\
+    tar -xf "${TMP_DIR}/task.tar.gz" -C "${TMP_DIR}" task ;\
+    chmod +x "${TMP_DIR}/task" ;\
+    mv "${TMP_DIR}/task" /usr/bin/task ;\
+  fi ;\
+  rm -rf "${TMP_DIR}"
 
 # Cloud CLIs
 
 # AWS
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=DL3013,SC2015,SC2034
+COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
+COPY awscli_pgp_public_key.asc /tmp/awscli_pgp_public_key.asc
+# hadolint ignore=DL3013
 RUN if [ "${AWS}" = "yes" ]; then \
-    echo "Installing AWS CLI" ;\
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-      ARCHITECTURE=x86_64 ;\
-    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-      ARCHITECTURE=aarch64 ;\
-    else \
-      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-      exit 1 ;\
-    fi ;\
+    case "${TARGETARCH}" in \
+      amd64) AWS_ARCHITECTURE=x86_64 ;; \
+      arm64) AWS_ARCHITECTURE=aarch64 ;; \
+      *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; \
+    esac ;\
     xargs -n 1 -a /tmp/pip_aws_requirements.txt pip3 install --no-cache-dir ;\
-    DOWNLOAD_URL="https://awscli.amazonaws.com/awscli-exe-linux-${ARCHITECTURE}-${AWS_VERSION}.zip" ;\
-    curl -sL "${DOWNLOAD_URL}" -o /tmp/awscli.zip ;\
-    mkdir -p /usr/local/awscli ;\
-    unzip -q /tmp/awscli.zip -d /usr/local/awscli ;\
-    /usr/local/awscli/aws/install ;\
-  fi
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_ARCHITECTURE}-${AWS_VERSION}.zip" -o /tmp/awscli.zip ;\
+    curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_ARCHITECTURE}-${AWS_VERSION}.zip.sig" -o /tmp/awscli.zip.sig ;\
+    GNUPGHOME="$(mktemp -d)" ;\
+    export GNUPGHOME ;\
+    gpg --batch --import /tmp/awscli_pgp_public_key.asc ;\
+    AWS_GPG_FINGERPRINT="" ;\
+    AWS_GPG_FINGERPRINT="$(gpg --batch --with-colons --fingerprint "aws-cli@amazon.com" | awk -F: '/^fpr:/ {print $10; exit}')" ;\
+    [ "${AWS_GPG_FINGERPRINT}" = "FB5DB77FD5C118B80511ADA8A6310ACC4672475C" ] ;\
+    gpg --batch --verify /tmp/awscli.zip.sig /tmp/awscli.zip ;\
+    rm -rf "${GNUPGHOME}" ;\
+    mkdir -p /tmp/awscli ;\
+    unzip -q /tmp/awscli.zip -d /tmp/awscli ;\
+    /tmp/awscli/aws/install ;\
+    rm -rf /tmp/awscli /tmp/awscli.zip /tmp/awscli.zip.sig /tmp/awscli_pgp_public_key.asc ;\
+  fi ;\
+  rm -f /tmp/pip_aws_requirements.txt /tmp/awscli_pgp_public_key.asc
 
 # GCP
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# hadolint ignore=SC1091,SC2015,SC2129,SC2034
+# hadolint ignore=SC1091,SC2129
 RUN if [ "${GCP}" = "yes" ]; then \
-    echo "Installing Google Cloud SDK" ;\
-    if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-      ARCHITECTURE=x86_64 ;\
-    elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-      ARCHITECTURE=arm ;\
-    else \
-      echo "Unsupported architecture: ${TARGETPLATFORM}" ;\
-      exit 1 ;\
-    fi ;\
-    DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCP_VERSION}-linux-${ARCHITECTURE}.tar.gz" ;\
-    curl -sL "${DOWNLOAD_URL}" -o google-cloud-sdk.tar.gz ;\
-    tar -xf google-cloud-sdk.tar.gz ;\
-    rm -f google-cloud-sdk.tar.gz ;\
-    ./google-cloud-sdk/install.sh \
-      --usage-reporting false \
-      --command-completion true \
-      --path-update true \
-      --quiet ;\
-    /google-cloud-sdk/bin/gcloud config set component_manager/disable_update_check true ;\
-    /google-cloud-sdk/bin/gcloud config set metrics/environment github_docker_image ;\
-    echo -e "\n# Add Google Cloud SDK" >> /etc/bash.bashrc ;\
-    echo "source /google-cloud-sdk/path.bash.inc" >> /etc/bash.bashrc ;\
-    echo "source /google-cloud-sdk/completion.bash.inc" >> /etc/bash.bashrc ;\
+    mkdir -p /usr/share/keyrings ;\
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor > /usr/share/keyrings/cloud.google.gpg ;\
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list ;\
+    apt-get update -y ;\
+    apt-get install --no-install-recommends -y google-cloud-cli="${GCP_VERSION}-0" ;\
+    apt-get clean ;\
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* ;\
+    gcloud config set component_manager/disable_update_check true ;\
+    gcloud config set metrics/environment github_docker_image ;\
   fi
 
-ENV PATH="$PATH:/google-cloud-sdk/bin"
-
 # Azure
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
-# using wget to bypass curl error for arm64 https://bugs.launchpad.net/ubuntu/+source/curl/+bug/2073448
-# hadolint ignore=DL3009,DL4001,SC2034
+# hadolint ignore=DL3009
 RUN if [ "${AZURE}" = "yes" ]; then \
-    echo "Installing Azure CLI" ;\
     mkdir -p /etc/apt/keyrings ;\
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
     chmod go+r /etc/apt/keyrings/microsoft.gpg ;\
-    AZ_DIST=$(lsb_release -cs) ;\
+    AZ_DIST="$(lsb_release -cs)" ;\
     printf "Types: deb\n\
 URIs: https://packages.microsoft.com/repos/azure-cli/\n\
 Suites: %s\n\
 Components: main\n\
 Architectures: %s\n\
-Signed-by: /etc/apt/keyrings/microsoft.gpg" "$AZ_DIST" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources ;\
+Signed-by: /etc/apt/keyrings/microsoft.gpg" "${AZ_DIST}" "$(dpkg --print-architecture)" | tee /etc/apt/sources.list.d/azure-cli.sources ;\
     apt-get update -y ;\
     apt-get install --no-install-recommends -y azure-cli="${AZ_VERSION}-1~${AZ_DIST}" ;\
+    apt-get clean ;\
+    rm -rf /var/lib/apt/lists/* /var/cache/apt/* ;\
   fi
 
-# Scripts, configs and cleanup
+# Scripts and final cleanup
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh entrypoint.sh /usr/bin/
-SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 RUN chmod +x \
     /usr/bin/format-hcl \
     /usr/bin/fmt.sh \
     /usr/bin/terragrunt-fmt.sh \
     /usr/bin/entrypoint.sh ;\
-  apt-get clean ;\
-  rm -rf /var/lib/apt/lists/* ;\
-  rm -rf /var/cache/* ;\
-  rm -rf /root/.cache/* ;\
-  rm -rf /tmp/*
+  rm -rf /root/.cache/* /tmp/*
 
 WORKDIR /data
 CMD ["entrypoint.sh"]

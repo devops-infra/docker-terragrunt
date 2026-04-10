@@ -15,7 +15,7 @@
 
 # Info
 
-Docker image with Terraform or Terragrunt, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
+Docker image with Terraform or OpenTofu, together with Terragrunt, Go, Python, Make, Docker, Git, and all needed components to easily manage cloud  infrastructure for CI/CD environments as a runner image.
 
 Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google Cloud Platform**.
 

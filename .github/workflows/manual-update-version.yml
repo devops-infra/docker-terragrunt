@@ -149,39 +149,38 @@ jobs:
             's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
           TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
             's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+          {
+            echo "TF_VERSION=${TF_VERSION}"
+            echo "OT_VERSION=${OT_VERSION}"
+            echo "TG_VERSION=${TG_VERSION}"
+          } >> "$GITHUB_ENV"
           FLAVOUR="${{ matrix.flavour }}"
           GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
           DOCKER_IMAGE="devopsinfra/docker-terragrunt"
           docker buildx create --use || true
           task login
           task push-${{ matrix.flavour }} VERSION_OVERRIDE="${VERSION}"
-          docker pull "${GHCR_IMAGE}:${FLAVOUR}-latest"
-          docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-latest"
-          docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-latest"
           docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
-          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-latest"
-          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-latest"
-          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-latest"
           docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
       - name: Cont.Struc.Test - ${{ matrix.flavour }}
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-latest
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/${{ matrix.flavour }}.yml
 
       - name: Cont.Struc.Test - Terraform
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-latest
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/tf.yml
 
       - name: Cont.Struc.Test - OpenTofu
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-ot-latest
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/ot.yml
 
   build-and-push-only:
@@ -238,37 +237,36 @@ jobs:
             's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
           TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
             's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+          {
+            echo "TF_VERSION=${TF_VERSION}"
+            echo "OT_VERSION=${OT_VERSION}"
+            echo "TG_VERSION=${TG_VERSION}"
+          } >> "$GITHUB_ENV"
           FLAVOUR="${{ matrix.flavour }}"
           GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
           DOCKER_IMAGE="devopsinfra/docker-terragrunt"
           docker buildx create --use || true
           task login
           task push-${{ matrix.flavour }} VERSION_OVERRIDE="${VERSION}"
-          docker pull "${GHCR_IMAGE}:${FLAVOUR}-latest"
-          docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-latest"
-          docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-latest"
           docker pull "${GHCR_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${GHCR_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
-          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-latest"
-          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-latest"
-          docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-latest"
           docker pull "${DOCKER_IMAGE}:${FLAVOUR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${DOCKER_IMAGE}:${FLAVOUR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
       - name: Cont.Struc.Test - ${{ matrix.flavour }}
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-latest
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/${{ matrix.flavour }}.yml
 
       - name: Cont.Struc.Test - Terraform
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-latest
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/tf.yml
 
       - name: Cont.Struc.Test - OpenTofu
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
-          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-ot-latest
+          image: devopsinfra/docker-terragrunt:${{ matrix.flavour }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/ot.yml
