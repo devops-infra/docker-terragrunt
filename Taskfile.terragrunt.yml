@@ -103,7 +103,7 @@ tasks:
       - task: docker:login
 
   terragrunt:update-versions:
-    desc: Check TF, OT, TG, AWS, GCP, AZ versions and update Taskfile/README
+    desc: Check TF, OT, TG, cloud CLIs, and helper binary versions
     cmds:
       - |
         set -eu
@@ -114,6 +114,43 @@ tasks:
         gcp_latest=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives \
           | grep -Eo 'google-cloud-sdk-[0-9.]+' | head -1 | sed 's/google-cloud-sdk-//')
         az_latest=$(curl -LsS https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')
+        tflint_latest=$(curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | jq -r .tag_name | sed 's/^v//')
+        hcledit_latest=$(curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | jq -r .tag_name | sed 's/^v//')
+        sops_latest=$(curl -LsS https://api.github.com/repos/getsops/sops/releases/latest | jq -r .tag_name | sed 's/^v//')
+        task_latest=$(curl -LsS https://api.github.com/repos/go-task/task/releases/latest | jq -r .tag_name | sed 's/^v//')
+
+        tflint_checksums=$(curl -LsS "https://github.com/terraform-linters/tflint/releases/download/v${tflint_latest}/checksums.txt")
+        hcledit_checksums=$(curl -LsS \
+          "https://github.com/minamijoyo/hcledit/releases/download/v${hcledit_latest}/hcledit_${hcledit_latest}_checksums.txt")
+        sops_checksums=$(curl -LsS "https://github.com/getsops/sops/releases/download/v${sops_latest}/sops-v${sops_latest}.checksums.txt")
+        task_checksums=$(curl -LsS "https://github.com/go-task/task/releases/download/v${task_latest}/task_checksums.txt")
+
+        tflint_sha_amd64=$(printf '%s\n' "$tflint_checksums" | awk '/tflint_linux_amd64.zip$/ {print $1; exit}')
+        tflint_sha_arm64=$(printf '%s\n' "$tflint_checksums" | awk '/tflint_linux_arm64.zip$/ {print $1; exit}')
+        hcledit_sha_amd64=$(printf '%s\n' "$hcledit_checksums" | awk '/hcledit_[0-9.]+_linux_amd64.tar.gz$/ {print $1; exit}')
+        hcledit_sha_arm64=$(printf '%s\n' "$hcledit_checksums" | awk '/hcledit_[0-9.]+_linux_arm64.tar.gz$/ {print $1; exit}')
+        sops_sha_amd64=$(printf '%s\n' "$sops_checksums" | awk '/sops-v[0-9.]+\.linux\.amd64$/ {print $1; exit}')
+        sops_sha_arm64=$(printf '%s\n' "$sops_checksums" | awk '/sops-v[0-9.]+\.linux\.arm64$/ {print $1; exit}')
+        task_sha_amd64=$(printf '%s\n' "$task_checksums" | awk '/task_linux_amd64.tar.gz$/ {print $1; exit}')
+        task_sha_arm64=$(printf '%s\n' "$task_checksums" | awk '/task_linux_arm64.tar.gz$/ {print $1; exit}')
+
+        require_non_empty() {
+          key="$1"
+          value="$2"
+          if [ -z "$value" ] || [ "$value" = "null" ]; then
+            echo "Failed to resolve value for ${key}"
+            exit 1
+          fi
+        }
+
+        require_non_empty tflint_sha_amd64 "$tflint_sha_amd64"
+        require_non_empty tflint_sha_arm64 "$tflint_sha_arm64"
+        require_non_empty hcledit_sha_amd64 "$hcledit_sha_amd64"
+        require_non_empty hcledit_sha_arm64 "$hcledit_sha_arm64"
+        require_non_empty sops_sha_amd64 "$sops_sha_amd64"
+        require_non_empty sops_sha_arm64 "$sops_sha_arm64"
+        require_non_empty task_sha_amd64 "$task_sha_amd64"
+        require_non_empty task_sha_arm64 "$task_sha_arm64"
 
         echo "Current Terraform: {{.TF_VERSION}} | Latest: $tf_latest"
         echo "Current Terragrunt: {{.TG_VERSION}} | Latest: $tg_latest"
@@ -121,6 +158,10 @@ tasks:
         echo "Current AWS CLI: {{.AWS_VERSION}} | Latest: $aws_latest"
         echo "Current GCP CLI: {{.GCP_VERSION}} | Latest: $gcp_latest"
         echo "Current Azure CLI: {{.AZ_VERSION}} | Latest: $az_latest"
+        echo "Current TFLint: {{.TFLINT_VERSION}} | Latest: $tflint_latest"
+        echo "Current hcledit: {{.HCLEDIT_VERSION}} | Latest: $hcledit_latest"
+        echo "Current sops: {{.SOPS_VERSION}} | Latest: $sops_latest"
+        echo "Current task: {{.TASK_VERSION}} | Latest: $task_latest"
 
         update_file() {
           file="$1"
@@ -139,6 +180,31 @@ tasks:
         update_file Taskfile.terragrunt.yml "{{.AWS_VERSION}}" "$aws_latest"
         update_file Taskfile.terragrunt.yml "{{.GCP_VERSION}}" "$gcp_latest"
         update_file Taskfile.terragrunt.yml "{{.AZ_VERSION}}" "$az_latest"
+        update_file Taskfile.terragrunt.yml "{{.TFLINT_VERSION}}" "$tflint_latest"
+        update_file Taskfile.terragrunt.yml "{{.HCLEDIT_VERSION}}" "$hcledit_latest"
+        update_file Taskfile.terragrunt.yml "{{.SOPS_VERSION}}" "$sops_latest"
+        update_file Taskfile.terragrunt.yml "{{.TASK_VERSION}}" "$task_latest"
+
+        set_arg() {
+          file="$1"
+          key="$2"
+          value="$3"
+          {{.SED}} -i "s|^ARG ${key}=.*$|ARG ${key}=${value}|g" "$file"
+        }
+
+        set_arg Dockerfile TFLINT_VERSION "$tflint_latest"
+        set_arg Dockerfile HCLEDIT_VERSION "$hcledit_latest"
+        set_arg Dockerfile SOPS_VERSION "$sops_latest"
+        set_arg Dockerfile TASK_VERSION "$task_latest"
+        set_arg Dockerfile TFLINT_SHA256_AMD64 "$tflint_sha_amd64"
+        set_arg Dockerfile TFLINT_SHA256_ARM64 "$tflint_sha_arm64"
+        set_arg Dockerfile HCLEDIT_SHA256_AMD64 "$hcledit_sha_amd64"
+        set_arg Dockerfile HCLEDIT_SHA256_ARM64 "$hcledit_sha_arm64"
+        set_arg Dockerfile SOPS_SHA256_AMD64 "$sops_sha_amd64"
+        set_arg Dockerfile SOPS_SHA256_ARM64 "$sops_sha_arm64"
+        set_arg Dockerfile TASK_SHA256_AMD64 "$task_sha_amd64"
+        set_arg Dockerfile TASK_SHA256_ARM64 "$task_sha_arm64"
+
         update_file README.md "{{.TF_VERSION}}" "$tf_latest"
         update_file README.md "{{.TG_VERSION}}" "$tg_latest"
         update_file README.md "{{.OT_VERSION}}" "$ot_latest"
