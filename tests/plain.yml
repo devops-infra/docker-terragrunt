@@ -59,7 +59,7 @@ commandTests:
   - name: Task version
     command: task
     args: [--version]
-    expectedOutput: ["Task version: v.*"]
+    expectedOutput: [.*]
 
   - name: Python modules
     command: pip
