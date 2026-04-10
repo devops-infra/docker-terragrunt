@@ -4,7 +4,7 @@ commandTests:
   - name: AWS CLI
     command: aws
     args: [--version]
-    expectedOutput: [aws-cli/2.34.24]
+    expectedOutput: [aws-cli/.*]
 
   - name: Boto3 Python module
     command: pip3

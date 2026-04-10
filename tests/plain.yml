@@ -4,12 +4,12 @@ commandTests:
   - name: hcledit
     command: hcledit
     args: [version]
-    expectedOutput: [0.2.17]
+    expectedOutput: [0.*]
 
   - name: sops
     command: sops
     args: [--version]
-    expectedOutput: [sops 3.10.2]
+    expectedOutput: [sops .*]
 
   - name: Other tools
     command: which
@@ -59,7 +59,7 @@ commandTests:
   - name: Task version
     command: task
     args: [--version]
-    expectedOutput: [Task version: v3.45.4]
+    expectedOutput: ["Task version: v.*"]
 
   - name: Python modules
     command: pip

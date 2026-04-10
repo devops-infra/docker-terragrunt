@@ -238,11 +238,10 @@ RUN if [ "${GCP}" = "yes" ]; then \
 ENV PATH="$PATH:/google-cloud-sdk/bin"
 
 # Azure
-# using wget to bypass curl error for arm64 https://bugs.launchpad.net/ubuntu/+source/curl/+bug/2073448
 # hadolint ignore=DL3009
 RUN if [ "${AZURE}" = "yes" ]; then \
     mkdir -p /etc/apt/keyrings ;\
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
+    curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft.gpg > /dev/null ;\
     chmod go+r /etc/apt/keyrings/microsoft.gpg ;\
     AZ_DIST="$(lsb_release -cs)" ;\
     printf "Types: deb\n\

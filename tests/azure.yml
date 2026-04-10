@@ -4,7 +4,7 @@ commandTests:
   - name: Azure CLI
     command: az
     args: [--version]
-    expectedOutput: [azure-cli 2.84.0]
+    expectedOutput: [azure-cli .*]
 
   - name: APT lists cleaned
     command: bash

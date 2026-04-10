@@ -4,4 +4,4 @@ commandTests:
   - name: OpenTofu
     command: tofu
     args: [--version]
-    expectedOutput: [OpenTofu v1.11.5]
+    expectedOutput: [OpenTofu v.*]

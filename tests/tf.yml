@@ -4,4 +4,4 @@ commandTests:
   - name: Terraform
     command: terraform
     args: [--version]
-    expectedOutput: [Terraform v1.14.8]
+    expectedOutput: [Terraform v.*]

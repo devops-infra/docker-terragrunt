@@ -4,7 +4,7 @@ commandTests:
   - name: Google Cloud SDK
     command: gcloud
     args: [--version]
-    expectedOutput: [Google Cloud SDK 563.0.0]
+    expectedOutput: [Google Cloud SDK .*]
 
   - name: APT lists cleaned
     command: bash

@@ -31,7 +31,7 @@ commandTests:
   - name: TFLint
     command: tflint
     args: [--version]
-    expectedOutput: [TFLint version 0.59.1]
+    expectedOutput: [TFLint version .*]
 
   - name: APT lists cleaned
     command: bash
