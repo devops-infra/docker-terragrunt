@@ -40,7 +40,7 @@ commandTests:
         value: ${TASK_VERSION}
     args:
       - -lc
-      - task --version | grep -Eq '^Task version: v${EXPECTED_TASK_VERSION}$'
+      - "task --version | grep -Eq '^Task version: v${EXPECTED_TASK_VERSION}$'"
 
   - name: Cloud CLIs not installed
     command: bash
