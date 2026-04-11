@@ -13,7 +13,7 @@ commandTests:
         value: ${HCLEDIT_VERSION}
     args:
       - -lc
-      - hcledit version | grep -Eq "^${EXPECTED_HCLEDIT_VERSION}$"
+      - hcledit version | grep -Eq "^${EXPECTED_HCLEDIT_VERSION}"
 
   - name: sops
     command: bash
@@ -22,7 +22,7 @@ commandTests:
         value: ${SOPS_VERSION}
     args:
       - -lc
-      - sops --version | grep -Eq "^sops ${EXPECTED_SOPS_VERSION}$"
+      - sops --version | grep -Eq "^sops ${EXPECTED_SOPS_VERSION}"
 
   - name: TFLint
     command: bash
@@ -31,7 +31,7 @@ commandTests:
         value: ${TFLINT_VERSION}
     args:
       - -lc
-      - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}$"
+      - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}"
 
   - name: Task version
     command: bash

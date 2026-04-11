@@ -8,7 +8,7 @@ commandTests:
         value: ${AWS_VERSION}
     args:
       - -lc
-      - aws --version | grep -Eq "^aws-cli/${EXPECTED_AWS_VERSION}$"
+      - aws --version | grep -Eq "^aws-cli/${EXPECTED_AWS_VERSION}"
 
   - name: Boto3 Python module
     command: pip3

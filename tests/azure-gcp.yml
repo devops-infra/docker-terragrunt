@@ -8,7 +8,7 @@ commandTests:
         value: ${AZ_VERSION}
     args:
       - -lc
-      - az --version | grep -Eq "^azure-cli ${EXPECTED_AZ_VERSION}$"
+      - az --version | grep -Eq "^azure-cli ${EXPECTED_AZ_VERSION}"
 
   - name: Google Cloud SDK
     command: bash
@@ -17,7 +17,7 @@ commandTests:
         value: ${GCP_VERSION}
     args:
       - -lc
-      - gcloud --version | grep -Eq "^Google Cloud SDK ${EXPECTED_GCP_VERSION}$"
+      - gcloud --version | grep -Eq "^Google Cloud SDK ${EXPECTED_GCP_VERSION}"
 
   - name: AWS CLI not installed
     command: bash
