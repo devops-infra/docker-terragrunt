@@ -29,7 +29,6 @@ ARG TG_VERSION=1.0.0
 ARG TFLINT_VERSION=0.59.1
 ARG HCLEDIT_VERSION=0.2.17
 ARG SOPS_VERSION=3.10.2
-ARG TASK_VERSION=3.45.4
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
@@ -49,7 +48,6 @@ RUN echo Debug information: ;\
   echo TFLINT_VERSION = "${TFLINT_VERSION}" ;\
   echo HCLEDIT_VERSION = "${HCLEDIT_VERSION}" ;\
   echo SOPS_VERSION = "${SOPS_VERSION}" ;\
-  echo TASK_VERSION = "${TASK_VERSION}" ;\
   case "${TARGETARCH}" in amd64|arm64) ;; *) echo "Unsupported architecture: ${TARGETARCH}"; exit 1 ;; esac ;\
   echo 'path-exclude /usr/share/doc/*' > /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
   echo 'path-exclude /usr/share/man/*' >> /etc/dpkg/dpkg.cfg.d/docker-minimal ;\
@@ -90,6 +88,9 @@ RUN apt-get update -y ;\
       python-is-python3 \
       python3-pip \
       zip ;\
+    curl -1sLf 'https://dl.cloudsmith.io/public/task/task/setup.deb.sh' | bash ;\
+    apt-get update -y ;\
+    apt-get install --no-install-recommends -y task ;\
   fi ;\
   apt-get clean ;\
   rm -rf /var/lib/apt/lists/* /var/cache/apt/*
@@ -152,8 +153,6 @@ RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo
     [ -n "${HCLEDIT_SHA256}" ] || { echo "Missing hcledit checksum for ${HCLEDIT_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
     SOPS_SHA256=$(curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.checksums.txt" | awk '/sops-v[0-9.]+\.linux\.'"${ARCHITECTURE}"'$/ {print $1; exit}') ;\
     [ -n "${SOPS_SHA256}" ] || { echo "Missing sops checksum for ${SOPS_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
-    TASK_SHA256=$(curl -fsSL "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_checksums.txt" | awk '/task_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}') ;\
-    [ -n "${TASK_SHA256}" ] || { echo "Missing task checksum for ${TASK_VERSION}/${ARCHITECTURE}"; exit 1; } ;\
     TMP_DIR="$(mktemp -d)" ;\
   fi ;\
   install_zip_binary() { \
@@ -177,11 +176,6 @@ RUN case "${TARGETARCH}" in amd64|arm64) ARCHITECTURE="${TARGETARCH}" ;; *) echo
     curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.${ARCHITECTURE}" -o /usr/bin/sops ;\
     echo "${SOPS_SHA256}  /usr/bin/sops" | sha256sum -c - ;\
     chmod +x /usr/bin/sops ;\
-    curl -fsSL "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_linux_${ARCHITECTURE}.tar.gz" -o "${TMP_DIR}/task.tar.gz" ;\
-    echo "${TASK_SHA256}  ${TMP_DIR}/task.tar.gz" | sha256sum -c - ;\
-    tar -xf "${TMP_DIR}/task.tar.gz" -C "${TMP_DIR}" task ;\
-    chmod +x "${TMP_DIR}/task" ;\
-    mv "${TMP_DIR}/task" /usr/bin/task ;\
     rm -rf "${TMP_DIR}" ;\
   fi ;\
   true

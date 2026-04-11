@@ -33,15 +33,6 @@ commandTests:
       - -lc
       - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}"
 
-  - name: Task version
-    command: bash
-    envVars:
-      - key: EXPECTED_TASK_VERSION
-        value: ${TASK_VERSION}
-    args:
-      - -lc
-      - "task --version | grep -Eq '^Task version: v${EXPECTED_TASK_VERSION}$'"
-
   - name: Cloud CLIs not installed
     command: bash
     args:

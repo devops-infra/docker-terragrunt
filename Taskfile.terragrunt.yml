@@ -28,8 +28,6 @@ vars:
     sh: sed -nE 's/^ARG HCLEDIT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
   SOPS_VERSION:
     sh: sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
-  TASK_VERSION:
-    sh: sed -nE 's/^ARG TASK_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
   GITHUB_REF:
     sh: echo "${GITHUB_REF:-refs/heads/null}"
   GITHUB_SHA:
@@ -117,7 +115,6 @@ tasks:
         tflint_latest=$(curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | jq -r .tag_name | sed 's/^v//')
         hcledit_latest=$(curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | jq -r .tag_name | sed 's/^v//')
         sops_latest=$(curl -LsS https://api.github.com/repos/getsops/sops/releases/latest | jq -r .tag_name | sed 's/^v//')
-        task_latest=$(curl -LsS https://api.github.com/repos/go-task/task/releases/latest | jq -r .tag_name | sed 's/^v//')
 
         echo "Current Terraform: {{.TF_VERSION}} | Latest: $tf_latest"
         echo "Current Terragrunt: {{.TG_VERSION}} | Latest: $tg_latest"
@@ -128,7 +125,6 @@ tasks:
         echo "Current TFLint: {{.TFLINT_VERSION}} | Latest: $tflint_latest"
         echo "Current hcledit: {{.HCLEDIT_VERSION}} | Latest: $hcledit_latest"
         echo "Current sops: {{.SOPS_VERSION}} | Latest: $sops_latest"
-        echo "Current task: {{.TASK_VERSION}} | Latest: $task_latest"
 
         update_file() {
           file="$1"
@@ -157,7 +153,6 @@ tasks:
         set_arg Dockerfile TFLINT_VERSION "$tflint_latest"
         set_arg Dockerfile HCLEDIT_VERSION "$hcledit_latest"
         set_arg Dockerfile SOPS_VERSION "$sops_latest"
-        set_arg Dockerfile TASK_VERSION "$task_latest"
 
         update_file README.md "{{.TF_VERSION}}" "$tf_latest"
         update_file README.md "{{.TG_VERSION}}" "$tg_latest"

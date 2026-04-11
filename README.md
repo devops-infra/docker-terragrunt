@@ -69,12 +69,12 @@ bundled with or not (see second table below).
 | `tf-1.14.8-ot-1.11.5-tg-1.0.0`         |
 
 
-| Registry                                                                             | Example full image name                                                        | Image name          | Image version         | Terraform version | OpenTofu version | Terragrunt version |
-|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|---------------------|-----------------------|-------------------|------------------|--------------------|
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.14.8-tg-1.0.0`                            | `docker-terragrunt` | `tf-1.14.8-tg-1.0.0` | `1.14.8`          | `N/A`            | `1.0.0`           |
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.11.5-tg-1.0.0`                            | `docker-terragrunt` | `ot-1.11.5-tg-1.0.0` | `N/A`             | `1.11.5`         | `1.0.0`           |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.14.8-tg-1.0.0` | `docker-terragrunt` | `tf-1.14.8-tg-1.0.0` | `1.14.8`          | `N/A`            | `1.0.0`           |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.11.5-tg-1.0.0` | `docker-terragrunt` | `ot-1.11.5-tg-1.0.0` | `N/A`             | `1.11.5`         | `1.0.0`           |
+| Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
+|--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|------------------|--------------------|
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.14.8-tg-1.0.0`                            | `docker-terragrunt` | `tf-1.14.8-tg-1.0.0` | `1.14.8`          | `N/A`            | `1.0.0`            |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.11.5-tg-1.0.0`                            | `docker-terragrunt` | `ot-1.11.5-tg-1.0.0` | `N/A`             | `1.11.5`         | `1.0.0`            |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.14.8-tg-1.0.0` | `docker-terragrunt` | `tf-1.14.8-tg-1.0.0` | `1.14.8`          | `N/A`            | `1.0.0`            |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.11.5-tg-1.0.0` | `docker-terragrunt` | `ot-1.11.5-tg-1.0.0` | `N/A`             | `1.11.5`         | `1.0.0`            |
 
 
 # Available flavors
@@ -226,45 +226,45 @@ docker run --rm \
 
 ### Binaries and Python libraries
 
-| Name                         | Type           | Flavor   | Description                                                            | Source/Documentation                               |
-|------------------------------|----------------|----------|------------------------------------------------------------------------|----------------------------------------------------|
-| awscli                       | Binary         | aws      | Interact with AWS via terminal.                                        | https://github.com/aws/aws-cli                     |
-| azure-cli                    | Binary         | azure    | Interact with Azure via terminal.                                      | https://github.com/Azure/azure-cli                 |
-| bc                           | Binary         | non-slim | Numeric operations.                                                    | https://www.gnu.org/software/bc/bc.html            |
-| boto3                        | Python library | aws      | Interact with AWS via Python.                                          | https://github.com/boto/boto3                      |
-| cloudflare                   | Python library | non-slim | Cloudflare API operations.                                             | https://github.com/cloudflare/python-cloudflare    |
-| curl                         | Binary         | slim     | HTTP and API calls.                                                    | https://curl.haxx.se/                              |
-| docker                       | Binary         | non-slim | Run nested Docker workloads (for example, Lambda packaging workflows). | https://github.com/docker/docker-ce                |
-| git                          | Binary         | slim     | Interact with Git repositories.                                        | https://git-scm.com/                               |
-| go                           | Binary         | non-slim | Build/install additional Go tooling.                                   | https://go.dev/                                    |
-| google-cloud-cli             | Binary         | gcp      | Interact with GCP via terminal.                                        | https://cloud.google.com/sdk                       |
-| gnupg                        | Binary         | non-slim | GPG operations (including AWS CLI signature verification).             | https://gnupg.org/                                 |
-| graphviz                     | Binary         | non-slim | Generate graph output, for example from `terraform graph`.             | https://graphviz.org/                              |
-| hcledit                      | Binary         | non-slim | Read/write HCL files.                                                  | https://github.com/minamijoyo/hcledit              |
-| gh                           | Binary         | non-slim | Interact with GitHub via official GitHub CLI.                          | https://cli.github.com/                            |
-| hub                          | Binary         | non-slim | Interact with GitHub APIs.                                             | https://github.com/github/hub                      |
-| jq                           | Binary         | slim     | Parse JSON outputs.                                                    | https://stedolan.github.io/jq/                     |
-| make                         | Binary         | non-slim | `Makefile`-based task orchestration.                                   | https://www.gnu.org/software/make/                 |
-| ncurses (`tput`)             | Binary         | non-slim | Color and terminal helpers used by automation scripts.                 | https://invisible-island.net/ncurses/announce.html |
-| openssh-client (`ssh`)       | Binary         | non-slim | Outbound SSH connections.                                              | https://www.openssh.com/                           |
-| openssl                      | Binary         | non-slim | Cryptographic operations and hashing.                                  | https://github.com/openssl/openssl                 |
-| opentofu                     | Binary         | slim     | Open-source Terraform alternative for IaC.                             | https://github.com/opentofu/opentofu               |
-| PyGithub                     | Python library | non-slim | Interact with GitHub API in Python.                                    | https://github.com/PyGithub/PyGithub               |
-| python-hcl2                  | Python library | non-slim | Parse HCL in Python.                                                   | https://github.com/amplify-education/python-hcl2   |
-| python3                      | Binary         | non-slim | Execute Python scripts in automation workflows.                        | https://www.python.org/                            |
-| python-is-python3 (`python`) | Binary         | non-slim | `python` command alias to Python 3.                                    | https://www.python.org/                            |
-| python3-pip (`pip3`, `pip`)  | Binary         | non-slim | Python package management.                                             | https://pip.pypa.io/                               |
-| requests                     | Python library | non-slim | HTTP requests from Python.                                             | https://github.com/psf/requests                    |
-| slack_sdk                    | Python library | non-slim | Slack integration in Python.                                           | https://github.com/slackapi/python-slack-sdk       |
-| sops                         | Binary         | non-slim | Encrypt/decrypt secrets used by Terragrunt workflows.                  | https://github.com/getsops/sops                    |
-| task                         | Binary         | non-slim | `Taskfile`-based task orchestration.                                   | https://taskfile.dev/                              |
-| terraform                    | Binary         | slim     | IaC engine used directly and by Terragrunt.                            | https://github.com/hashicorp/terraform             |
-| terragrunt                   | Binary         | slim     | IaC wrapper over Terraform/OpenTofu.                                   | https://github.com/gruntwork-io/terragrunt         |
-| tflint                       | Binary         | non-slim | Terraform/OpenTofu linting.                                            | https://github.com/terraform-linters/tflint        |
-| unzip                        | Binary         | slim     | Extract archives during workflows.                                     | http://infozip.sourceforge.net/                    |
-| vim                          | Binary         | slim     | Basic editor in container shell sessions.                              | https://www.vim.org/                               |
-| wget                         | Binary         | slim     | Download helper utility.                                               | https://www.gnu.org/software/wget/                 |
-| zip                          | Binary         | non-slim | Create zip artifacts (for example for Lambda packages).                | http://infozip.sourceforge.net/                    |
+| Name                         | Type           | Flavor   | Description                                                                       | Source/Documentation                               |
+|------------------------------|----------------|----------|-----------------------------------------------------------------------------------|----------------------------------------------------|
+| awscli                       | Binary         | aws      | Interact with AWS via terminal.                                                   | https://github.com/aws/aws-cli                     |
+| azure-cli                    | Binary         | azure    | Interact with Azure via terminal.                                                 | https://github.com/Azure/azure-cli                 |
+| bc                           | Binary         | non-slim | Numeric operations.                                                               | https://www.gnu.org/software/bc/bc.html            |
+| boto3                        | Python library | aws      | Interact with AWS via Python.                                                     | https://github.com/boto/boto3                      |
+| cloudflare                   | Python library | non-slim | Cloudflare API operations.                                                        | https://github.com/cloudflare/python-cloudflare    |
+| curl                         | Binary         | slim     | HTTP and API calls.                                                               | https://curl.haxx.se/                              |
+| docker                       | Binary         | non-slim | Run nested Docker workloads (for example, Lambda packaging workflows).            | https://github.com/docker/docker-ce                |
+| git                          | Binary         | slim     | Interact with Git repositories.                                                   | https://git-scm.com/                               |
+| go                           | Binary         | non-slim | Build/install additional Go tooling.                                              | https://go.dev/                                    |
+| google-cloud-cli             | Binary         | gcp      | Interact with GCP via terminal.                                                   | https://cloud.google.com/sdk                       |
+| gnupg                        | Binary         | non-slim | GPG operations (including AWS CLI signature verification).                        | https://gnupg.org/                                 |
+| graphviz                     | Binary         | non-slim | Generate graph output, for example from `terraform graph`.                        | https://graphviz.org/                              |
+| hcledit                      | Binary         | non-slim | Read/write HCL files.                                                             | https://github.com/minamijoyo/hcledit              |
+| gh                           | Binary         | non-slim | Interact with GitHub via official GitHub CLI.                                     | https://cli.github.com/                            |
+| hub                          | Binary         | non-slim | Interact with GitHub APIs.                                                        | https://github.com/github/hub                      |
+| jq                           | Binary         | slim     | Parse JSON outputs.                                                               | https://stedolan.github.io/jq/                     |
+| make                         | Binary         | non-slim | `Makefile`-based task orchestration.                                              | https://www.gnu.org/software/make/                 |
+| ncurses (`tput`)             | Binary         | non-slim | Color and terminal helpers used by automation scripts.                            | https://invisible-island.net/ncurses/announce.html |
+| openssh-client (`ssh`)       | Binary         | non-slim | Outbound SSH connections.                                                         | https://www.openssh.com/                           |
+| openssl                      | Binary         | non-slim | Cryptographic operations and hashing.                                             | https://github.com/openssl/openssl                 |
+| opentofu                     | Binary         | slim     | Open-source Terraform alternative for IaC.                                        | https://github.com/opentofu/opentofu               |
+| PyGithub                     | Python library | non-slim | Interact with GitHub API in Python.                                               | https://github.com/PyGithub/PyGithub               |
+| python-hcl2                  | Python library | non-slim | Parse HCL in Python.                                                              | https://github.com/amplify-education/python-hcl2   |
+| python3                      | Binary         | non-slim | Execute Python scripts in automation workflows.                                   | https://www.python.org/                            |
+| python-is-python3 (`python`) | Binary         | non-slim | `python` command alias to Python 3.                                               | https://www.python.org/                            |
+| python3-pip (`pip3`, `pip`)  | Binary         | non-slim | Python package management.                                                        | https://pip.pypa.io/                               |
+| requests                     | Python library | non-slim | HTTP requests from Python.                                                        | https://github.com/psf/requests                    |
+| slack_sdk                    | Python library | non-slim | Slack integration in Python.                                                      | https://github.com/slackapi/python-slack-sdk       |
+| sops                         | Binary         | non-slim | Encrypt/decrypt secrets used by Terragrunt workflows.                             | https://github.com/getsops/sops                    |
+| task                         | Binary         | non-slim | `Taskfile`-based task orchestration (installed via official Task APT repository). | https://taskfile.dev/                              |
+| terraform                    | Binary         | slim     | IaC engine used directly and by Terragrunt.                                       | https://github.com/hashicorp/terraform             |
+| terragrunt                   | Binary         | slim     | IaC wrapper over Terraform/OpenTofu.                                              | https://github.com/gruntwork-io/terragrunt         |
+| tflint                       | Binary         | non-slim | Terraform/OpenTofu linting.                                                       | https://github.com/terraform-linters/tflint        |
+| unzip                        | Binary         | slim     | Extract archives during workflows.                                                | http://infozip.sourceforge.net/                    |
+| vim                          | Binary         | slim     | Basic editor in container shell sessions.                                         | https://www.vim.org/                               |
+| wget                         | Binary         | slim     | Download helper utility.                                                          | https://www.gnu.org/software/wget/                 |
+| zip                          | Binary         | non-slim | Create zip artifacts (for example for Lambda packages).                           | http://infozip.sourceforge.net/                    |
 
 
 # Forking
