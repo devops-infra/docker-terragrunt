@@ -206,7 +206,7 @@ jobs:
   build-and-push-only:
     name: Build & push only
     if: ${{ inputs.build-and-push-only }}
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     strategy:
       fail-fast: false
