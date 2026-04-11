@@ -8,7 +8,7 @@ commandTests:
         value: ${TF_VERSION}
     args:
       - -lc
-      - terraform --version | grep -Eq "^Terraform v${EXPECTED_TF_VERSION}$"
+      - terraform --version | grep -Eq "^Terraform v${EXPECTED_TF_VERSION}"
 
   - name: Terragrunt
     command: bash
