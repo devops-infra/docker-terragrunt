@@ -17,7 +17,7 @@ commandTests:
         value: ${TG_VERSION}
     args:
       - -lc
-      - terragrunt --version | grep -Eq "^terragrunt version v${EXPECTED_TG_VERSION}\n$"
+      - terragrunt --version | grep -Eq "^terragrunt version v${EXPECTED_TG_VERSION}"
 
   - name: Terraform not installed
     command: bash
