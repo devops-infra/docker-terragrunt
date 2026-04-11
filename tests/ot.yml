@@ -8,7 +8,10 @@ commandTests:
         value: ${OT_VERSION}
     args:
       - -lc
-      - tofu --version | grep -Eq "^OpenTofu v${EXPECTED_OT_VERSION}"
+      - |
+        output="$(tofu --version)"
+        printf '%s\n' "$output" | grep -Eq "^OpenTofu v${EXPECTED_OT_VERSION}$"
+        printf '%s\n' "$output" | grep -Eq "^on (linux|darwin)_(amd64|arm64)$"
 
   - name: Terragrunt
     command: bash

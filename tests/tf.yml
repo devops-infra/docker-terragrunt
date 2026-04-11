@@ -8,7 +8,10 @@ commandTests:
         value: ${TF_VERSION}
     args:
       - -lc
-      - terraform --version | grep -Eq "^Terraform v${EXPECTED_TF_VERSION}"
+      - |
+        output="$(terraform --version)"
+        printf '%s\n' "$output" | grep -Eq "^Terraform v${EXPECTED_TF_VERSION}$"
+        printf '%s\n' "$output" | grep -Eq "^on (linux|darwin)_(amd64|arm64)$"
 
   - name: Terragrunt
     command: bash
