@@ -9,3 +9,12 @@ commandTests:
     args: [--version]
     expectedOutput:
       - ^Google Cloud SDK ${EXPECTED_GCP_VERSION}$
+
+  - name: AWS and Azure CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in aws az; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done

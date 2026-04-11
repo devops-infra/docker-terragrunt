@@ -9,3 +9,12 @@ commandTests:
     args: [--version]
     expectedOutput:
       - ^azure-cli ${EXPECTED_AZ_VERSION}$
+
+  - name: AWS and GCP CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in aws gcloud; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done

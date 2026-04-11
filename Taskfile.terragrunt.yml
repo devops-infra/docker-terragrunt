@@ -55,7 +55,7 @@ vars:
   GITHUB_NAME: ghcr.io/{{.GITHUB_ORG_NAME}}/{{.DOCKER_IMAGE}}
   BUILD_DATE:
     sh: date -u +"%Y-%m-%dT%H:%M:%SZ"
-  FLAVOURS: aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
+  FLAVORS: aws azure aws-azure gcp aws-gcp azure-gcp aws-azure-gcp
   LABEL_AUTHOR: Krzysztof ChristophShyper Szyper <biotyk@mail.com>
   LABEL_NAME: IaaC dockerized framework for Terragrunt, Terraform and OpenTofu
   LABEL_DESCRIPTION: >-
@@ -180,11 +180,11 @@ tasks:
   terragrunt:build:_variant:
     internal: true
     requires:
-      vars: [FLAVOUR, TOOL]
+      vars: [FLAVOR, TOOL]
     cmds:
       - |
         set -eu
-        flavour='{{.FLAVOUR}}'
+        flavor='{{.FLAVOR}}'
         tool='{{.TOOL}}'
         push='{{default "false" .PUSH}}'
         prefix='{{.EFFECTIVE_PREFIX}}'
@@ -205,7 +205,7 @@ tasks:
         fi
 
         args=()
-        case "$flavour" in
+        case "$flavor" in
           slim)
             args+=(--build-arg SLIM=yes)
             tag_prefix='slim-'
@@ -256,7 +256,7 @@ tasks:
             include_global_latest='yes'
             ;;
           *)
-            echo "Unknown flavour: $flavour"
+            echo "Unknown flavor: $flavor"
             exit 1
             ;;
         esac
@@ -350,7 +350,7 @@ tasks:
             cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}latest")
           fi
         fi
-        if [ "$flavour" = "plain" ]; then
+        if [ "$flavor" = "plain" ]; then
           if [ "$has_dockerhub" = true ]; then
             cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${combo_version}")
             cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tool_latest}")
@@ -372,22 +372,22 @@ tasks:
 
         docker buildx create --use || true
         docker buildx inspect --bootstrap >/dev/null 2>&1 || true
-        printf 'Building %s (%s)\n' "$flavour" "$tool"
+        printf 'Building %s (%s)\n' "$flavor" "$tool"
         "${cmd[@]}"
 
-  terragrunt:build:_flavour:
+  terragrunt:build:_flavor:
     internal: true
     requires:
-      vars: [FLAVOUR]
+      vars: [FLAVOR]
     cmds:
       - task: terragrunt:build:_variant
         vars:
-          FLAVOUR: '{{.FLAVOUR}}'
+          FLAVOR: '{{.FLAVOR}}'
           TOOL: tf
           PUSH: '{{default "false" .PUSH}}'
       - task: terragrunt:build:_variant
         vars:
-          FLAVOUR: '{{.FLAVOUR}}'
+          FLAVOR: '{{.FLAVOR}}'
           TOOL: ot
           PUSH: '{{default "false" .PUSH}}'
 
@@ -411,7 +411,7 @@ tasks:
       - task terragrunt:build:plain
       - |
         set -eu
-        for fl in {{.FLAVOURS}}; do
+        for fl in {{.FLAVORS}}; do
           task "terragrunt:build:${fl}" &
         done
         wait
@@ -419,57 +419,57 @@ tasks:
   terragrunt:build:slim:
     desc: Build slim image without cloud CLIs
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: slim
+          FLAVOR: slim
   terragrunt:build:plain:
     desc: Build image without cloud CLIs
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: plain
+          FLAVOR: plain
   terragrunt:build:aws:
     desc: Build image with AWS CLI
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: aws
+          FLAVOR: aws
   terragrunt:build:azure:
     desc: Build image with Azure CLI
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: azure
+          FLAVOR: azure
   terragrunt:build:aws-azure:
     desc: Build image with AWS and Azure CLIs
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: aws-azure
+          FLAVOR: aws-azure
   terragrunt:build:gcp:
     desc: Build image with GCP CLI
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: gcp
+          FLAVOR: gcp
   terragrunt:build:aws-gcp:
     desc: Build image with AWS and GCP CLIs
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: aws-gcp
+          FLAVOR: aws-gcp
   terragrunt:build:azure-gcp:
     desc: Build image with Azure and GCP CLIs
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: azure-gcp
+          FLAVOR: azure-gcp
   terragrunt:build:aws-azure-gcp:
     desc: Build image with AWS, Azure and GCP CLIs
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: aws-azure-gcp
+          FLAVOR: aws-azure-gcp
 
   terragrunt:push:parallel:
     desc: Push all images in parallel
@@ -480,77 +480,77 @@ tasks:
       - task terragrunt:push:plain
       - |
         set -eu
-        for fl in {{.FLAVOURS}}; do
+        for fl in {{.FLAVORS}}; do
           task "terragrunt:push:${fl}" &
         done
         wait
 
-  terragrunt:push:_flavour:
+  terragrunt:push:_flavor:
     internal: true
     requires:
-      vars: [FLAVOUR]
+      vars: [FLAVOR]
     deps:
       - task: terragrunt:login
     cmds:
-      - task: terragrunt:build:_flavour
+      - task: terragrunt:build:_flavor
         vars:
-          FLAVOUR: '{{.FLAVOUR}}'
+          FLAVOR: '{{.FLAVOR}}'
           PUSH: true
 
   terragrunt:push:slim:
     desc: Push slim image
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: slim
+          FLAVOR: slim
   terragrunt:push:plain:
     desc: Push plain image
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: plain
+          FLAVOR: plain
   terragrunt:push:aws:
     desc: Push image with AWS CLI
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: aws
+          FLAVOR: aws
   terragrunt:push:azure:
     desc: Push image with Azure CLI
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: azure
+          FLAVOR: azure
   terragrunt:push:aws-azure:
     desc: Push image with AWS and Azure CLIs
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: aws-azure
+          FLAVOR: aws-azure
   terragrunt:push:gcp:
     desc: Push image with GCP CLI
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: gcp
+          FLAVOR: gcp
   terragrunt:push:aws-gcp:
     desc: Push image with AWS and GCP CLIs
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: aws-gcp
+          FLAVOR: aws-gcp
   terragrunt:push:azure-gcp:
     desc: Push image with Azure and GCP CLIs
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: azure-gcp
+          FLAVOR: azure-gcp
   terragrunt:push:aws-azure-gcp:
     desc: Push image with AWS, Azure and GCP CLIs
     cmds:
-      - task: terragrunt:push:_flavour
+      - task: terragrunt:push:_flavor
         vars:
-          FLAVOUR: aws-azure-gcp
+          FLAVOR: aws-azure-gcp
 
   help-terragrunt:
     desc: Show docker-terragrunt custom task help

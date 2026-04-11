@@ -18,3 +18,9 @@ commandTests:
     args: [--version]
     expectedOutput:
       - ^Google Cloud SDK ${EXPECTED_GCP_VERSION}$
+
+  - name: Azure CLI not installed
+    command: bash
+    args:
+      - -lc
+      - '! command -v az >/dev/null 2>&1'

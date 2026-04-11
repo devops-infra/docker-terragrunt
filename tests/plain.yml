@@ -42,6 +42,15 @@ commandTests:
     expectedOutput:
       - ^Task version: v${EXPECTED_TASK_VERSION}$
 
+  - name: Cloud CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in aws az gcloud; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
+
   - name: Other tools
     command: which
     args:
@@ -54,6 +63,7 @@ commandTests:
       - dot
       - hub
       - hcledit
+      - gh
       - jq
       - make
       - task
@@ -75,6 +85,7 @@ commandTests:
       - /usr/bin/dot
       - /usr/bin/hub
       - /usr/bin/hcledit
+      - /usr/bin/gh
       - /usr/bin/jq
       - /usr/bin/make
       - /usr/bin/task

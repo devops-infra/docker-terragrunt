@@ -15,3 +15,12 @@ commandTests:
     args: [list]
     expectedOutput:
       - boto3
+
+  - name: Azure and GCP CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in az gcloud; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
