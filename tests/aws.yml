@@ -2,13 +2,13 @@ schemaVersion: 2.0.0
 
 commandTests:
   - name: AWS CLI
-    command: aws
+    command: bash
     envVars:
       - key: EXPECTED_AWS_VERSION
         value: ${AWS_VERSION}
-    args: [--version]
-    expectedOutput:
-      - ^aws-cli/${EXPECTED_AWS_VERSION}
+    args:
+      - -lc
+      - aws --version | grep -Eq "^aws-cli/${EXPECTED_AWS_VERSION}$"
 
   - name: Boto3 Python module
     command: pip3

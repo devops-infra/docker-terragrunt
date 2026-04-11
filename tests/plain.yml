@@ -7,40 +7,40 @@ commandTests:
     expectedOutput: [VERSION_ID=\"24.04\"]
 
   - name: hcledit
-    command: hcledit
+    command: bash
     envVars:
       - key: EXPECTED_HCLEDIT_VERSION
         value: ${HCLEDIT_VERSION}
-    args: [version]
-    expectedOutput:
-      - ^${EXPECTED_HCLEDIT_VERSION}
+    args:
+      - -lc
+      - hcledit version | grep -Eq "^${EXPECTED_HCLEDIT_VERSION}$"
 
   - name: sops
-    command: sops
+    command: bash
     envVars:
       - key: EXPECTED_SOPS_VERSION
         value: ${SOPS_VERSION}
-    args: [--version]
-    expectedOutput:
-      - ^sops ${EXPECTED_SOPS_VERSION}
+    args:
+      - -lc
+      - sops --version | grep -Eq "^sops ${EXPECTED_SOPS_VERSION}$"
 
   - name: TFLint
-    command: tflint
+    command: bash
     envVars:
       - key: EXPECTED_TFLINT_VERSION
         value: ${TFLINT_VERSION}
-    args: [--version]
-    expectedOutput:
-      - ^TFLint version ${EXPECTED_TFLINT_VERSION}
+    args:
+      - -lc
+      - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}$"
 
   - name: Task version
-    command: task
+    command: bash
     envVars:
       - key: EXPECTED_TASK_VERSION
         value: ${TASK_VERSION}
-    args: [--version]
-    expectedOutput:
-      - '^Task version: v${EXPECTED_TASK_VERSION}$'
+    args:
+      - -lc
+      - task --version | grep -Eq '^Task version: v${EXPECTED_TASK_VERSION}$'
 
   - name: Cloud CLIs not installed
     command: bash

@@ -2,22 +2,22 @@ schemaVersion: 2.0.0
 
 commandTests:
   - name: AWS CLI
-    command: aws
+    command: bash
     envVars:
       - key: EXPECTED_AWS_VERSION
         value: ${AWS_VERSION}
-    args: [--version]
-    expectedOutput:
-      - ^aws-cli/${EXPECTED_AWS_VERSION}
+    args:
+      - -lc
+      - aws --version | grep -Eq "^aws-cli/${EXPECTED_AWS_VERSION}"
 
   - name: Azure CLI
-    command: az
+    command: bash
     envVars:
       - key: EXPECTED_AZ_VERSION
         value: ${AZ_VERSION}
-    args: [--version]
-    expectedOutput:
-      - ^azure-cli ${EXPECTED_AZ_VERSION}
+    args:
+      - -lc
+      - az --version | grep -Eq "^azure-cli ${EXPECTED_AZ_VERSION}$"
 
   - name: GCP CLI not installed
     command: bash

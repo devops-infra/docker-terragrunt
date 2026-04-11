@@ -2,13 +2,13 @@ schemaVersion: 2.0.0
 
 commandTests:
   - name: Google Cloud SDK
-    command: gcloud
+    command: bash
     envVars:
       - key: EXPECTED_GCP_VERSION
         value: ${GCP_VERSION}
-    args: [--version]
-    expectedOutput:
-      - ^Google Cloud SDK ${EXPECTED_GCP_VERSION}
+    args:
+      - -lc
+      - gcloud --version | grep -Eq "^Google Cloud SDK ${EXPECTED_GCP_VERSION}$"
 
   - name: AWS and Azure CLIs not installed
     command: bash
