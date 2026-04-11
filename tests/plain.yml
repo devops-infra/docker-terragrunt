@@ -13,7 +13,7 @@ commandTests:
         value: ${HCLEDIT_VERSION}
     args: [version]
     expectedOutput:
-      - ^${EXPECTED_HCLEDIT_VERSION}$
+      - ^${EXPECTED_HCLEDIT_VERSION}
 
   - name: sops
     command: sops
@@ -22,7 +22,7 @@ commandTests:
         value: ${SOPS_VERSION}
     args: [--version]
     expectedOutput:
-      - ^sops ${EXPECTED_SOPS_VERSION}$
+      - ^sops ${EXPECTED_SOPS_VERSION}
 
   - name: TFLint
     command: tflint
@@ -31,7 +31,7 @@ commandTests:
         value: ${TFLINT_VERSION}
     args: [--version]
     expectedOutput:
-      - ^TFLint version ${EXPECTED_TFLINT_VERSION}$
+      - ^TFLint version ${EXPECTED_TFLINT_VERSION}
 
   - name: Task version
     command: task

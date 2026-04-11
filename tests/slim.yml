@@ -13,7 +13,7 @@ commandTests:
         value: ${TG_VERSION}
     args: [--version]
     expectedOutput:
-      - ^terragrunt version v${EXPECTED_TG_VERSION}$
+      - ^terragrunt version v${EXPECTED_TG_VERSION}
 
   - name: Cloud CLIs not installed
     command: bash

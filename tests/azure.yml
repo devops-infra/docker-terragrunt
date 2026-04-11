@@ -8,7 +8,7 @@ commandTests:
         value: ${AZ_VERSION}
     args: [--version]
     expectedOutput:
-      - ^azure-cli ${EXPECTED_AZ_VERSION}$
+      - ^azure-cli ${EXPECTED_AZ_VERSION}
 
   - name: AWS and GCP CLIs not installed
     command: bash

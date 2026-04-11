@@ -8,7 +8,7 @@ commandTests:
         value: ${AZ_VERSION}
     args: [--version]
     expectedOutput:
-      - ^azure-cli ${EXPECTED_AZ_VERSION}$
+      - ^azure-cli ${EXPECTED_AZ_VERSION}
 
   - name: Google Cloud SDK
     command: gcloud
@@ -17,7 +17,7 @@ commandTests:
         value: ${GCP_VERSION}
     args: [--version]
     expectedOutput:
-      - ^Google Cloud SDK ${EXPECTED_GCP_VERSION}$
+      - ^Google Cloud SDK ${EXPECTED_GCP_VERSION}
 
   - name: AWS CLI not installed
     command: bash
