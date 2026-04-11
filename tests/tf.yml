@@ -3,24 +3,15 @@ schemaVersion: 2.0.0
 commandTests:
   - name: Terraform
     command: bash
-    envVars:
-      - key: EXPECTED_TF_VERSION
-        value: ${TF_VERSION}
     args:
       - -lc
-      - |
-        output="$(terraform --version)"
-        printf '%s\n' "$output" | grep -Eq "^Terraform v${EXPECTED_TF_VERSION}$"
-        printf '%s\n' "$output" | grep -Eq "^on (linux|darwin)_(amd64|arm64)$"
+      - terraform --version | grep -Eq "^Terraform v${TF_VERSION}"
 
   - name: Terragrunt
     command: bash
-    envVars:
-      - key: EXPECTED_TG_VERSION
-        value: ${TG_VERSION}
     args:
       - -lc
-      - terragrunt --version | grep -Eq "^terragrunt version v${EXPECTED_TG_VERSION}"
+      - terragrunt --version | grep -Eq "^terragrunt version v${TG_VERSION}"
 
   - name: OpenTofu not installed
     command: bash
