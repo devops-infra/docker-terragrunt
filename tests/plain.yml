@@ -40,7 +40,7 @@ commandTests:
         value: ${TASK_VERSION}
     args: [--version]
     expectedOutput:
-      - ^Task version: v${EXPECTED_TASK_VERSION}$
+      - '^Task version: v${EXPECTED_TASK_VERSION}$'
 
   - name: Cloud CLIs not installed
     command: bash
