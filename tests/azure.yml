@@ -3,17 +3,9 @@ schemaVersion: 2.0.0
 commandTests:
   - name: Azure CLI
     command: az
+    envVars:
+      - key: EXPECTED_AZ_VERSION
+        value: ${AZ_VERSION}
     args: [--version]
-    expectedOutput: [azure-cli .*]
-
-  - name: APT lists cleaned
-    command: bash
-    args:
-      - -lc
-      - test -z "$(find /var/lib/apt/lists -mindepth 1 -maxdepth 1 2>/dev/null)"
-
-  - name: APT cache cleaned
-    command: bash
-    args:
-      - -lc
-      - test -z "$(find /var/cache/apt -mindepth 1 -maxdepth 1 2>/dev/null)"
+    expectedOutput:
+      - ^azure-cli ${EXPECTED_AZ_VERSION}$

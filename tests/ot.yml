@@ -3,5 +3,24 @@ schemaVersion: 2.0.0
 commandTests:
   - name: OpenTofu
     command: tofu
+    envVars:
+      - key: EXPECTED_OT_VERSION
+        value: ${OT_VERSION}
     args: [--version]
-    expectedOutput: [OpenTofu v.*]
+    expectedOutput:
+      - ^OpenTofu v${EXPECTED_OT_VERSION}$
+
+  - name: Terragrunt
+    command: terragrunt
+    envVars:
+      - key: EXPECTED_TG_VERSION
+        value: ${TG_VERSION}
+    args: [--version]
+    expectedOutput:
+      - ^terragrunt version v${EXPECTED_TG_VERSION}$
+
+  - name: Terraform not installed
+    command: bash
+    args:
+      - -lc
+      - '! command -v terraform >/dev/null 2>&1'
