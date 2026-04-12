@@ -23,15 +23,41 @@ commandTests:
       - /usr/bin/wget
       - /usr/bin/unzip
 
-  - name: Terragrunt
-    command: terragrunt
-    args: [--version]
-    expectedOutput: [terragrunt version v.*]
+  - name: Cloud CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in aws az gcloud; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
 
-  - name: TFLint
-    command: tflint
-    args: [--version]
-    expectedOutput: [TFLint version .*]
+  - name: Slim-only missing helper tools
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in tflint hcledit sops; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
+
+  - name: Plain-only tools not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in task docker go python3 pip3; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
+
+  - name: Additional non-slim tools not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in bc gpg dot hub make tput ssh openssl zip gh; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
 
   - name: APT lists cleaned
     command: bash

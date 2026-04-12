@@ -36,12 +36,12 @@ tasks:
         fi
 
   docker:cmds:
-    desc: Show docker build command for plain flavour
+    desc: Show docker build command for plain flavor
     cmds:
       - task terragrunt:build:plain --dry VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
 
   docker:build:
-    desc: Build Docker image (plain flavour)
+    desc: Build Docker image (plain flavor)
     cmds:
       - task terragrunt:build:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
 
@@ -55,7 +55,7 @@ tasks:
         docker image inspect "$image" | jq || true
 
   docker:push:
-    desc: Build and push Docker images (plain flavour)
+    desc: Build and push Docker images (plain flavor)
     cmds:
       - task terragrunt:push:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
 

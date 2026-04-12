@@ -2,6 +2,19 @@ schemaVersion: 2.0.0
 
 commandTests:
   - name: OpenTofu
-    command: tofu
-    args: [--version]
-    expectedOutput: [OpenTofu v.*]
+    command: bash
+    args:
+      - -lc
+      - tofu --version | grep -Eq "^OpenTofu v${OT_VERSION}"
+
+  - name: Terragrunt
+    command: bash
+    args:
+      - -lc
+      - terragrunt --version | grep -Eq "^terragrunt version v${TG_VERSION}"
+
+  - name: Terraform not installed
+    command: bash
+    args:
+      - -lc
+      - '! command -v terraform >/dev/null 2>&1'

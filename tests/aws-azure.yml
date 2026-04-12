@@ -1,15 +1,126 @@
 schemaVersion: 2.0.0
 
 commandTests:
+  - name: Ubuntu version
+    command: cat
+    args: [/etc/os-release]
+    expectedOutput: [VERSION_ID=\"24.04\"]
+
+  - name: hcledit
+    command: bash
+    envVars:
+      - key: EXPECTED_HCLEDIT_VERSION
+        value: ${HCLEDIT_VERSION}
+    args:
+      - -lc
+      - hcledit version | grep -Eq "^${EXPECTED_HCLEDIT_VERSION}"
+
+  - name: sops
+    command: bash
+    envVars:
+      - key: EXPECTED_SOPS_VERSION
+        value: ${SOPS_VERSION}
+    args:
+      - -lc
+      - sops --version | grep -Eq "^sops ${EXPECTED_SOPS_VERSION}"
+
+  - name: TFLint
+    command: bash
+    envVars:
+      - key: EXPECTED_TFLINT_VERSION
+        value: ${TFLINT_VERSION}
+    args:
+      - -lc
+      - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}"
+
+  - name: Other tools
+    command: which
+    args:
+      - curl
+      - bc
+      - docker
+      - git
+      - go
+      - gpg
+      - dot
+      - hub
+      - hcledit
+      - gh
+      - jq
+      - make
+      - task
+      - tput
+      - ssh
+      - openssl
+      - python3
+      - pip3
+      - unzip
+      - wget
+      - zip
+    expectedOutput:
+      - /usr/bin/curl
+      - /usr/bin/bc
+      - /usr/bin/docker
+      - /usr/bin/git
+      - /usr/bin/go
+      - /usr/bin/gpg
+      - /usr/bin/dot
+      - /usr/bin/hub
+      - /usr/bin/hcledit
+      - /usr/bin/gh
+      - /usr/bin/jq
+      - /usr/bin/make
+      - /usr/bin/task
+      - /usr/bin/tput
+      - /usr/bin/ssh
+      - /usr/bin/openssl
+      - /usr/bin/python3
+      - /usr/bin/pip3
+      - /usr/bin/unzip
+      - /usr/bin/wget
+      - /usr/bin/zip
+
+  - name: Python modules
+    command: pip
+    args: [list]
+    expectedOutput:
+      - cloudflare
+      - PyGithub
+      - python-hcl2
+      - requests
+      - slack_sdk
+      - anyio
+      - zipp
+
   - name: AWS CLI
-    command: aws
-    args: [--version]
-    expectedOutput: [aws-cli/.*]
+    command: bash
+    envVars:
+      - key: EXPECTED_AWS_VERSION
+        value: ${AWS_VERSION}
+    args:
+      - -lc
+      - aws --version | grep -Eq "^aws-cli/${EXPECTED_AWS_VERSION}"
+
+  - name: Boto3 Python module
+    command: pip3
+    args: [list]
+    expectedOutput:
+      - boto3
 
   - name: Azure CLI
-    command: az
-    args: [--version]
-    expectedOutput: [azure-cli .*]
+    command: bash
+    envVars:
+      - key: EXPECTED_AZ_VERSION
+        value: ${AZ_VERSION}
+    args:
+      - -lc
+      - az --version | grep -Eq "^azure-cli ${EXPECTED_AZ_VERSION}"
+
+  - name: GCP CLI not installed
+    command: bash
+    args:
+      - -lc
+      - '! command -v gcloud >/dev/null 2>&1'
 
   - name: APT lists cleaned
     command: bash
@@ -22,3 +133,33 @@ commandTests:
     args:
       - -lc
       - test -z "$(find /var/cache/apt -mindepth 1 -maxdepth 1 2>/dev/null)"
+
+fileExistenceTests:
+  - name: entrypoint.sh
+    path: /usr/bin/entrypoint.sh
+    shouldExist: true
+    permissions: -rwxr-xr-x
+
+  - name: format-hcl
+    path: /usr/bin/format-hcl
+    shouldExist: true
+    permissions: -rwxr-xr-x
+
+  - name: fmt.sh
+    path: /usr/bin/fmt.sh
+    shouldExist: true
+    permissions: -rwxr-xr-x
+
+  - name: terragrunt-fmt.sh
+    path: /usr/bin/terragrunt-fmt.sh
+    shouldExist: true
+    permissions: -rwxr-xr-x
+
+metadataTest:
+  cmd: [entrypoint.sh]
+  entrypoint: []
+  exposedPorts: []
+  workdir: /data
+  envVars:
+    - key: DEBIAN_FRONTEND
+      value: noninteractive
