@@ -105,7 +105,6 @@ jobs:
           TFLINT_VERSION=$(sed -nE 's/^ARG TFLINT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           HCLEDIT_VERSION=$(sed -nE 's/^ARG HCLEDIT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          TASK_VERSION=$(sed -nE 's/^ARG TASK_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           AWS_VERSION=$(sed -nE 's/^ARG AWS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
@@ -116,7 +115,6 @@ jobs:
             echo "TFLINT_VERSION=${TFLINT_VERSION}"
             echo "HCLEDIT_VERSION=${HCLEDIT_VERSION}"
             echo "SOPS_VERSION=${SOPS_VERSION}"
-            echo "TASK_VERSION=${TASK_VERSION}"
             echo "AWS_VERSION=${AWS_VERSION}"
             echo "GCP_VERSION=${GCP_VERSION}"
             echo "AZ_VERSION=${AZ_VERSION}"
