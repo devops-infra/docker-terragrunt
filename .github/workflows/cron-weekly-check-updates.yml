@@ -129,7 +129,7 @@ jobs:
           docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
-      - name: Cont.Struc.Test - ${{ matrix.flavor }}
+      - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: >-

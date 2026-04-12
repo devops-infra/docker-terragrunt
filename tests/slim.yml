@@ -6,51 +6,6 @@ commandTests:
     args: [/etc/os-release]
     expectedOutput: [VERSION_ID=\"24.04\"]
 
-  - name: Terragrunt
-    command: bash
-    envVars:
-      - key: EXPECTED_TG_VERSION
-        value: ${TG_VERSION}
-    args:
-      - -lc
-      - terragrunt --version | grep -Eq "^terragrunt version v${EXPECTED_TG_VERSION}"
-
-  - name: Cloud CLIs not installed
-    command: bash
-    args:
-      - -lc
-      - |
-        for bin in aws az gcloud; do
-          ! command -v "$bin" >/dev/null 2>&1 || exit 1
-        done
-
-  - name: Plain-only tools not installed
-    command: bash
-    args:
-      - -lc
-      - |
-        for bin in task docker go python3 pip3; do
-          ! command -v "$bin" >/dev/null 2>&1 || exit 1
-        done
-
-  - name: Slim-only missing helper tools
-    command: bash
-    args:
-      - -lc
-      - |
-        for bin in tflint hcledit sops; do
-          ! command -v "$bin" >/dev/null 2>&1 || exit 1
-        done
-
-  - name: Additional non-slim tools not installed
-    command: bash
-    args:
-      - -lc
-      - |
-        for bin in bc gpg dot hub make tput ssh openssl zip gh; do
-          ! command -v "$bin" >/dev/null 2>&1 || exit 1
-        done
-
   - name: Essential tools
     command: which
     args:
@@ -67,6 +22,42 @@ commandTests:
       - /usr/bin/vim
       - /usr/bin/wget
       - /usr/bin/unzip
+
+  - name: Cloud CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in aws az gcloud; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
+
+  - name: Slim-only missing helper tools
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in tflint hcledit sops; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
+
+  - name: Plain-only tools not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in task docker go python3 pip3; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
+
+  - name: Additional non-slim tools not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in bc gpg dot hub make tput ssh openssl zip gh; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
 
   - name: APT lists cleaned
     command: bash

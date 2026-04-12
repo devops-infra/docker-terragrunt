@@ -5,7 +5,7 @@ commandTests:
     command: bash
     args:
       - -lc
-      - tofu --version | grep -Eq "^OpenTofu v${TG_VERSION}"
+      - tofu --version | grep -Eq "^OpenTofu v${OT_VERSION}"
 
   - name: Terragrunt
     command: bash

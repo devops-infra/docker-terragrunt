@@ -108,17 +108,17 @@ Tag of the image tells also which cloud API/SDK is included in the image.
 Container-structure-tests validate both positive and negative cases for installed software.
 For each flavor, tests run against both image variants (`-tf-...` and `-ot-...`).
 
-| Flavor          | Expected cloud CLIs present | Expected cloud CLIs absent | Extra constraints checked                                                          |
-|-----------------|-----------------------------|----------------------------|------------------------------------------------------------------------------------|
-| `slim`          | none                        | `aws`, `az`, `gcloud`      | no non-slim tools (`task`, `docker`, `go`, `python3`, `pip3`)                      |
-| `plain`         | none                        | `aws`, `az`, `gcloud`      | non-slim tool versions (`tflint`, `hcledit`, `sops`, `task`)                       |
-| `aws`           | `aws`                       | `az`, `gcloud`             | `boto3` present                                                                    |
-| `azure`         | `az`                        | `aws`, `gcloud`            | -                                                                                  |
-| `gcp`           | `gcloud`                    | `aws`, `az`                | -                                                                                  |
-| `aws-azure`     | `aws`, `az`                 | `gcloud`                   | -                                                                                  |
-| `aws-gcp`       | `aws`, `gcloud`             | `az`                       | -                                                                                  |
-| `azure-gcp`     | `az`, `gcloud`              | `aws`                      | -                                                                                  |
-| `aws-azure-gcp` | `aws`, `az`, `gcloud`       | none                       | -                                                                                  |
+| Flavor          | Expected cloud CLIs present | Expected cloud CLIs absent | Extra constraints checked                                                                  |
+|-----------------|-----------------------------|----------------------------|--------------------------------------------------------------------------------------------|
+| `slim`          | none                        | `aws`, `az`, `gcloud`      | `curl`, `git`, `jq`, `vim`, `wget`, `unzip`                                                |
+| `plain`         | none                        | `aws`, `az`, `gcloud`      | slim flavor + `task`, `make`, `docker`, `go`, `python3`, `tflint`, `hcledit`, `sops`, etc. |
+| `aws`           | `aws`                       | `az`, `gcloud`             | plain flavor + `boto3`                                                                     |
+| `azure`         | `az`                        | `aws`, `gcloud`            | plain flavor                                                                               |
+| `gcp`           | `gcloud`                    | `aws`, `az`                | plain flavor                                                                               |
+| `aws-azure`     | `aws`, `az`                 | `gcloud`                   | plain flavor                                                                               |
+| `aws-gcp`       | `aws`, `gcloud`             | `az`                       | plain flavor                                                                               |
+| `azure-gcp`     | `az`, `gcloud`              | `aws`                      | plain flavor                                                                               |
+| `aws-azure-gcp` | `aws`, `az`, `gcloud`       | none                       | plain flavor                                                                               |
 
 Additionally, tool-variant tests verify:
 - TF image contains the exact Terraform version and does not contain OpenTofu.

@@ -177,7 +177,7 @@ jobs:
           docker pull "${DOCKER_IMAGE}:${FLAVOR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${DOCKER_IMAGE}:${FLAVOR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
-      - name: Cont.Struc.Test - ${{ matrix.flavor }}
+      - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
@@ -283,7 +283,7 @@ jobs:
           docker pull "${DOCKER_IMAGE}:${FLAVOR}-tf-${TF_VERSION}-tg-${TG_VERSION}"
           docker pull "${DOCKER_IMAGE}:${FLAVOR}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
-      - name: Cont.Struc.Test - ${{ matrix.flavor }}
+      - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}

@@ -33,15 +33,6 @@ commandTests:
       - -lc
       - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}"
 
-  - name: Cloud CLIs not installed
-    command: bash
-    args:
-      - -lc
-      - |
-        for bin in aws az gcloud; do
-          ! command -v "$bin" >/dev/null 2>&1 || exit 1
-        done
-
   - name: Other tools
     command: which
     args:
@@ -100,6 +91,15 @@ commandTests:
       - slack_sdk
       - anyio
       - zipp
+
+  - name: Cloud CLIs not installed
+    command: bash
+    args:
+      - -lc
+      - |
+        for bin in aws az gcloud; do
+          ! command -v "$bin" >/dev/null 2>&1 || exit 1
+        done
 
   - name: APT lists cleaned
     command: bash
