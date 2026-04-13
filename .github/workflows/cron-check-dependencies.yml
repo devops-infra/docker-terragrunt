@@ -1,4 +1,4 @@
-name: (Cron) Check for Updates
+name: (Cron) Check dependencies
 
 on:
   schedule:
@@ -9,6 +9,7 @@ permissions:
   contents: write
   packages: write
   pull-requests: write
+  issues: read
 
 jobs:
   check:
