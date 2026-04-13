@@ -1,4 +1,4 @@
-FROM ubuntu:noble-20260217
+FROM ubuntu:noble-20260324
 
 # Disable interactive mode
 ENV DEBIAN_FRONTEND=noninteractive
