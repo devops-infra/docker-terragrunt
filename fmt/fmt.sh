@@ -57,7 +57,9 @@ if [ "${_write}" = "1" ]; then
 	_PERM="$(stat -c %a "${_file}")"
 
 	# Adjust permissions of temporary file
+	# shellcheck disable=SC2086
 	chown ${_UID}:${_GID} "${_temp}"
+	# shellcheck disable=SC2086
 	chmod ${_PERM} "${_temp}"
 
 	# Overwrite existing file
