@@ -3,5 +3,5 @@ PyGithub==2.9.0
 python-hcl2==7.3.1
 requests==2.33.1
 slack_sdk==3.41.0
-anyio==4.11.0 # not directly required, pinned by Snyk to avoid a vulnerability
+anyio==4.13.0 # not directly required, pinned by Snyk to avoid a vulnerability
 zipp==3.23.0 # not directly required, pinned by Snyk to avoid a vulnerability
