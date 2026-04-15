@@ -100,7 +100,7 @@ tasks:
     cmds:
       - task: docker:login
 
-  terragrunt:update-versions:
+  dependency:update:
     desc: Check TF, OT, TG, cloud CLIs and helper binary versions
     cmds:
       - |
@@ -551,11 +551,6 @@ tasks:
     desc: Show docker-terragrunt custom task help
     cmds:
       - task terragrunt:help
-
-  update-versions:
-    desc: Check dependency versions and update files
-    cmds:
-      - task terragrunt:update-versions
 
   login:
     desc: Log into Docker Hub and GHCR

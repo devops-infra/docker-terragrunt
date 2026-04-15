@@ -1,22 +1,22 @@
-name: (Auto) Create Pull Request
+name: (Cron) Dependency Update
 
 on:
-  push:
-    branches-ignore:
-      - master
-      - dependabot/**
+  schedule:
+    - cron: 0 5 * * 1
+  workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   packages: write
   pull-requests: write
+  issues: read
 
 jobs:
-  pull-request:
-    name: Pull Request
+  check:
+    name: Check for new versions
     runs-on: ubuntu-24.04-arm
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -27,42 +27,41 @@ jobs:
         with:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for new versions
+        env:
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          TERM: xterm-256color
+        run: task dependency:update
+
+      - name: Run linters
+        run: task lint
+
+      - name: Commit and push changes (conditional)
+        if: env.VERSION_TAG != ''
+        uses: devops-infra/action-commit-push@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branch: dependency/${{ env.VERSION_BRANCH }}
+          commit_message: ⬆️ Bump for ${{ env.VERSION_TAG }}
 
       - name: Get template
         run: task git:get-pr-template
 
-      - name: Create Pull Request
+      - name: Create pull request
+        if: env.VERSION_TAG != ''
         uses: devops-infra/action-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          assignee: ${{ github.actor }}
+          title: ⬆️ Bump for ${{ env.VERSION_TAG }}
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-
-      - name: Install Task
-        uses: arduino/setup-task@v2.0.0
-        with:
-          version: 3.x
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Run linters
-        run: task lint
 
   build-and-push:
     name: Build and push
     runs-on: ubuntu-24.04
     timeout-minutes: 90
-    needs: [pull-request, lint]
+    needs: [check]
     env:
       VERSION_PREFIX: test-
     strategy:

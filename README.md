@@ -300,7 +300,7 @@ Recommended setup:
 - For personal repositories use values for `DOCKER_ORG_NAME` as for `DOCKER_USERNAME`, and the same for Docker.
 
 Publish images without a release:
-- Run the `(Manual) Update Version` workflow with `build-and-push-only: true` to build and push images without tagging a release.
+- Run the `(Manual) Release Create` workflow with `build-and-push-only: true` to build and push images without tagging a release.
 
 
 ## Contributors ✨
