@@ -1,4 +1,4 @@
-name: (Manual) Update Version
+name: (Manual) Release Create
 
 on:
   workflow_dispatch:
