@@ -25,13 +25,10 @@ vars:
       else
         echo sed
       fi
-
   PROJECT_DIR_NAME:
     sh: basename "$PWD"
-
   VERSION_OVERRIDE:
     sh: echo "${VERSION_OVERRIDE:-}"
-
   VERSION:
     sh: |
       override="{{.VERSION_OVERRIDE}}"
@@ -47,10 +44,8 @@ vars:
       else
         echo "tf-1.14.7-ot-1.11.5-tg-0.99.4"
       fi
-
   VERSION_FULL:
     sh: echo "{{.VERSION}}"
-
   GIT_SHA:
     sh: git rev-parse HEAD 2>/dev/null || echo 0000000000000000000000000000000000000000
   GIT_SHORT_SHA:
