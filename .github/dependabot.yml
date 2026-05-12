@@ -1,6 +1,5 @@
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions
   - package-ecosystem: github-actions
     directory: /
     target-branch: master
@@ -8,8 +7,11 @@ updates:
       interval: weekly
     assignees:
       - ChristophShyper
+    groups:
+      gha-all:
+        patterns:
+          - "*"
 
-  # Enable version updates for Docker
   - package-ecosystem: docker
     directory: /
     target-branch: master
@@ -17,8 +19,11 @@ updates:
       interval: weekly
     assignees:
       - ChristophShyper
+    groups:
+      docker-base-images:
+        patterns:
+          - "*"
 
-  # Enable version updates for pip
   - package-ecosystem: pip
     directory: /pip/common/
     target-branch: master
@@ -26,8 +31,19 @@ updates:
       interval: weekly
     assignees:
       - ChristophShyper
+    groups:
+      pip-common-patch-minor:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      pip-common-major:
+        patterns:
+          - "*"
+        update-types:
+          - major
 
-  # Enable version updates for aws
   - package-ecosystem: pip
     directory: /pip/aws/
     target-branch: master
@@ -35,3 +51,15 @@ updates:
       interval: weekly
     assignees:
       - ChristophShyper
+    groups:
+      pip-aws-patch-minor:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      pip-aws-major:
+        patterns:
+          - "*"
+        update-types:
+          - major
