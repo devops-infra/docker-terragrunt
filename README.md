@@ -66,15 +66,15 @@ bundled with or not (see second table below).
 
 | Current release full tag version value |
 |:---------------------------------------|
-| `tf-1.15.2-ot-1.11.6-tg-1.0.4`         |
+| `tf-1.15.3-ot-1.12.0-tg-1.0.4`         |
 
 
 | Registry                                                                             | Example full image name                                                       | Image name          | Image version        | Terraform version | OpenTofu version | Terragrunt version |
 |--------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|---------------------|----------------------|-------------------|------------------|--------------------|
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.15.2-tg-1.0.4`                            | `docker-terragrunt` | `tf-1.15.2-tg-1.0.4` | `1.15.2`          | `N/A`            | `1.0.4`            |
-| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.11.6-tg-1.0.4`                            | `docker-terragrunt` | `ot-1.11.6-tg-1.0.4` | `N/A`             | `1.11.6`         | `1.0.4`            |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.15.2-tg-1.0.4` | `docker-terragrunt` | `tf-1.15.2-tg-1.0.4` | `1.15.2`          | `N/A`            | `1.0.4`            |
-| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.11.6-tg-1.0.4` | `docker-terragrunt` | `ot-1.11.6-tg-1.0.4` | `N/A`             | `1.11.6`         | `1.0.4`            |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:tf-1.15.3-tg-1.0.4`                            | `docker-terragrunt` | `tf-1.15.3-tg-1.0.4` | `1.15.3`          | `N/A`            | `1.0.4`            |
+| [Docker Hub](https://hub.docker.com/repository/docker/devopsinfra/docker-terragrunt) | `devopsinfra/docker-terragrunt:ot-1.12.0-tg-1.0.4`                            | `docker-terragrunt` | `ot-1.12.0-tg-1.0.4` | `N/A`             | `1.12.0`         | `1.0.4`            |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:tf-1.15.3-tg-1.0.4` | `docker-terragrunt` | `tf-1.15.3-tg-1.0.4` | `1.15.3`          | `N/A`            | `1.0.4`            |
+| [GitHub Packages](https://github.com/devops-infra/docker-terragrunt/packages)        | `ghcr.io/devops-infra/docker-terragrunt/docker-terragrunt:ot-1.12.0-tg-1.0.4` | `docker-terragrunt` | `ot-1.12.0-tg-1.0.4` | `N/A`             | `1.12.0`         | `1.0.4`            |
 
 
 # Available flavors
