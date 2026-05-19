@@ -2,15 +2,20 @@
 .idea/
 *.iml
 
-# all-contributors-cli
-package.json
-yarn.lock
-node_modules/
-
 # Custom
+.DS_Store
 .tmp/
 .venv
 .venv/
 .envrc
 .env
 .tmp
+
+# Python
+build/
+dist/
+*.egg-info/
+*.pyc
+__py
+
+node_modules/

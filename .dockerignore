@@ -2,9 +2,10 @@
 *
 
 # Include
-!fmt
+!Dockerfile
 !LICENSE
 !README.md
-!entrypoint.sh
 !awscli_pgp_public_key.asc
+!entrypoint.sh
+!fmt
 !pip

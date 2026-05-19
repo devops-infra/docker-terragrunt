@@ -1,0 +1,11 @@
+{
+  "author": "ChristophShyper <45788587+ChristophShyper@users.noreply.github.com>",
+  "devDependencies": {
+    "all-contributors-cli": "^6.26.1"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "name": "docker-terragrunt",
+  "repository": "https://github.com/devops-infra/docker-terragrunt.git",
+  "version": "1.0.0"
+}

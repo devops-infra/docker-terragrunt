@@ -1,12 +1,9 @@
 version: '3'
-
 silent: true
-
 vars:
   PR_TEMPLATE: https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/PULL_REQUEST_TEMPLATE.md
   CONFIGS_BASE_URL: https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/templates/dockerized/configs
   TASKFILES_BASE_URL: https://raw.githubusercontent.com/devops-infra/.github/refs/tags/v1/templates/dockerized/taskfiles
-
 tasks:
   pre-commit:
     desc: Run all pre-commit hooks
@@ -49,63 +46,17 @@ tasks:
   version:get:
     desc: Get current custom version (tf-*-ot-*-tg-*)
     cmds:
-      - echo "{{.VERSION}}"
+      - task: scripts:version:get
 
   version:set:
     desc: Set custom version in README and taskfile defaults
-    requires:
-      vars: [VERSION]
     cmds:
-      - |
-        set -eu
-        version='{{.VERSION}}'
-        if ! printf "%s" "$version" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
-          echo "❌ ERROR: VERSION '$version' must match tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
-          exit 1
-        fi
-
-        tf="$(printf "%s" "$version" | sed -E \
-          's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')"
-        ot="$(printf "%s" "$version" | sed -E \
-          's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\2/')"
-        tg="$(printf "%s" "$version" | sed -E \
-          's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/')"
-
-        echo "Updating TF_VERSION -> $tf"
-        echo "Updating OT_VERSION -> $ot"
-        echo "Updating TG_VERSION -> $tg"
-
-        {{.SED}} -i "s/\${TF_VERSION:-[0-9]\+\.[0-9]\+\.[0-9]\+}/\${TF_VERSION:-$tf}/g" Taskfile.terragrunt.yml
-        {{.SED}} -i "s/\${OT_VERSION:-[0-9]\+\.[0-9]\+\.[0-9]\+}/\${OT_VERSION:-$ot}/g" Taskfile.terragrunt.yml
-        {{.SED}} -i "s/\${TG_VERSION:-[0-9]\+\.[0-9]\+\.[0-9]\+}/\${TG_VERSION:-$tg}/g" Taskfile.terragrunt.yml
-
-        {{.SED}} -i "s/Terraform v[0-9]\+\.[0-9]\+\.[0-9]\+/Terraform v$tf/g" README.md
-        {{.SED}} -i "s/OpenTofu v[0-9]\+\.[0-9]\+\.[0-9]\+/OpenTofu v$ot/g" README.md
-        {{.SED}} -i "s/Terragrunt v[0-9]\+\.[0-9]\+\.[0-9]\+/Terragrunt v$tg/g" README.md
+      - task: scripts:version:set
 
   version:tag-release:
     desc: Create custom release tag only
     cmds:
-      - |
-        set -eu
-        version='{{.VERSION}}'
-        if ! printf "%s" "$version" | grep -Eq '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$'; then
-          echo "❌ ERROR: VERSION '$version' must match tf-X.Y.Z-ot-X.Y.Z-tg-X.Y.Z"
-          exit 1
-        fi
-
-        if git ls-remote --tags origin "refs/tags/${version}" | grep -q .; then
-          echo "❌ ERROR: Tag '${version}' already exists on remote"
-          exit 1
-        fi
-
-        if git rev-parse --quiet --verify "refs/tags/${version}" >/dev/null 2>&1; then
-          echo "ℹ️ INFO: Tag '${version}' exists locally, pushing"
-        else
-          echo "ℹ️ INFO: Creating tag '${version}'"
-          git tag --annotate "${version}" --message "${version}"
-        fi
-        git push origin "refs/tags/${version}"
+      - task: scripts:version:tag-release
 
   git:get-pr-template:
     desc: Get pull request template
