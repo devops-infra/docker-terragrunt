@@ -1,9 +1,11 @@
-name: (Auto) Pull Request Create
+name: (Automatic) Pull Request Create
 
 on:
   push:
     branches-ignore:
       - master
+      - main
+      - release/**
       - dependabot/**
 
 permissions:

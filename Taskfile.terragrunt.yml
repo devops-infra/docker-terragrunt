@@ -172,6 +172,7 @@ tasks:
 
   terragrunt:build:_variant:
     internal: true
+    desc: Internal helper to build one flavor/tool variant
     requires:
       vars: [FLAVOR, TOOL]
     cmds:
@@ -370,6 +371,7 @@ tasks:
 
   terragrunt:build:_flavor:
     internal: true
+    desc: Internal helper to build both tf and ot variants for a flavor
     requires:
       vars: [FLAVOR]
     cmds:
@@ -488,6 +490,7 @@ tasks:
 
   terragrunt:push:_flavor:
     internal: true
+    desc: Internal helper to push both tf and ot variants for a flavor
     requires:
       vars: [FLAVOR]
     deps:
