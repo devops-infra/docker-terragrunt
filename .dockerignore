@@ -5,6 +5,9 @@
 !Dockerfile
 !LICENSE
 !README.md
+!alpine-packages.txt
+!alpine-packages-nonslim.txt
+!alpine-packages-aws.txt
 !awscli_pgp_public_key.asc
 !entrypoint.sh
 !fmt

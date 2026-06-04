@@ -1,0 +1,15 @@
+bc~=1.08
+docker-cli~=29.5
+github-cli~=2.83
+gnupg~=2.4
+go~=1.25
+go-task~=3.45
+graphviz~=12.2
+libc6-compat~=1.1
+make~=4.4
+ncurses~=6.5
+openssh-client-default~=10.2
+openssl~=3.5
+py3-pip~=25.1
+python3~=3.12
+zip~=3.0

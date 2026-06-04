@@ -90,6 +90,182 @@ tasks:
       - git config user.name "github-actions[bot]"
       - git config user.email "github-actions[bot]@users.noreply.github.com"
 
+  packages:update:
+    desc: Update Alpine package pins in alpine-packages*.txt
+    cmds:
+      - |
+        set -eu
+        if [ ! -f Dockerfile ]; then
+          echo "INFO: Dockerfile not found; nothing to update"
+          exit 0
+        fi
+
+        package_files=""
+        for file in alpine-packages*.txt; do
+          if [ -f "$file" ]; then
+            package_files="$package_files $file"
+          fi
+        done
+        package_files="$(printf '%s' "$package_files" | sed -E 's/^[[:space:]]+//')"
+        if [ -z "$package_files" ]; then
+          echo "INFO: No alpine-packages*.txt files found; nothing to update"
+          exit 0
+        fi
+
+        base_image="$(awk '
+          toupper($1) == "FROM" {
+            i = 2
+            while (i <= NF && $i ~ /^--/) {
+              i++
+            }
+            if (i <= NF) {
+              image = $i
+            }
+          }
+          END {
+            if (image != "") {
+              print image
+            }
+          }
+        ' Dockerfile)"
+        if [ -z "$base_image" ]; then
+          echo "INFO: Could not resolve base image; nothing to update"
+          exit 0
+        fi
+
+        case "$base_image" in
+          alpine:*|alpine)
+            :
+            ;;
+          *)
+            echo "INFO: Base image is '$base_image', not Alpine; nothing to update"
+            exit 0
+            ;;
+        esac
+
+        alpine_line="${base_image#alpine:}"
+        if [ "$alpine_line" = "$base_image" ] || [ -z "$alpine_line" ]; then
+          echo "INFO: Could not parse Alpine version from '$base_image'; nothing to update"
+          exit 0
+        fi
+        alpine_minor="$(printf '%s' "$alpine_line" | awk -F. '{print $1 "." $2}')"
+        if ! printf '%s' "$alpine_minor" | grep -Eq '^[0-9]+\.[0-9]+$'; then
+          echo "INFO: Unsupported Alpine version '$alpine_line'; nothing to update"
+          exit 0
+        fi
+        alpine_repo="v${alpine_minor}"
+        arch="x86_64"
+
+        normalize_minor() {
+          version="$1"
+          printf '%s' "$version" | sed -E 's/^([0-9]+\.[0-9]+).*/\1/'
+        }
+
+        fetch_index() {
+          repo="$1"
+          out="$2"
+          url="https://dl-cdn.alpinelinux.org/alpine/${alpine_repo}/${repo}/${arch}/APKINDEX.tar.gz"
+          curl --fail --silent --show-error "$url" | tar -O -zx APKINDEX > "$out"
+        }
+
+        lookup_latest() {
+          pkg="$1"
+          for index in "$index_main" "$index_community"; do
+            found="$(awk -v pkg="$pkg" '
+              BEGIN { RS=""; FS="\n" }
+              {
+                p=""; v=""
+                for (i=1; i<=NF; i++) {
+                  if ($i ~ /^P:/) p=substr($i,3)
+                  if ($i ~ /^V:/) v=substr($i,3)
+                }
+                if (p==pkg) { print v; exit }
+              }
+            ' "$index")"
+            if [ -n "$found" ]; then
+              printf '%s' "$found"
+              return 0
+            fi
+          done
+          return 1
+        }
+
+        mkdir -p .tmp
+        index_main=".tmp/apkindex-main-${alpine_repo}-${arch}.txt"
+        index_community=".tmp/apkindex-community-${alpine_repo}-${arch}.txt"
+        fetch_index main "$index_main"
+        fetch_index community "$index_community"
+
+        for package_file in $package_files; do
+          tmp_out=".tmp/${package_file}.updated.txt"
+          : > "$tmp_out"
+          updated=0
+          processed=0
+
+          while IFS= read -r line || [ -n "$line" ]; do
+            if [ -z "$line" ] || printf '%s' "$line" | grep -Eq '^[[:space:]]*#'; then
+              echo "$line" >> "$tmp_out"
+              continue
+            fi
+            if ! printf '%s' "$line" | grep -Eq '^[a-zA-Z0-9+_.-]+((=~|~=)[0-9]+\.[0-9]+)?$'; then
+              echo "$line" >> "$tmp_out"
+              continue
+            fi
+
+            pkg="$(printf '%s' "$line" | sed -E 's/^([a-zA-Z0-9+_.-]+).*/\1/')"
+            current_minor=""
+            if printf '%s' "$line" | grep -Eq '^[a-zA-Z0-9+_.-]+(=~|~=)[0-9]+\.[0-9]+$'; then
+              current_minor="$(printf '%s' "$line" | sed -E 's/^[a-zA-Z0-9+_.-]+(=~|~=)([0-9]+\.[0-9]+).*$/\2/')"
+            fi
+
+            latest_full="$(lookup_latest "$pkg" || true)"
+            if [ -z "$latest_full" ]; then
+              echo "WARN: Could not resolve latest version for $pkg; keeping $line"
+              echo "$line" >> "$tmp_out"
+              continue
+            fi
+
+            latest_minor="$(normalize_minor "$latest_full")"
+            processed=1
+
+            if ! printf '%s' "$latest_minor" | grep -Eq '^[0-9]+\.[0-9]+$'; then
+              echo "INFO: Skipping non-numeric version pin for $pkg ($latest_full); keeping $line"
+              echo "$line" >> "$tmp_out"
+              continue
+            fi
+
+            if [ -z "$current_minor" ]; then
+              echo "PIN: $pkg -> $latest_minor"
+              echo "$pkg~=$latest_minor" >> "$tmp_out"
+              updated=1
+              continue
+            fi
+
+            if [ "$latest_minor" = "$current_minor" ]; then
+              echo "OK: $pkg already up to date at $current_minor"
+              echo "$pkg~=$current_minor" >> "$tmp_out"
+              continue
+            fi
+            echo "UPDATE: $pkg $current_minor -> $latest_minor"
+            echo "$pkg~=$latest_minor" >> "$tmp_out"
+            updated=1
+          done < "$package_file"
+
+          if [ "$processed" -eq 0 ]; then
+            echo "INFO: No Alpine package entries found in $package_file"
+          fi
+
+          if ! cmp -s "$package_file" "$tmp_out"; then
+            mv "$tmp_out" "$package_file"
+          else
+            rm -f "$tmp_out"
+          fi
+
+          if [ "$updated" -eq 0 ]; then
+            echo "INFO: No Alpine package updates were required in $package_file"
+          fi
+        done
+
   version:get:
     desc: Get current custom version (tf-*-ot-*-tg-*)
     cmds:

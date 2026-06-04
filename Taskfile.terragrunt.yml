@@ -101,12 +101,60 @@ tasks:
   dependency:update:
     desc: Check TF, OT, TG, cloud CLIs and helper binary versions
     cmds:
+      - task: scripts:packages:update
       - |
         set -eu
         tf_latest=$(curl -LsS https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r .tag_name | sed 's/^v//')
         ot_latest=$(curl -LsS https://api.github.com/repos/opentofu/opentofu/releases/latest | jq -r .tag_name | sed 's/^v//')
         tg_latest=$(curl -LsS https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest | jq -r .tag_name | sed 's/^v//')
-        aws_latest=$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[0].name')
+
+        base_image="$(awk '
+          toupper($1) == "FROM" {
+            i = 2
+            while (i <= NF && $i ~ /^--/) {
+              i++
+            }
+            if (i <= NF) {
+              image = $i
+            }
+          }
+          END {
+            if (image != "") {
+              print image
+            }
+          }
+        ' Dockerfile)"
+        case "$base_image" in
+          alpine:*)
+            alpine_line="${base_image#alpine:}"
+            alpine_minor="$(printf '%s' "$alpine_line" | awk -F. '{print $1 "." $2}')"
+            alpine_repo="v${alpine_minor}"
+            aws_pkg_version="$(
+              for repo in main community; do
+                curl -LsS "https://dl-cdn.alpinelinux.org/alpine/${alpine_repo}/${repo}/x86_64/APKINDEX.tar.gz" \
+                  | tar -O -zx APKINDEX \
+                  | awk '
+                      BEGIN { RS=""; FS="\n" }
+                      {
+                        p=""; v=""
+                        for (i=1; i<=NF; i++) {
+                          if ($i ~ /^P:/) p=substr($i,3)
+                          if ($i ~ /^V:/) v=substr($i,3)
+                        }
+                        if (p=="aws-cli") print v
+                      }
+                    '
+              done | head -1
+            )"
+            aws_latest="$(printf '%s' "$aws_pkg_version" | sed -E 's/-r[0-9]+$//')"
+            ;;
+          *)
+            aws_latest=$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[0].name')
+            ;;
+        esac
+        if [ -z "$aws_latest" ]; then
+          aws_latest="{{.AWS_VERSION}}"
+        fi
         gcp_latest=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives \
           | grep -Eo 'google-cloud-sdk-[0-9.]+' | head -1 | sed 's/google-cloud-sdk-//')
         az_latest=$(curl -LsS https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')
@@ -163,6 +211,9 @@ tasks:
         [ "{{.AWS_VERSION}}" = "$aws_latest" ] || version_tag="$version_tag aws-$aws_latest"
         [ "{{.GCP_VERSION}}" = "$gcp_latest" ] || version_tag="$version_tag gcp-$gcp_latest"
         [ "{{.AZ_VERSION}}" = "$az_latest" ] || version_tag="$version_tag az-$az_latest"
+        if ! git diff --quiet -- alpine-packages.txt alpine-packages-nonslim.txt alpine-packages-aws.txt 2>/dev/null; then
+          version_tag="$version_tag alpine-packages"
+        fi
         version_tag=$(echo "$version_tag" | sed 's/^ *//')
         version_branch=$(echo "$version_tag" | sed 's/ /-/g')
         if [ -n "${GITHUB_ENV:-}" ]; then
