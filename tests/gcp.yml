@@ -1,10 +1,10 @@
 schemaVersion: 2.0.0
 
 commandTests:
-  - name: Ubuntu version
+  - name: Alpine version
     command: cat
     args: [/etc/os-release]
-    expectedOutput: [VERSION_ID=\"24.04\"]
+    expectedOutput: [VERSION_ID=3\.23]
 
   - name: hcledit
     command: bash
@@ -33,52 +33,33 @@ commandTests:
       - -lc
       - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}"
 
-  - name: Other tools
-    command: which
+  - name: Non-slim tools smoke tests
+    command: bash
     args:
-      - curl
-      - bc
-      - docker
-      - git
-      - go
-      - gpg
-      - dot
-      - hub
-      - hcledit
-      - gh
-      - jq
-      - make
-      - task
-      - tput
-      - ssh
-      - openssl
-      - python3
-      - pip3
-      - unzip
-      - wget
-      - zip
-    expectedOutput:
-      - /usr/bin/curl
-      - /usr/bin/bc
-      - /usr/bin/docker
-      - /usr/bin/git
-      - /usr/bin/go
-      - /usr/bin/gpg
-      - /usr/bin/dot
-      - /usr/bin/hub
-      - /usr/bin/hcledit
-      - /usr/bin/gh
-      - /usr/bin/jq
-      - /usr/bin/make
-      - /usr/bin/task
-      - /usr/bin/tput
-      - /usr/bin/ssh
-      - /usr/bin/openssl
-      - /usr/bin/python3
-      - /usr/bin/pip3
-      - /usr/bin/unzip
-      - /usr/bin/wget
-      - /usr/bin/zip
+      - -lc
+      - |
+        curl --version >/dev/null
+        bc --version >/dev/null
+        docker --version >/dev/null
+        git --version >/dev/null
+        go version >/dev/null
+        gpg --version >/dev/null
+        dot -V >/dev/null 2>&1
+        gh --version >/dev/null
+        hcledit version >/dev/null
+        jq --version >/dev/null
+        make --version >/dev/null
+        task --version >/dev/null
+        TERM=xterm tput cols >/dev/null
+        ssh -V >/dev/null 2>&1
+        openssl version >/dev/null
+        python3 --version >/dev/null
+        pip3 --version >/dev/null
+        unzip -v >/dev/null
+        wget --version >/dev/null
+        zip -v >/dev/null
+        format-hcl -help >/dev/null
+        terragrunt --version >/dev/null
 
   - name: Python modules
     command: pip
@@ -99,7 +80,7 @@ commandTests:
         value: ${GCP_VERSION}
     args:
       - -lc
-      - gcloud --version | grep -Eq "^Google Cloud SDK ${EXPECTED_GCP_VERSION}"
+      - gcloud --version | grep -Eq "^Google Cloud SDK ${EXPECTED_GCP_VERSION}$"
 
   - name: AWS and Azure CLIs not installed
     command: bash
@@ -110,17 +91,18 @@ commandTests:
           ! command -v "$bin" >/dev/null 2>&1 || exit 1
         done
 
-  - name: APT lists cleaned
+  - name: Temporary and APK cache cleaned
     command: bash
     args:
       - -lc
-      - test -z "$(find /var/lib/apt/lists -mindepth 1 -maxdepth 1 2>/dev/null)"
-
-  - name: APT cache cleaned
-    command: bash
-    args:
-      - -lc
-      - test -z "$(find /var/cache/apt -mindepth 1 -maxdepth 1 2>/dev/null)"
+      - >-
+        test ! -f /tmp/alpine-packages.txt &&
+        test ! -f /tmp/alpine-packages-nonslim.txt &&
+        test ! -f /tmp/alpine-packages-aws.txt &&
+        test ! -f /tmp/pip_common_requirements.txt &&
+        test ! -f /tmp/pip_aws_requirements.txt &&
+        (test ! -d /var/cache/apk || test -z "$(find /var/cache/apk -mindepth 1 -maxdepth 1 2>/dev/null)") &&
+        (test ! -d /root/.cache || test -z "$(find /root/.cache -mindepth 1 -maxdepth 1 2>/dev/null)")
 
 fileExistenceTests:
   - name: entrypoint.sh
@@ -148,6 +130,3 @@ metadataTest:
   entrypoint: []
   exposedPorts: []
   workdir: /data
-  envVars:
-    - key: DEBIAN_FRONTEND
-      value: noninteractive
