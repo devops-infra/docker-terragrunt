@@ -72,6 +72,13 @@ SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2155
 RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
   TMP_DIR="$(mktemp -d)"; \
+  checksum_for() { \
+    url="$1"; \
+    pattern="$2"; \
+    checksum_file="${TMP_DIR}/checksums.txt"; \
+    curl -fsSL "${url}" -o "${checksum_file}"; \
+    awk -v arch="${ARCHITECTURE}" -v pattern="${pattern}" '$0 ~ pattern {print $1; exit}' "${checksum_file}"; \
+  }; \
   install_zip_binary() { \
     url="$1"; \
     binary_name="$2"; \
@@ -84,12 +91,12 @@ RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
     mv "${TMP_DIR}/${binary_name}" "/usr/bin/${binary_name}"; \
   }; \
   if [ "${TF}" = "yes" ]; then \
-    TF_SHA256="$(curl -fsSL "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS" | awk '/terraform_[0-9.]+_linux_'"${ARCHITECTURE}"'\.zip$/ {print $1; exit}')"; \
+    TF_SHA256="$(checksum_for "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_SHA256SUMS" "terraform_[0-9.]+_linux_${ARCHITECTURE}\\.zip$")"; \
     [ -n "${TF_SHA256}" ] || { echo "Missing Terraform checksum for ${TF_VERSION}/${ARCHITECTURE}"; exit 1; }; \
     install_zip_binary "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_${ARCHITECTURE}.zip" terraform "${TF_SHA256}"; \
   fi; \
   if [ "${OT}" = "yes" ]; then \
-    OT_SHA256="$(curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_SHA256SUMS" | awk '/tofu_[0-9.]+_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}')"; \
+    OT_SHA256="$(checksum_for "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_SHA256SUMS" "tofu_[0-9.]+_linux_${ARCHITECTURE}\\.tar\\.gz$")"; \
     [ -n "${OT_SHA256}" ] || { echo "Missing OpenTofu checksum for ${OT_VERSION}/${ARCHITECTURE}"; exit 1; }; \
     curl -fsSL "https://github.com/opentofu/opentofu/releases/download/v${OT_VERSION}/tofu_${OT_VERSION}_linux_${ARCHITECTURE}.tar.gz" -o "${TMP_DIR}/tofu.tar.gz"; \
     echo "${OT_SHA256}  ${TMP_DIR}/tofu.tar.gz" | sha256sum -c -; \
@@ -98,7 +105,7 @@ RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
     mv "${TMP_DIR}/tofu" /usr/bin/tofu; \
   fi; \
   if [ "${TG}" = "yes" ]; then \
-    TG_SHA256="$(curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/SHA256SUMS" | awk '/terragrunt_linux_'"${ARCHITECTURE}"'$/ {print $1; exit}')"; \
+    TG_SHA256="$(checksum_for "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/SHA256SUMS" "terragrunt_linux_${ARCHITECTURE}$")"; \
     [ -n "${TG_SHA256}" ] || { echo "Missing Terragrunt checksum for ${TG_VERSION}/${ARCHITECTURE}"; exit 1; }; \
     curl -fsSL "https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_${ARCHITECTURE}" -o /usr/bin/terragrunt; \
     echo "${TG_SHA256}  /usr/bin/terragrunt" | sha256sum -c -; \
@@ -112,11 +119,18 @@ SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN if [ "${SLIM}" = "no" ]; then \
     ARCHITECTURE="$(cat /tmp/targetarch)"; \
     TMP_DIR="$(mktemp -d)"; \
-    TFLINT_SHA256="$(curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt" | awk '/tflint_linux_'"${ARCHITECTURE}"'\.zip$/ {print $1; exit}')"; \
+    checksum_for() { \
+      url="$1"; \
+      pattern="$2"; \
+      checksum_file="${TMP_DIR}/checksums.txt"; \
+      curl -fsSL "${url}" -o "${checksum_file}"; \
+      awk -v pattern="${pattern}" '$0 ~ pattern {print $1; exit}' "${checksum_file}"; \
+    }; \
+    TFLINT_SHA256="$(checksum_for "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/checksums.txt" "tflint_linux_${ARCHITECTURE}\\.zip$")"; \
     [ -n "${TFLINT_SHA256}" ] || { echo "Missing TFLint checksum for ${TFLINT_VERSION}/${ARCHITECTURE}"; exit 1; }; \
-    HCLEDIT_SHA256="$(curl -fsSL "https://github.com/minamijoyo/hcledit/releases/download/v${HCLEDIT_VERSION}/hcledit_${HCLEDIT_VERSION}_checksums.txt" | awk '/hcledit_[0-9.]+_linux_'"${ARCHITECTURE}"'\.tar\.gz$/ {print $1; exit}')"; \
+    HCLEDIT_SHA256="$(checksum_for "https://github.com/minamijoyo/hcledit/releases/download/v${HCLEDIT_VERSION}/hcledit_${HCLEDIT_VERSION}_checksums.txt" "hcledit_[0-9.]+_linux_${ARCHITECTURE}\\.tar\\.gz$")"; \
     [ -n "${HCLEDIT_SHA256}" ] || { echo "Missing hcledit checksum for ${HCLEDIT_VERSION}/${ARCHITECTURE}"; exit 1; }; \
-    SOPS_SHA256="$(curl -fsSL "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.checksums.txt" | awk '/sops-v[0-9.]+\.linux\.'"${ARCHITECTURE}"'$/ {print $1; exit}')"; \
+    SOPS_SHA256="$(checksum_for "https://github.com/getsops/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.checksums.txt" "sops-v[0-9.]+\\.linux\\.${ARCHITECTURE}$")"; \
     [ -n "${SOPS_SHA256}" ] || { echo "Missing sops checksum for ${SOPS_VERSION}/${ARCHITECTURE}"; exit 1; }; \
     curl -fsSL "https://github.com/terraform-linters/tflint/releases/download/v${TFLINT_VERSION}/tflint_linux_${ARCHITECTURE}.zip" -o "${TMP_DIR}/tflint.zip"; \
     echo "${TFLINT_SHA256}  ${TMP_DIR}/tflint.zip" | sha256sum -c -; \
