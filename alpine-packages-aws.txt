@@ -1,1 +1,1 @@
-aws-cli~=2.32
+aws-cli~=aws-cli~=2.32
