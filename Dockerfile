@@ -16,7 +16,6 @@ ARG GCP=no
 ARG YC=no
 
 # Versions of dependencies
-ARG AWS_VERSION=2.32.7
 ARG GCP_VERSION=570.0.0
 ARG AZ_VERSION=2.86.0
 ARG TF_VERSION=1.15.5
@@ -46,7 +45,7 @@ RUN targetarch="${TARGETARCH:-}"; \
   fi; \
   case "${targetarch}" in amd64|arm64) ;; *) echo "Unsupported architecture: ${targetarch}"; exit 1 ;; esac; \
   echo "TARGETARCH=${targetarch}"; \
-  echo "AWS=${AWS} AWS_VERSION=${AWS_VERSION}"; \
+  echo "AWS=${AWS}"; \
   echo "GCP=${GCP} GCP_VERSION=${GCP_VERSION}"; \
   echo "AZURE=${AZURE} AZ_VERSION=${AZ_VERSION}"; \
   echo "TF=${TF} TF_VERSION=${TF_VERSION}"; \
