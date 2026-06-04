@@ -42,7 +42,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_BRANCH }}
-          commit_message: ⬆️ Bump for ${{ env.VERSION_TAG }}
+          commit_message: "chore(deps): bump ${{ env.VERSION_TAG }}"
 
       - name: Get template
         run: task git:get-pr-template
@@ -52,7 +52,7 @@ jobs:
         uses: devops-infra/action-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          title: ⬆️ Bump for ${{ env.VERSION_TAG }}
+          title: "chore(deps): bump ${{ env.VERSION_TAG }}"
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
 
