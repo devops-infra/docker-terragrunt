@@ -94,17 +94,17 @@ commandTests:
     command: bash
     args:
       - -lc
-      - |
-        actual_az="$(az --version | awk '/^azure-cli / {print $2; exit}')"
-        printf '%s' "${actual_az}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+      - >-
+        az --version 2>/dev/null |
+        grep -Eq '^azure-cli[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+([[:space:]]+\*)?[[:space:]]*$'
 
   - name: Google Cloud SDK
     command: bash
     args:
       - -lc
-      - |
-        actual_gcp="$(gcloud --version | awk '/^Google Cloud SDK / {print $4; exit}')"
-        printf '%s' "${actual_gcp}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+      - >-
+        gcloud --version 2>/dev/null |
+        grep -Eq '^Google Cloud SDK[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+[[:space:]]*$'
 
   - name: Temporary and APK cache cleaned
     command: bash

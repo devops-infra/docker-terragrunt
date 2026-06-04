@@ -94,9 +94,9 @@ commandTests:
     command: bash
     args:
       - -lc
-      - |
-        actual_az="$(az --version | awk '/^azure-cli / {print $2; exit}')"
-        printf '%s' "${actual_az}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+      - >-
+        az --version 2>/dev/null |
+        grep -Eq '^azure-cli[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+([[:space:]]+\*)?[[:space:]]*$'
 
   - name: GCP CLI not installed
     command: bash

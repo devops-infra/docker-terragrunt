@@ -77,9 +77,9 @@ commandTests:
     command: bash
     args:
       - -lc
-      - |
-        actual_gcp="$(gcloud --version | awk '/^Google Cloud SDK / {print $4; exit}')"
-        printf '%s' "${actual_gcp}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+      - >-
+        gcloud --version 2>/dev/null |
+        grep -Eq '^Google Cloud SDK[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+[[:space:]]*$'
 
   - name: AWS and Azure CLIs not installed
     command: bash
