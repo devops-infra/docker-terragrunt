@@ -155,6 +155,7 @@ tasks:
         if [ -z "$aws_latest" ]; then
           aws_latest="{{.AWS_VERSION}}"
         fi
+        aws_current="aws-cli~={{.AWS_VERSION}}"
         gcp_latest=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives \
           | grep -Eo 'google-cloud-sdk-[0-9.]+' | head -1 | sed 's/google-cloud-sdk-//')
         az_latest=$(curl -LsS https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')
@@ -198,7 +199,7 @@ tasks:
         set_arg Dockerfile TFLINT_VERSION "$tflint_latest"
         set_arg Dockerfile HCLEDIT_VERSION "$hcledit_latest"
         set_arg Dockerfile SOPS_VERSION "$sops_latest"
-        update_file alpine-packages-aws.txt "{{.AWS_VERSION}}" "aws-cli~=$aws_latest"
+        update_file alpine-packages-aws.txt "$aws_current" "aws-cli~=$aws_latest"
 
         update_file README.md "{{.TF_VERSION}}" "$tf_latest"
         update_file README.md "{{.TG_VERSION}}" "$tg_latest"
