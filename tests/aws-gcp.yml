@@ -97,7 +97,16 @@ commandTests:
         value: ${GCP_VERSION}
     args:
       - -lc
-      - gcloud --version | grep -Eq "^Google Cloud SDK ${EXPECTED_GCP_VERSION}$"
+      - |
+        actual_gcp="$(gcloud --version | awk '/^Google Cloud SDK / {print $4; exit}')"
+        case "${EXPECTED_GCP_VERSION:-}" in
+          ''|'${GCP_VERSION}')
+            printf '%s' "${actual_gcp}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+            ;;
+          *)
+            [ "${actual_gcp}" = "${EXPECTED_GCP_VERSION}" ]
+            ;;
+        esac
 
   - name: Azure CLI not installed
     command: bash

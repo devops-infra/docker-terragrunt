@@ -133,28 +133,28 @@ jobs:
           docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
       - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
             devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/${{ matrix.flavor }}.yml
 
       - name: Cont.Struc.Test - ${{ matrix.flavor }} (OT image)
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
             devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/${{ matrix.flavor }}.yml
 
       - name: Cont.Struc.Test - Terraform
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
             devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/tf.yml
 
       - name: Cont.Struc.Test - OpenTofu
-        uses: plexsystems/container-structure-test-action@v0.3.0
+        uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
             devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
