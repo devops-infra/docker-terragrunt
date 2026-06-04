@@ -10,7 +10,7 @@ vars:
   TG_VERSION_FROM_TAG:
     sh: printf "%s" "{{.VERSION}}" | sed -E 's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\3/'
   AWS_VERSION:
-    sh: sed -nE 's/^ARG AWS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
+    sh: sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1
   GCP_VERSION:
     sh: sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
   AZ_VERSION:
@@ -146,10 +146,10 @@ tasks:
                     '
               done | head -1
             )"
-            aws_latest="$(printf '%s' "$aws_pkg_version" | sed -E 's/-r[0-9]+$//')"
+            aws_latest="$(printf '%s' "$aws_pkg_version" | sed -E 's/-r[0-9]+$//; s/^([0-9]+\.[0-9]+)\..*$/\1/')"
             ;;
           *)
-            aws_latest=$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[0].name')
+            aws_latest="$(curl -LsS https://api.github.com/repos/aws/aws-cli/tags | jq -r '.[0].name' | sed -E 's/^v//; s/^([0-9]+\.[0-9]+)\..*$/\1/')"
             ;;
         esac
         if [ -z "$aws_latest" ]; then
@@ -193,12 +193,12 @@ tasks:
         set_arg Dockerfile TF_VERSION "$tf_latest"
         set_arg Dockerfile OT_VERSION "$ot_latest"
         set_arg Dockerfile TG_VERSION "$tg_latest"
-        set_arg Dockerfile AWS_VERSION "$aws_latest"
         set_arg Dockerfile GCP_VERSION "$gcp_latest"
         set_arg Dockerfile AZ_VERSION "$az_latest"
         set_arg Dockerfile TFLINT_VERSION "$tflint_latest"
         set_arg Dockerfile HCLEDIT_VERSION "$hcledit_latest"
         set_arg Dockerfile SOPS_VERSION "$sops_latest"
+        update_file alpine-packages-aws.txt "{{.AWS_VERSION}}" "aws-cli~=$aws_latest"
 
         update_file README.md "{{.TF_VERSION}}" "$tf_latest"
         update_file README.md "{{.TG_VERSION}}" "$tg_latest"
