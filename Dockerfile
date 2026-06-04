@@ -34,9 +34,8 @@ COPY alpine-packages-aws.txt /tmp/alpine-packages-aws.txt
 COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
 
-SHELL ["/bin/sh", "-euxo", "pipefail", "-c"]
-
 # Debug information and architecture resolution
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN targetarch="${TARGETARCH:-}"; \
   if [ -z "${targetarch}" ]; then \
     case "$(uname -m)" in \
@@ -59,6 +58,7 @@ RUN targetarch="${TARGETARCH:-}"; \
   printf '%s' "${targetarch}" > /tmp/targetarch
 
 # Install pinned Alpine dependencies
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3018
 RUN xargs -r apk add --no-cache < /tmp/alpine-packages.txt; \
   if [ "${SLIM}" = "no" ]; then \
@@ -69,6 +69,7 @@ RUN xargs -r apk add --no-cache < /tmp/alpine-packages.txt; \
   fi
 
 # Install Terraform/OpenTofu/Terragrunt
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2155
 RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
   TMP_DIR="$(mktemp -d)"; \
@@ -107,6 +108,7 @@ RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
   rm -rf "${TMP_DIR}"
 
 # Install helper binaries for non-slim images
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2155
 RUN if [ "${SLIM}" = "no" ]; then \
     ARCHITECTURE="$(cat /tmp/targetarch)"; \
@@ -134,6 +136,7 @@ RUN if [ "${SLIM}" = "no" ]; then \
   fi
 
 # Cloud CLIs
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AWS}" = "yes" ]; then \
     if [ "${SLIM}" = "yes" ]; then \
       echo "AWS flavor requires non-slim dependencies"; \
@@ -144,6 +147,7 @@ RUN if [ "${AWS}" = "yes" ]; then \
     aws --version | grep -Eq '^aws-cli/[0-9]+\.[0-9]+'; \
   fi
 
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN if [ "${GCP}" = "yes" ]; then \
     if [ "${SLIM}" = "yes" ]; then \
       echo "GCP flavor requires non-slim dependencies"; \
@@ -164,16 +168,18 @@ RUN if [ "${GCP}" = "yes" ]; then \
     gcloud config set metrics/environment github_docker_image; \
   fi
 
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AZURE}" = "yes" ]; then \
     if [ "${SLIM}" = "yes" ]; then \
       echo "Azure flavor requires non-slim dependencies"; \
       exit 1; \
     fi; \
     pip3 install --no-cache-dir "azure-cli==${AZ_VERSION}"; \
-    az --version | grep -Eq '^azure-cli[[:space:]]+'"${AZ_VERSION}"'$'; \
+    test "$(az version --output json | jq -r '."azure-cli"')" = "${AZ_VERSION}"; \
   fi
 
 COPY fmt/format-hcl fmt/fmt.sh fmt/terragrunt-fmt.sh entrypoint.sh /usr/bin/
+SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN chmod +x \
     /usr/bin/format-hcl \
     /usr/bin/fmt.sh \
