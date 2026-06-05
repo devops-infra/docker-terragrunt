@@ -37,11 +37,12 @@ jobs:
       - name: Run linters
         run: task lint
 
-  release:
-    name: Release
+  prepare:
+    name: Validate version
     if: ${{ !inputs.build-and-push-only }}
     runs-on: ubuntu-24.04-arm
-    needs: lint
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -55,6 +56,7 @@ jobs:
           version: 3.x
 
       - name: Validate version format
+        id: version
         run: |
           VERSION="${{ github.event.inputs.version }}"
           if [ -z "$VERSION" ]; then
@@ -65,50 +67,19 @@ jobs:
             echo "❌ Invalid version format. Use format: tf-1.2.3-ot-1.2.3-tg-1.2.3"
             exit 1
           fi
-          echo "✅ Version format is valid: $VERSION"
-
-      - name: Check if version already exists
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
           if git rev-parse -q --verify "refs/tags/${VERSION}" >/dev/null; then
             echo "❌ Version $VERSION already exists"
             exit 1
           fi
-          echo "✅ Version $VERSION is available"
-
-      - name: Push repo tag
-        run: |
-          VERSION="${{ github.event.inputs.version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$VERSION" -m "$VERSION"
-          git push origin "$VERSION"
-
-      - name: GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          name: ${{ github.event.inputs.version }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v5
-        with:
-          username: ${{ vars.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-          repository: ${{ vars.DOCKER_ORG_NAME }}/${{ github.event.repository.name }}
-          short-description: ${{ github.event.repository.description }}
+          echo "✅ Version format is valid: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build-and-push:
     name: Build & push
     if: ${{ !inputs.build-and-push-only }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90
-    needs: release
+    needs: [lint, prepare]
     strategy:
       fail-fast: false
       matrix:
@@ -142,7 +113,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
         run: |
-          VERSION="${{ github.event.inputs.version }}"
+          VERSION="${{ needs.prepare.outputs.version }}"
           TF_VERSION=$(printf "%s" "$VERSION" | sed -E \
             's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
           OT_VERSION=$(printf "%s" "$VERSION" | sed -E \
@@ -306,3 +277,47 @@ jobs:
         with:
           image: devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
           config: tests/ot.yml
+
+  release:
+    name: Release
+    if: ${{ !inputs.build-and-push-only }}
+    runs-on: ubuntu-24.04-arm
+    needs: [lint, prepare, build-and-push]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Push repo tag
+        run: |
+          VERSION="${{ needs.prepare.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$VERSION" -m "$VERSION"
+          git push origin "$VERSION"
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.prepare.outputs.version }}
+          name: ${{ needs.prepare.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+          repository: ${{ vars.DOCKER_ORG_NAME }}/${{ github.event.repository.name }}
+          short-description: ${{ github.event.repository.description }}
