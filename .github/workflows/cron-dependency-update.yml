@@ -1,4 +1,4 @@
-name: (Cron) Dependency Update
+name: (C) Dependency Update
 
 on:
   schedule:
@@ -43,6 +43,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           target_branch: dependency/${{ env.VERSION_BRANCH }}
           commit_message: "chore(deps): bump ${{ env.VERSION_TAG }}"
+          signing_mode: ssh
+          signing_key: ${{ secrets.SSH_SIGNING_KEY }}
 
       - name: Get template
         run: task git:get-pr-template

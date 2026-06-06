@@ -1,4 +1,4 @@
-name: (Automatic) Pull Request Create
+name: (A) Pull Request Create
 
 on:
   push:
