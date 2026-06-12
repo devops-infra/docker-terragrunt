@@ -36,6 +36,7 @@ jobs:
         uses: devops-infra/action-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          target_branch: ${{ github.event.repository.default_branch }}
           assignee: ${{ github.actor }}
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
