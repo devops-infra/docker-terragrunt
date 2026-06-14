@@ -33,11 +33,34 @@ vars:
     sh: echo "${GITHUB_SHA:-aabbccddeeff}"
   VERSION_PREFIX:
     sh: echo "${VERSION_PREFIX:-}"
+  VERSION_OVERRIDE:
+    sh: echo "${VERSION_OVERRIDE:-}"
   GITHUB_SHORT_SHA:
     sh: printf "%s" "{{.GITHUB_SHA}}" | cut -c1-7
-  TF_TG_VERSION: tf-{{.TF_VERSION}}-tg-{{.TG_VERSION}}
-  OT_TG_VERSION: ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
-  FULL_VERSION: tf-{{.TF_VERSION}}-ot-{{.OT_VERSION}}-tg-{{.TG_VERSION}}
+  EFFECTIVE_TF_VERSION:
+    sh: |
+      if [ -n "${VERSION_OVERRIDE:-}" ]; then
+        printf "%s" "{{.TF_VERSION_FROM_TAG}}"
+      else
+        printf "%s" "{{.TF_VERSION}}"
+      fi
+  EFFECTIVE_OT_VERSION:
+    sh: |
+      if [ -n "${VERSION_OVERRIDE:-}" ]; then
+        printf "%s" "{{.OT_VERSION_FROM_TAG}}"
+      else
+        printf "%s" "{{.OT_VERSION}}"
+      fi
+  EFFECTIVE_TG_VERSION:
+    sh: |
+      if [ -n "${VERSION_OVERRIDE:-}" ]; then
+        printf "%s" "{{.TG_VERSION_FROM_TAG}}"
+      else
+        printf "%s" "{{.TG_VERSION}}"
+      fi
+  TF_TG_VERSION: tf-{{.EFFECTIVE_TF_VERSION}}-tg-{{.EFFECTIVE_TG_VERSION}}
+  OT_TG_VERSION: ot-{{.EFFECTIVE_OT_VERSION}}-tg-{{.EFFECTIVE_TG_VERSION}}
+  FULL_VERSION: tf-{{.EFFECTIVE_TF_VERSION}}-ot-{{.EFFECTIVE_OT_VERSION}}-tg-{{.EFFECTIVE_TG_VERSION}}
   DOCKER_USERNAME:
     sh: echo "${DOCKER_USERNAME:-christophshyper}"
   DOCKER_ORG_NAME:
@@ -56,8 +79,8 @@ vars:
   LABEL_AUTHOR: Krzysztof ChristophShyper Szyper <biotyk@mail.com>
   LABEL_NAME: IaaC dockerized framework for Terragrunt, Terraform and OpenTofu
   LABEL_DESCRIPTION: >-
-    Docker image with Terragrunt v{{.TG_VERSION}}, Terraform v{{.TF_VERSION}}
-    or OpenTofu v{{.OT_VERSION}}, together with all needed components
+    Docker image with Terragrunt v{{.EFFECTIVE_TG_VERSION}}, Terraform v{{.EFFECTIVE_TF_VERSION}}
+    or OpenTofu v{{.EFFECTIVE_OT_VERSION}}, together with all needed components
     to easily manage cloud infrastructure.
   LABEL_REPO_URL: https://github.com/devops-infra/docker-terragrunt
   LABEL_HOMEPAGE: https://shyper.pro
@@ -357,6 +380,9 @@ tasks:
         fi
         cmd+=("${args[@]}")
         cmd+=(--build-arg TF="$tf_install" --build-arg OT="$ot_install" --build-arg TG=yes)
+        cmd+=(--build-arg TF_VERSION='{{.EFFECTIVE_TF_VERSION}}')
+        cmd+=(--build-arg OT_VERSION='{{.EFFECTIVE_OT_VERSION}}')
+        cmd+=(--build-arg TG_VERSION='{{.EFFECTIVE_TG_VERSION}}')
         docker_username='{{.DOCKER_USERNAME}}'
         github_username='{{.GITHUB_USERNAME}}'
         has_dockerhub=false

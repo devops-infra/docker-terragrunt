@@ -27,6 +27,21 @@ vars:
       fi
   PROJECT_DIR_NAME:
     sh: basename "$PWD"
+  DEFAULT_BRANCH:
+    sh: |
+      if [ -n "${DEFAULT_BRANCH:-}" ]; then
+        printf "%s\n" "${DEFAULT_BRANCH}"
+      elif branch_ref="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null)"; then
+        printf "%s\n" "${branch_ref#origin/}"
+      elif current_branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null)" && { [ "${current_branch}" = "main" ] || [ "${current_branch}" = "master" ]; }; then
+        printf "%s\n" "${current_branch}"
+      elif git show-ref --verify --quiet refs/heads/main || git show-ref --verify --quiet refs/remotes/origin/main; then
+        echo main
+      elif git show-ref --verify --quiet refs/heads/master || git show-ref --verify --quiet refs/remotes/origin/master; then
+        echo master
+      else
+        echo master
+      fi
   VERSION_OVERRIDE:
     sh: echo "${VERSION_OVERRIDE:-}"
   VERSION:
@@ -36,14 +51,14 @@ vars:
         echo "$override"
         exit 0
       fi
-
-      latest_tag="$(git tag --sort=-v:refname 2>/dev/null | \
-        grep -E '^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$' | head -1)"
-      if [ -n "$latest_tag" ]; then
-        echo "$latest_tag"
-      else
-        echo "tf-1.14.7-ot-1.11.5-tg-0.99.4"
+      tf="$(sed -nE 's/^ARG TF_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+      ot="$(sed -nE 's/^ARG OT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+      tg="$(sed -nE 's/^ARG TG_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+      if [ -z "$tf" ] || [ -z "$ot" ] || [ -z "$tg" ]; then
+        echo "❌ ERROR: Unable to derive VERSION from Dockerfile ARG values" >&2
+        exit 1
       fi
+      printf "tf-%s-ot-%s-tg-%s\n" "$tf" "$ot" "$tg"
   VERSION_FULL:
     sh: echo "{{.VERSION}}"
   GIT_SHA:
