@@ -30,8 +30,8 @@ by [cytopia](https://github.com/cytopia): [docker-terragrunt](https://github.com
 and [docker-terragrunt-fmt](https://github.com/cytopia/docker-terragrunt-fmt)
 .
 Original README files are included in this
-repository: [docker-terragrunt](README.docker-terragrunt.md)
-and [docker-terragrunt-fmt](README.docker-terragrunt-fmt.md)
+repository: [docker-terragrunt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt.md)
+and [docker-terragrunt-fmt](https://github.com/devopsinfra/docker-terragrunt/blob/master/README.docker-terragrunt-fmt.md)
 . This project grew much bigger than the original ones and is intended to be a framework for cloud
 Infrastructure-as-a-Code.
 
@@ -219,9 +219,9 @@ docker run --rm \
 
 | Script name         | Is included in PATH | Purpose                                                                                                                            | Source/Documentation                                                                           |
 |---------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| `format-hcl`        | Yes                 | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). | [devops-infra](fmt/format-hcl)   |
+| `format-hcl`        | Yes                 | For formatting all HCL files (`.hcl`, `.tf` and `.tfvars`) into format suggested by [Hashicorp](https://github.com/hashicorp/hcl). | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/fmt/format-hcl)   |
 | `terragrunt-fmt.sh` | No                  | Dependency for `format-hcl`                                                                                                        | [cytopia](https://github.com/cytopia/docker-terragrunt-fmt/blob/master/data/terragrunt-fmt.sh) |
-| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show main installed binaries versions.                                                   | [devops-infra](entrypoint.sh)    |
+| `entrypoint.sh`     | Yes                 | Main CMD target for Docker image, just to show main installed binaries versions.                                                   | [devops-infra](https://github.com/devops-infra/docker-terragrunt/blob/master/entrypoint.sh)    |
 
 
 ### Binaries and Python libraries
@@ -266,7 +266,7 @@ docker run --rm \
 | zip                         | Binary         | non-slim | Create zip artifacts (for example for Lambda packages).                | http://infozip.sourceforge.net/                    |
 
 
-## Forking
+# Forking
 
 To publish images from a fork, set these variables so Task uses your registry identities:
 `DOCKER_USERNAME`, `DOCKER_ORG_NAME`, `DOCKER_TOKEN`, `GITHUB_USERNAME`, `GITHUB_ORG_NAME`, `GITHUB_TOKEN`.
