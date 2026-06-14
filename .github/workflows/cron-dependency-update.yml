@@ -128,10 +128,28 @@ jobs:
           task push-${{ matrix.flavor }}
           GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
           DOCKER_IMAGE="devopsinfra/docker-terragrunt"
-          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
-          docker pull "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
-          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
-          docker pull "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+          pull_with_retry() {
+            image="$1"
+            max_attempts="${2:-5}"
+            attempt=1
+            while [ "$attempt" -le "$max_attempts" ]; do
+              if docker pull "$image"; then
+                return 0
+              fi
+              if [ "$attempt" -eq "$max_attempts" ]; then
+                echo "Failed to pull ${image} after ${max_attempts} attempts."
+                return 1
+              fi
+              echo "Pull failed for ${image} (attempt ${attempt}/${max_attempts}); retrying in 5 seconds..."
+              attempt=$((attempt + 1))
+              sleep 5
+            done
+          }
+          sleep 5
+          pull_with_retry "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          pull_with_retry "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+          pull_with_retry "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
+          pull_with_retry "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
 
       - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
         uses: devops-infra/action-container-structure-test@v1
