@@ -1,7 +1,7 @@
 bash~=5.3
 ca-certificates
-curl~=8.19
-git~=2.52
+curl~=8.20
+git~=2.54
 jq~=1.8
 unzip~=6.0
 vim~=9.2
