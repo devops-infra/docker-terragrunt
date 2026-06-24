@@ -29,6 +29,7 @@ ARG TFLINT_VERSION=0.63.1
 ARG HCLEDIT_VERSION=0.2.18
 ARG SOPS_VERSION=3.13.1
 
+COPY alpine-packages.txt /tmp/alpine-packages.txt
 COPY alpine-packages-nonslim.txt /tmp/alpine-packages-nonslim.txt
 COPY alpine-packages-aws.txt /tmp/alpine-packages-aws.txt
 COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
@@ -58,7 +59,8 @@ RUN targetarch="${TARGETARCH:-}"; \
 
 SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3018
-RUN if [ "${SLIM}" = "no" ]; then \
+RUN xargs -r apk add --no-cache < /tmp/alpine-packages.txt; \
+  if [ "${SLIM}" = "no" ]; then \
     xargs -r apk add --no-cache < /tmp/alpine-packages-nonslim.txt; \
     pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt; \
     ln -sf /usr/bin/python3 /usr/bin/python; \
