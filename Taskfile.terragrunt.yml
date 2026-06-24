@@ -14,7 +14,7 @@ vars:
   GCP_VERSION:
     sh: sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
   AZ_VERSION:
-    sh: sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
+    sh: sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1
   TF_VERSION:
     sh: sed -nE 's/^ARG TF_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1
   OT_VERSION:
@@ -31,8 +31,8 @@ vars:
     sh: echo "${GITHUB_REF:-refs/heads/null}"
   GITHUB_SHA:
     sh: echo "${GITHUB_SHA:-aabbccddeeff}"
-  VERSION_PREFIX:
-    sh: echo "${VERSION_PREFIX:-}"
+  VERSION_SUFFIX:
+    sh: echo "${VERSION_SUFFIX:-}"
   VERSION_OVERRIDE:
     sh: echo "${VERSION_OVERRIDE:-}"
   GITHUB_SHORT_SHA:
@@ -85,23 +85,8 @@ vars:
   LABEL_REPO_URL: https://github.com/devops-infra/docker-terragrunt
   LABEL_HOMEPAGE: https://shyper.pro
   LABEL_VENDOR: DevOps-Infra
-  CI_VERSION_PREFIX:
-    sh: |
-      if [ -n "${VERSION_PREFIX:-}" ]; then
-        printf "%s" "${VERSION_PREFIX}"
-      elif [ -n "${VERSION_SUFFIX:-}" ]; then
-        suffix="${VERSION_SUFFIX#-}"
-        if [ -n "$suffix" ]; then
-          printf "%s-" "$suffix"
-        fi
-      fi
-  EFFECTIVE_PREFIX:
-    sh: |
-      if [ -n "${VERSION_PREFIX:-}" ]; then
-        printf "%s" "${VERSION_PREFIX}"
-      else
-        printf "%s" "{{.CI_VERSION_PREFIX}}"
-      fi
+  EFFECTIVE_SUFFIX:
+    sh: printf "%s" "${VERSION_SUFFIX:-}"
 
 tasks:
   terragrunt:help:
@@ -215,13 +200,20 @@ tasks:
         }
 
         set_arg Dockerfile TF_VERSION "$tf_latest"
+        set_arg Dockerfile.azure TF_VERSION "$tf_latest"
         set_arg Dockerfile OT_VERSION "$ot_latest"
+        set_arg Dockerfile.azure OT_VERSION "$ot_latest"
         set_arg Dockerfile TG_VERSION "$tg_latest"
+        set_arg Dockerfile.azure TG_VERSION "$tg_latest"
         set_arg Dockerfile GCP_VERSION "$gcp_latest"
-        set_arg Dockerfile AZ_VERSION "$az_latest"
+        set_arg Dockerfile.azure GCP_VERSION "$gcp_latest"
+        set_arg Dockerfile.azure AZ_VERSION "$az_latest"
         set_arg Dockerfile TFLINT_VERSION "$tflint_latest"
+        set_arg Dockerfile.azure TFLINT_VERSION "$tflint_latest"
         set_arg Dockerfile HCLEDIT_VERSION "$hcledit_latest"
+        set_arg Dockerfile.azure HCLEDIT_VERSION "$hcledit_latest"
         set_arg Dockerfile SOPS_VERSION "$sops_latest"
+        set_arg Dockerfile.azure SOPS_VERSION "$sops_latest"
         update_file alpine-packages-aws.txt "$aws_current" "aws-cli~=$aws_latest"
 
         update_file README.md "{{.TF_VERSION}}" "$tf_latest"
@@ -256,7 +248,7 @@ tasks:
         flavor='{{.FLAVOR}}'
         tool='{{.TOOL}}'
         push='{{default "false" .PUSH}}'
-        prefix='{{.EFFECTIVE_PREFIX}}'
+        suffix='{{.EFFECTIVE_SUFFIX}}'
         tf_tg='{{.TF_TG_VERSION}}'
         ot_tg='{{.OT_TG_VERSION}}'
         full_version='{{.FULL_VERSION}}'
@@ -274,6 +266,7 @@ tasks:
         fi
 
         args=()
+        dockerfile='Dockerfile'
         case "$flavor" in
           slim)
             args+=(--build-arg SLIM=yes)
@@ -290,13 +283,15 @@ tasks:
             include_global_latest='yes'
             ;;
           azure)
-            args+=(--build-arg AZURE=yes)
+            dockerfile='Dockerfile.azure'
+            args+=(--build-arg AZ_VERSION='{{.AZ_VERSION}}')
             tag_prefix='azure-'
             include_global_latest='yes'
             ;;
           aws-azure)
             args+=(--build-arg AWS=yes)
-            args+=(--build-arg AZURE=yes)
+            dockerfile='Dockerfile.azure'
+            args+=(--build-arg AZ_VERSION='{{.AZ_VERSION}}')
             tag_prefix='aws-azure-'
             include_global_latest='yes'
             ;;
@@ -312,14 +307,16 @@ tasks:
             include_global_latest='yes'
             ;;
           azure-gcp)
-            args+=(--build-arg AZURE=yes)
+            dockerfile='Dockerfile.azure'
+            args+=(--build-arg AZ_VERSION='{{.AZ_VERSION}}')
             args+=(--build-arg GCP=yes)
             tag_prefix='azure-gcp-'
             include_global_latest='yes'
             ;;
           aws-azure-gcp)
             args+=(--build-arg AWS=yes)
-            args+=(--build-arg AZURE=yes)
+            dockerfile='Dockerfile.azure'
+            args+=(--build-arg AZ_VERSION='{{.AZ_VERSION}}')
             args+=(--build-arg GCP=yes)
             tag_prefix='aws-azure-gcp-'
             include_global_latest='yes'
@@ -330,7 +327,7 @@ tasks:
             ;;
         esac
 
-        cmd=(docker buildx build --platform linux/amd64,linux/arm64 --file Dockerfile)
+        cmd=(docker buildx build --platform linux/amd64,linux/arm64 --file "$dockerfile")
         cmd+=(--annotation "index:org.label-schema.build-date={{.BUILD_DATE}}")
         cmd+=(--annotation "index:org.label-schema.name={{.LABEL_NAME}}")
         cmd+=(--annotation "index:org.label-schema.description={{.LABEL_DESCRIPTION}}")
@@ -383,6 +380,10 @@ tasks:
         cmd+=(--build-arg TF_VERSION='{{.EFFECTIVE_TF_VERSION}}')
         cmd+=(--build-arg OT_VERSION='{{.EFFECTIVE_OT_VERSION}}')
         cmd+=(--build-arg TG_VERSION='{{.EFFECTIVE_TG_VERSION}}')
+        cmd+=(--build-arg GCP_VERSION='{{.GCP_VERSION}}')
+        cmd+=(--build-arg TFLINT_VERSION='{{.TFLINT_VERSION}}')
+        cmd+=(--build-arg HCLEDIT_VERSION='{{.HCLEDIT_VERSION}}')
+        cmd+=(--build-arg SOPS_VERSION='{{.SOPS_VERSION}}')
         docker_username='{{.DOCKER_USERNAME}}'
         github_username='{{.GITHUB_USERNAME}}'
         has_dockerhub=false
@@ -407,36 +408,36 @@ tasks:
           fi
         fi
         if [ "$has_dockerhub" = true ]; then
-          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${combo_version}")
-          cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+          cmd+=(--tag "{{.DOCKER_NAME}}:${tag_prefix}${combo_version}${suffix}")
+          cmd+=(--tag "{{.DOCKER_NAME}}:${tag_prefix}${tool_latest}${suffix}")
         fi
         if [ "$has_ghcr" = true ]; then
-          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${combo_version}")
-          cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}${tool_latest}")
+          cmd+=(--tag "{{.GITHUB_NAME}}:${tag_prefix}${combo_version}${suffix}")
+          cmd+=(--tag "{{.GITHUB_NAME}}:${tag_prefix}${tool_latest}${suffix}")
         fi
         if [ "$include_global_latest" = "yes" ] && [ "$tool" = "tf" ]; then
           if [ "$has_dockerhub" = true ]; then
-            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tag_prefix}latest")
+            cmd+=(--tag "{{.DOCKER_NAME}}:${tag_prefix}latest${suffix}")
           fi
           if [ "$has_ghcr" = true ]; then
-            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tag_prefix}latest")
+            cmd+=(--tag "{{.GITHUB_NAME}}:${tag_prefix}latest${suffix}")
           fi
         fi
         if [ "$flavor" = "plain" ]; then
           if [ "$has_dockerhub" = true ]; then
-            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${combo_version}")
-            cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}${tool_latest}")
+            cmd+=(--tag "{{.DOCKER_NAME}}:${combo_version}${suffix}")
+            cmd+=(--tag "{{.DOCKER_NAME}}:${tool_latest}${suffix}")
           fi
           if [ "$has_ghcr" = true ]; then
-            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${combo_version}")
-            cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}${tool_latest}")
+            cmd+=(--tag "{{.GITHUB_NAME}}:${combo_version}${suffix}")
+            cmd+=(--tag "{{.GITHUB_NAME}}:${tool_latest}${suffix}")
           fi
           if [ "$tool" = "tf" ]; then
             if [ "$has_dockerhub" = true ]; then
-              cmd+=(--tag "{{.DOCKER_NAME}}:${prefix}latest")
+              cmd+=(--tag "{{.DOCKER_NAME}}:latest${suffix}")
             fi
             if [ "$has_ghcr" = true ]; then
-              cmd+=(--tag "{{.GITHUB_NAME}}:${prefix}latest")
+              cmd+=(--tag "{{.GITHUB_NAME}}:latest${suffix}")
             fi
           fi
         fi

@@ -61,15 +61,15 @@ jobs:
 
   build-and-push:
     name: Build and push
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     needs: [check]
     env:
-      VERSION_PREFIX: test-
+      VERSION_SUFFIX: -test
     strategy:
       fail-fast: false
       matrix:
-        flavor: [slim, plain, aws-azure-gcp]
+        flavor: [slim, plain, aws, azure, gcp, aws-azure, aws-gcp, azure-gcp, aws-azure-gcp]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -111,7 +111,7 @@ jobs:
           SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           AWS_VERSION=$(sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1)
           GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1)
           {
             echo "TF_VERSION=${TF_VERSION}"
             echo "OT_VERSION=${OT_VERSION}"
@@ -146,35 +146,35 @@ jobs:
             done
           }
           sleep 5
-          pull_with_retry "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
-          pull_with_retry "${GHCR_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
-          pull_with_retry "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}"
-          pull_with_retry "${DOCKER_IMAGE}:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}"
+          pull_with_retry "${GHCR_IMAGE}:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          pull_with_retry "${GHCR_IMAGE}:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          pull_with_retry "${DOCKER_IMAGE}:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          pull_with_retry "${DOCKER_IMAGE}:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
 
       - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
         uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
-            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
           config: tests/${{ matrix.flavor }}.yml
 
       - name: Cont.Struc.Test - ${{ matrix.flavor }} (OT image)
         uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
-            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
           config: tests/${{ matrix.flavor }}.yml
 
       - name: Cont.Struc.Test - Terraform
         uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
-            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
           config: tests/tf.yml
 
       - name: Cont.Struc.Test - OpenTofu
         uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
-            devopsinfra/docker-terragrunt:${{ env.VERSION_PREFIX }}${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
           config: tests/ot.yml

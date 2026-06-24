@@ -28,12 +28,18 @@ tasks:
         fi
 
   lint:hadolint:
-    desc: Lint Dockerfile with hadolint
+    desc: Lint Dockerfiles with hadolint
+    shell: bash
     cmds:
       - |
         echo "▶️ Running hadolint..."
+        mapfile -t files < <(git ls-files 'Dockerfile*')
+        if [ "${#files[@]}" -eq 0 ]; then
+          echo "ℹ️ No Dockerfiles found, skipping hadolint"
+          exit 0
+        fi
         set +e
-        docker run --rm -i -v "$PWD:/work" -w /work hadolint/hadolint:latest-debian < Dockerfile
+        docker run --rm -i -v "$PWD:/work" -w /work hadolint/hadolint:latest-debian /bin/hadolint "${files[@]}"
         rc=$?
         set -e
         if [ "$rc" -eq 0 ]; then
