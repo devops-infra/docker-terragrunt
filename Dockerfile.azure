@@ -2,6 +2,8 @@ ARG AZ_VERSION=2.87.0
 
 FROM ghcr.io/devops-infra/docker-azure-cli:${AZ_VERSION}
 
+ARG AZ_VERSION
+
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
 # Multi-architecture from buildx
