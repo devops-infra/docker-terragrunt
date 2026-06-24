@@ -4,7 +4,7 @@ commandTests:
   - name: Alpine version
     command: cat
     args: [/etc/os-release]
-    expectedOutput: [VERSION_ID=3\.24]
+    expectedOutput: [VERSION_ID=3\.24\.1]
 
   - name: hcledit
     command: bash

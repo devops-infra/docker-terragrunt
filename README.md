@@ -19,6 +19,8 @@ Alpine-based Docker image with Terraform or OpenTofu, together with Terragrunt, 
 
 Including cloud CLIs and SDKs for **Amazon Web Services, Microsoft Azure, Google Cloud Platform**.
 
+Azure-enabled flavors are built on top of `devops-infra/docker-azure-cli` to reduce Azure CLI install time during image builds.
+
 **Best used as runner image for CI/CD in automation, as well as a consistent local run environment.**
 
 Please note focus of those images is to maintain availability of current versions of **Terraform, OpenTofu and Terragrunt**, not CLIs or other dependencies.

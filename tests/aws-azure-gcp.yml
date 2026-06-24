@@ -4,7 +4,7 @@ commandTests:
   - name: Alpine version
     command: cat
     args: [/etc/os-release]
-    expectedOutput: [VERSION_ID=3\.24]
+    expectedOutput: [VERSION_ID=3\.24\.1]
 
   - name: hcledit
     command: bash
@@ -92,11 +92,12 @@ commandTests:
 
   - name: Azure CLI
     command: bash
+    envVars:
+      - key: EXPECTED_AZ_VERSION
+        value: ${AZ_VERSION}
     args:
       - -lc
-      - >-
-        az --version 2>/dev/null |
-        grep -Eq '^azure-cli[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+([[:space:]]+\*)?[[:space:]]*$'
+      - test "$(az version --output json | jq -r '."azure-cli"')" = "${EXPECTED_AZ_VERSION}"
 
   - name: Google Cloud SDK
     command: bash

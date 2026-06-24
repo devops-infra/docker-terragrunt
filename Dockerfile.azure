@@ -1,4 +1,6 @@
-FROM alpine:3.24.1
+ARG AZ_VERSION=2.87.0
+
+FROM ghcr.io/devops-infra/docker-azure-cli:${AZ_VERSION}
 
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
@@ -25,13 +27,11 @@ ARG TFLINT_VERSION=0.63.1
 ARG HCLEDIT_VERSION=0.2.18
 ARG SOPS_VERSION=3.13.1
 
-COPY alpine-packages.txt /tmp/alpine-packages.txt
 COPY alpine-packages-nonslim.txt /tmp/alpine-packages-nonslim.txt
 COPY alpine-packages-aws.txt /tmp/alpine-packages-aws.txt
 COPY pip/common/requirements.txt /tmp/pip_common_requirements.txt
 COPY pip/aws/requirements.txt /tmp/pip_aws_requirements.txt
 
-# Debug information and architecture resolution
 SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN targetarch="${TARGETARCH:-}"; \
   if [ -z "${targetarch}" ]; then \
@@ -45,6 +45,7 @@ RUN targetarch="${TARGETARCH:-}"; \
   echo "TARGETARCH=${targetarch}"; \
   echo "AWS=${AWS}"; \
   echo "GCP=${GCP} GCP_VERSION=${GCP_VERSION}"; \
+  echo "AZ_VERSION=${AZ_VERSION}"; \
   echo "TF=${TF} TF_VERSION=${TF_VERSION}"; \
   echo "OT=${OT} OT_VERSION=${OT_VERSION}"; \
   echo "TG=${TG} TG_VERSION=${TG_VERSION}"; \
@@ -53,18 +54,15 @@ RUN targetarch="${TARGETARCH:-}"; \
   echo "SOPS_VERSION=${SOPS_VERSION}"; \
   printf '%s' "${targetarch}" > /tmp/targetarch
 
-# Install pinned Alpine dependencies
 SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=DL3018
-RUN xargs -r apk add --no-cache < /tmp/alpine-packages.txt; \
-  if [ "${SLIM}" = "no" ]; then \
+RUN if [ "${SLIM}" = "no" ]; then \
     xargs -r apk add --no-cache < /tmp/alpine-packages-nonslim.txt; \
     pip3 install --no-cache-dir -r /tmp/pip_common_requirements.txt; \
     ln -sf /usr/bin/python3 /usr/bin/python; \
     ln -sf /usr/bin/pip3 /usr/bin/pip; \
   fi
 
-# Install Terraform/OpenTofu/Terragrunt
 SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2155
 RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
@@ -110,7 +108,6 @@ RUN ARCHITECTURE="$(cat /tmp/targetarch)"; \
   fi; \
   rm -rf "${TMP_DIR}"
 
-# Install helper binaries for non-slim images
 SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 # hadolint ignore=SC2155
 RUN if [ "${SLIM}" = "no" ]; then \
@@ -145,7 +142,6 @@ RUN if [ "${SLIM}" = "no" ]; then \
     rm -rf "${TMP_DIR}"; \
   fi
 
-# Cloud CLIs
 SHELL ["/bin/ash", "-euxo", "pipefail", "-c"]
 RUN if [ "${AWS}" = "yes" ]; then \
     if [ "${SLIM}" = "yes" ]; then \
@@ -192,6 +188,8 @@ RUN chmod +x \
   hcledit version >/dev/null 2>&1 || true; \
   sops --version >/dev/null 2>&1 || true; \
   aws --version >/dev/null 2>&1 || true; \
+  az --version >/dev/null 2>&1; \
+  test "$(az version --output json | jq -r '."azure-cli"')" = "${AZ_VERSION}"; \
   gcloud --version >/dev/null 2>&1 || true; \
   rm -rf /var/cache/*; \
   rm -rf /root/.cache/*; \
