@@ -16,10 +16,10 @@ ARG GCP=no
 ARG YC=no
 
 # Versions of dependencies
-ARG GCP_VERSION=572.0.0
+ARG GCP_VERSION=574.0.0
 ARG AZ_VERSION=2.87.0
-ARG TF_VERSION=1.15.6
-ARG OT_VERSION=1.12.2
+ARG TF_VERSION=1.15.7
+ARG OT_VERSION=1.12.3
 ARG TG_VERSION=1.0.8
 
 # Pinned tool versions (override via --build-arg if needed)
