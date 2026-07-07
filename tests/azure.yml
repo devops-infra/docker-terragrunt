@@ -8,36 +8,28 @@ commandTests:
 
   - name: hcledit
     command: bash
-    envVars:
-      - key: EXPECTED_HCLEDIT_VERSION
-        value: ${HCLEDIT_VERSION}
     args:
       - -lc
-      - hcledit version | grep -Eq "^${EXPECTED_HCLEDIT_VERSION}"
+      - hcledit version | grep -Fx '{{HCLEDIT_VERSION}}'
 
   - name: sops
     command: bash
-    envVars:
-      - key: EXPECTED_SOPS_VERSION
-        value: ${SOPS_VERSION}
     args:
       - -lc
-      - sops --version | grep -Eq "^sops ${EXPECTED_SOPS_VERSION}"
+      - sops --version | grep -Fq 'sops {{SOPS_VERSION}}'
 
   - name: TFLint
     command: bash
-    envVars:
-      - key: EXPECTED_TFLINT_VERSION
-        value: ${TFLINT_VERSION}
     args:
       - -lc
-      - tflint --version | grep -Eq "^TFLint version ${EXPECTED_TFLINT_VERSION}"
+      - tflint --version | grep -Fq 'TFLint version {{TFLINT_VERSION}}'
 
   - name: Non-slim tools smoke tests
     command: bash
     args:
       - -lc
       - |
+        set -euo pipefail
         curl --version >/dev/null
         bc --version >/dev/null
         docker --version >/dev/null
@@ -75,12 +67,9 @@ commandTests:
 
   - name: Azure CLI
     command: bash
-    envVars:
-      - key: EXPECTED_AZ_VERSION
-        value: ${AZ_VERSION}
     args:
       - -lc
-      - test "$(az version --output json | jq -r '."azure-cli"')" = "${EXPECTED_AZ_VERSION}"
+      - test "$(az version --output json | jq -r '."azure-cli"')" = '{{AZ_VERSION}}'
 
   - name: AWS and GCP CLIs not installed
     command: bash

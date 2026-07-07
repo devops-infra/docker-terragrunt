@@ -109,6 +109,7 @@ tasks:
   dependency:update:
     desc: Check TF, OT, TG, cloud CLIs and helper binary versions
     cmds:
+      - task: scripts:alpine:update
       - task: scripts:packages:update
       - |
         set -eu
@@ -164,12 +165,28 @@ tasks:
           aws_latest="{{.AWS_VERSION}}"
         fi
         aws_current="aws-cli~={{.AWS_VERSION}}"
+        cloudflare_current="$(sed -nE 's/^cloudflare==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        pygithub_current="$(sed -nE 's/^PyGithub==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        python_hcl2_current="$(sed -nE 's/^python-hcl2==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        requests_current="$(sed -nE 's/^requests==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        slack_sdk_current="$(sed -nE 's/^slack_sdk==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        anyio_current="$(sed -nE 's/^anyio==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        zipp_current="$(sed -nE 's/^zipp==([^[:space:]#]+).*$/\1/p' pip/common/requirements.txt)"
+        boto3_current="$(sed -nE 's/^boto3==([^[:space:]#]+).*$/\1/p' pip/aws/requirements.txt)"
         gcp_latest=$(curl -LsS https://cloud.google.com/sdk/docs/downloads-versioned-archives \
           | grep -Eo 'google-cloud-sdk-[0-9.]+' | head -1 | sed 's/google-cloud-sdk-//')
-        az_latest=$(curl -LsS https://pypi.org/pypi/azure-cli/json | jq -r '.info.version')
+        az_latest=$(curl -LsS https://api.github.com/repos/devops-infra/docker-azure-cli/releases/latest | jq -r '.tag_name')
         tflint_latest=$(curl -LsS https://api.github.com/repos/terraform-linters/tflint/releases/latest | jq -r .tag_name | sed 's/^v//')
         hcledit_latest=$(curl -LsS https://api.github.com/repos/minamijoyo/hcledit/releases/latest | jq -r .tag_name | sed 's/^v//')
         sops_latest=$(curl -LsS https://api.github.com/repos/getsops/sops/releases/latest | jq -r .tag_name | sed 's/^v//')
+        cloudflare_latest=$(curl -LsS https://pypi.org/pypi/cloudflare/json | jq -r '.info.version')
+        pygithub_latest=$(curl -LsS https://pypi.org/pypi/PyGithub/json | jq -r '.info.version')
+        python_hcl2_latest=$(curl -LsS https://pypi.org/pypi/python-hcl2/json | jq -r '.info.version')
+        requests_latest=$(curl -LsS https://pypi.org/pypi/requests/json | jq -r '.info.version')
+        slack_sdk_latest=$(curl -LsS https://pypi.org/pypi/slack_sdk/json | jq -r '.info.version')
+        anyio_latest=$(curl -LsS https://pypi.org/pypi/anyio/json | jq -r '.info.version')
+        zipp_latest=$(curl -LsS https://pypi.org/pypi/zipp/json | jq -r '.info.version')
+        boto3_latest=$(curl -LsS https://pypi.org/pypi/boto3/json | jq -r '.info.version')
 
         echo "Current Terraform: {{.TF_VERSION}} | Latest: $tf_latest"
         echo "Current Terragrunt: {{.TG_VERSION}} | Latest: $tg_latest"
@@ -180,6 +197,14 @@ tasks:
         echo "Current TFLint: {{.TFLINT_VERSION}} | Latest: $tflint_latest"
         echo "Current hcledit: {{.HCLEDIT_VERSION}} | Latest: $hcledit_latest"
         echo "Current sops: {{.SOPS_VERSION}} | Latest: $sops_latest"
+        echo "Current cloudflare: $cloudflare_current | Latest: $cloudflare_latest"
+        echo "Current PyGithub: $pygithub_current | Latest: $pygithub_latest"
+        echo "Current python-hcl2: $python_hcl2_current | Latest: $python_hcl2_latest"
+        echo "Current requests: $requests_current | Latest: $requests_latest"
+        echo "Current slack_sdk: $slack_sdk_current | Latest: $slack_sdk_latest"
+        echo "Current anyio: $anyio_current | Latest: $anyio_latest"
+        echo "Current zipp: $zipp_current | Latest: $zipp_latest"
+        echo "Current boto3: $boto3_current | Latest: $boto3_latest"
 
         update_file() {
           file="$1"
@@ -199,6 +224,13 @@ tasks:
           {{.SED}} -i "s|^ARG ${key}=.*$|ARG ${key}=${value}|g" "$file"
         }
 
+        set_requirement() {
+          file="$1"
+          package="$2"
+          version="$3"
+          {{.SED}} -E -i "s|^(${package}==)[^[:space:]#]+|\\1${version}|g" "$file"
+        }
+
         set_arg Dockerfile TF_VERSION "$tf_latest"
         set_arg Dockerfile.azure TF_VERSION "$tf_latest"
         set_arg Dockerfile OT_VERSION "$ot_latest"
@@ -215,6 +247,14 @@ tasks:
         set_arg Dockerfile SOPS_VERSION "$sops_latest"
         set_arg Dockerfile.azure SOPS_VERSION "$sops_latest"
         update_file alpine-packages-aws.txt "$aws_current" "aws-cli~=$aws_latest"
+        set_requirement pip/common/requirements.txt cloudflare "$cloudflare_latest"
+        set_requirement pip/common/requirements.txt PyGithub "$pygithub_latest"
+        set_requirement pip/common/requirements.txt python-hcl2 "$python_hcl2_latest"
+        set_requirement pip/common/requirements.txt requests "$requests_latest"
+        set_requirement pip/common/requirements.txt slack_sdk "$slack_sdk_latest"
+        set_requirement pip/common/requirements.txt anyio "$anyio_latest"
+        set_requirement pip/common/requirements.txt zipp "$zipp_latest"
+        set_requirement pip/aws/requirements.txt boto3 "$boto3_latest"
 
         update_file README.md "{{.TF_VERSION}}" "$tf_latest"
         update_file README.md "{{.TG_VERSION}}" "$tg_latest"
@@ -227,6 +267,14 @@ tasks:
         [ "{{.AWS_VERSION}}" = "$aws_latest" ] || version_tag="$version_tag aws-$aws_latest"
         [ "{{.GCP_VERSION}}" = "$gcp_latest" ] || version_tag="$version_tag gcp-$gcp_latest"
         [ "{{.AZ_VERSION}}" = "$az_latest" ] || version_tag="$version_tag az-$az_latest"
+        [ "$cloudflare_current" = "$cloudflare_latest" ] || version_tag="$version_tag cloudflare-$cloudflare_latest"
+        [ "$pygithub_current" = "$pygithub_latest" ] || version_tag="$version_tag pygithub-$pygithub_latest"
+        [ "$python_hcl2_current" = "$python_hcl2_latest" ] || version_tag="$version_tag python-hcl2-$python_hcl2_latest"
+        [ "$requests_current" = "$requests_latest" ] || version_tag="$version_tag requests-$requests_latest"
+        [ "$slack_sdk_current" = "$slack_sdk_latest" ] || version_tag="$version_tag slack-sdk-$slack_sdk_latest"
+        [ "$anyio_current" = "$anyio_latest" ] || version_tag="$version_tag anyio-$anyio_latest"
+        [ "$zipp_current" = "$zipp_latest" ] || version_tag="$version_tag zipp-$zipp_latest"
+        [ "$boto3_current" = "$boto3_latest" ] || version_tag="$version_tag boto3-$boto3_latest"
         if ! git diff --quiet -- alpine-packages.txt alpine-packages-nonslim.txt alpine-packages-aws.txt 2>/dev/null; then
           version_tag="$version_tag alpine-packages"
         fi
