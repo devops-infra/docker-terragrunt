@@ -12,7 +12,6 @@ ARG OT=no
 ARG TG=yes
 ARG AWS=no
 ARG GCP=no
-ARG YC=no
 
 # Versions of dependencies
 ARG GCP_VERSION=575.0.0
