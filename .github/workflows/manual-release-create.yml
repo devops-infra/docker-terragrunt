@@ -77,7 +77,7 @@ jobs:
   build-and-push:
     name: Build & push
     if: ${{ !inputs.build-and-push-only }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     needs: [lint, prepare]
     strategy:
@@ -125,7 +125,7 @@ jobs:
           SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           AWS_VERSION=$(sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1)
           GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1)
           {
             echo "TF_VERSION=${TF_VERSION}"
             echo "OT_VERSION=${OT_VERSION}"
@@ -193,7 +193,7 @@ jobs:
   build-and-push-only:
     name: Build & push only
     if: ${{ inputs.build-and-push-only }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -249,7 +249,7 @@ jobs:
           SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
           AWS_VERSION=$(sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1)
           GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1)
           {
             echo "TF_VERSION=${TF_VERSION}"
             echo "OT_VERSION=${OT_VERSION}"

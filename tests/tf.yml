@@ -5,13 +5,13 @@ commandTests:
     command: bash
     args:
       - -lc
-      - terraform --version | grep -Eq "^Terraform v${TF_VERSION}"
+      - terraform --version | grep -Fq 'Terraform v{{TF_VERSION}}'
 
   - name: Terragrunt
     command: bash
     args:
       - -lc
-      - terragrunt --version | grep -Eq "^terragrunt version v${TG_VERSION}"
+      - terragrunt --version | grep -Fq 'terragrunt version v{{TG_VERSION}}'
 
   - name: OpenTofu not installed
     command: bash

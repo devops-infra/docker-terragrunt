@@ -3,6 +3,7 @@
 
 # Include
 !Dockerfile
+!Dockerfile.azure
 !LICENSE
 !README.md
 !alpine-packages.txt

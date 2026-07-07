@@ -38,32 +38,32 @@ tasks:
   docker:cmds:
     desc: Show docker build command for plain flavor
     cmds:
-      - task terragrunt:build:plain --dry VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+      - task terragrunt:build:plain --dry VERSION_SUFFIX='{{.EFFECTIVE_SUFFIX}}'
 
   docker:build:
     desc: Build Docker image (plain flavor)
     cmds:
-      - task terragrunt:build:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+      - task terragrunt:build:plain VERSION_SUFFIX='{{.EFFECTIVE_SUFFIX}}'
 
   docker:build:inspect:
     desc: Inspect built Docker image (plain latest)
     cmds:
       - |
         set -eu
-        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
+        image="{{.DOCKER_NAME}}:plain-latest{{.EFFECTIVE_SUFFIX}}"
         echo "Inspecting image: ${image}"
         docker image inspect "$image" | jq || true
 
   docker:push:
     desc: Build and push Docker images (plain flavor)
     cmds:
-      - task terragrunt:push:plain VERSION_PREFIX='{{.CI_VERSION_PREFIX}}'
+      - task terragrunt:push:plain VERSION_SUFFIX='{{.EFFECTIVE_SUFFIX}}'
 
   docker:push:inspect:
     desc: Inspect pushed Docker image (plain latest)
     cmds:
       - |
         set -eu
-        image="{{.DOCKER_NAME}}:{{.CI_VERSION_PREFIX}}plain-latest"
+        image="{{.DOCKER_NAME}}:plain-latest{{.EFFECTIVE_SUFFIX}}"
         echo "Inspecting pushed image: ${image}"
         docker buildx imagetools inspect "$image" || docker manifest inspect "$image"
