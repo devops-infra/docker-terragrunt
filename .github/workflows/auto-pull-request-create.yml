@@ -7,6 +7,7 @@ on:
       - main
       - release/**
       - dependabot/**
+  pull_request:
 
 permissions:
   contents: read
@@ -16,6 +17,7 @@ permissions:
 jobs:
   pull-request:
     name: Pull Request
+    if: github.event_name == 'push'
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
@@ -43,6 +45,7 @@ jobs:
 
   lint:
     name: Lint
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
@@ -61,9 +64,10 @@ jobs:
 
   build-and-push:
     name: Build and push
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
-    needs: [pull-request, lint]
+    needs: [lint]
     env:
       VERSION_SUFFIX: -test
     strategy:
