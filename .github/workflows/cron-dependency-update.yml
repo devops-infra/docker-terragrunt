@@ -58,3 +58,123 @@ jobs:
           title: "chore(deps): bump ${{ env.VERSION_TAG }}"
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
+
+  build-and-push:
+    name: Build and push
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    needs: [check]
+    env:
+      VERSION_SUFFIX: -test
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor: [slim, plain, aws-azure-gcp]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Install Task
+        uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Install Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v4
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: amd64,arm64
+
+      - name: Build and push
+        env:
+          BUILDX_NO_DEFAULT_ATTESTATIONS: 1
+          DOCKER_BUILDKIT: 1
+          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TERM: xterm-256color
+        run: |
+          VERSION="$(task version:get)"
+          TF_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          OT_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
+          TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
+            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
+          TFLINT_VERSION=$(sed -nE 's/^ARG TFLINT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          HCLEDIT_VERSION=$(sed -nE 's/^ARG HCLEDIT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          AWS_VERSION=$(sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1)
+          GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
+          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1)
+          {
+            echo "TF_VERSION=${TF_VERSION}"
+            echo "OT_VERSION=${OT_VERSION}"
+            echo "TG_VERSION=${TG_VERSION}"
+            echo "TFLINT_VERSION=${TFLINT_VERSION}"
+            echo "HCLEDIT_VERSION=${HCLEDIT_VERSION}"
+            echo "SOPS_VERSION=${SOPS_VERSION}"
+            echo "AWS_VERSION=${AWS_VERSION}"
+            echo "GCP_VERSION=${GCP_VERSION}"
+            echo "AZ_VERSION=${AZ_VERSION}"
+          } >> "$GITHUB_ENV"
+          docker buildx create --use || true
+          task login
+          task push-${{ matrix.flavor }}
+          GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
+          DOCKER_IMAGE="devopsinfra/docker-terragrunt"
+          pull_with_retry() {
+            image="$1"
+            max_attempts="${2:-5}"
+            attempt=1
+            while [ "$attempt" -le "$max_attempts" ]; do
+              if docker pull "$image"; then
+                return 0
+              fi
+              if [ "$attempt" -eq "$max_attempts" ]; then
+                echo "Failed to pull ${image} after ${max_attempts} attempts."
+                return 1
+              fi
+              echo "Pull failed for ${image} (attempt ${attempt}/${max_attempts}); retrying in 5 seconds..."
+              attempt=$((attempt + 1))
+              sleep 5
+            done
+          }
+          sleep 5
+          pull_with_retry "${GHCR_IMAGE}:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          pull_with_retry "${GHCR_IMAGE}:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          pull_with_retry "${DOCKER_IMAGE}:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          pull_with_retry "${DOCKER_IMAGE}:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+
+      - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
+        uses: devops-infra/action-container-structure-test@v1
+        with:
+          image: >-
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
+          config: tests/${{ matrix.flavor }}.yml
+
+      - name: Cont.Struc.Test - ${{ matrix.flavor }} (OT image)
+        uses: devops-infra/action-container-structure-test@v1
+        with:
+          image: >-
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
+          config: tests/${{ matrix.flavor }}.yml
+
+      - name: Cont.Struc.Test - Terraform
+        uses: devops-infra/action-container-structure-test@v1
+        with:
+          image: >-
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
+          config: tests/tf.yml
+
+      - name: Cont.Struc.Test - OpenTofu
+        uses: devops-infra/action-container-structure-test@v1
+        with:
+          image: >-
+            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
+          config: tests/ot.yml
