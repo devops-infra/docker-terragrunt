@@ -22,7 +22,7 @@ ARG TG_VERSION=1.1.1
 # Pinned tool versions (override via --build-arg if needed)
 ARG TFLINT_VERSION=0.64.0
 ARG HCLEDIT_VERSION=0.2.18
-ARG SOPS_VERSION=3.13.2
+ARG SOPS_VERSION=3.13.3
 
 COPY alpine-packages.txt /tmp/alpine-packages.txt
 COPY alpine-packages-nonslim.txt /tmp/alpine-packages-nonslim.txt
