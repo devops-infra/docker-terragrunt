@@ -8,6 +8,10 @@ on:
       - release/**
       - dependabot/**
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 permissions:
   contents: read
@@ -45,7 +49,9 @@ jobs:
 
   lint:
     name: Lint
-    if: github.event_name == 'pull_request'
+    if: >-
+      (github.event_name == 'push' && github.actor == 'ChristophShyper') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]')
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
@@ -64,7 +70,9 @@ jobs:
 
   build-and-push:
     name: Build and push
-    if: github.event_name == 'pull_request'
+    if: >-
+      (github.event_name == 'push' && github.actor == 'ChristophShyper') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]')
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
     needs: [lint]
