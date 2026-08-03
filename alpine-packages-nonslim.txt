@@ -1,6 +1,6 @@
 bc~=1.08
 docker-cli~=29.5
-github-cli~=2.93
+github-cli~=2.97
 gnupg~=2.4
 go~=1.26
 go-task~=3.51
