@@ -14,9 +14,9 @@ ARG AWS=no
 ARG GCP=no
 
 # Versions of dependencies
-ARG GCP_VERSION=580.0.0
-ARG TF_VERSION=1.15.8
-ARG OT_VERSION=1.12.5
+ARG GCP_VERSION=582.0.0
+ARG TF_VERSION=1.15.9
+ARG OT_VERSION=1.12.6
 ARG TG_VERSION=1.1.3
 
 # Pinned tool versions (override via --build-arg if needed)
