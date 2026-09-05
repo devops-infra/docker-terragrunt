@@ -6,17 +6,20 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
+  checks: write
   contents: write
-  pull-requests: write
   packages: write
-  issues: read
+  pull-requests: write
 
 jobs:
-  check:
+  prepare:
     name: Check for new versions
     runs-on: ubuntu-24.04-arm
     outputs:
-      branch_name: ${{ steps.commit_push.outputs.branch_name }}
+      branch: ${{ steps.commit.outputs.branch_name }}
+      sha: ${{ steps.head.outputs.sha }}
+      version: ${{ steps.metadata.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -35,11 +38,13 @@ jobs:
           TERM: xterm-256color
         run: task dependency:update
 
-      - name: Run linters
-        run: task lint
+      - name: Export update metadata
+        id: metadata
+        if: env.VERSION_TAG != ''
+        run: echo "version=$VERSION_TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and push changes (conditional)
-        id: commit_push
+      - name: Commit and push changes
+        id: commit
         if: env.VERSION_TAG != ''
         uses: devops-infra/action-commit-push@v1
         with:
@@ -49,38 +54,47 @@ jobs:
           signing_mode: ssh
           signing_key: ${{ secrets.SSH_SIGNING_KEY }}
 
-      - name: Get template
-        run: task git:get-pr-template
-
-      - name: Create pull request
+      - name: Export dependency commit
+        id: head
         if: env.VERSION_TAG != ''
-        uses: devops-infra/action-pull-request@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          target_branch: ${{ github.event.repository.default_branch }}
-          title: "chore(deps): bump ${{ env.VERSION_TAG }}"
-          template: .tmp/PULL_REQUEST_TEMPLATE.md
-          get_diff: true
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-  build-and-push:
-    name: Build and push
-    if: needs.check.outputs.branch_name != ''
+  lint:
+    name: Lint
+    needs: [prepare]
+    if: needs.prepare.outputs.branch != ''
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout dependency branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.branch }}
+
+      - name: Install Task
+        uses: go-task/setup-task@v2
+        with:
+          version: 3.x
+
+      - name: Run linters
+        run: task lint
+
+  build:
+    name: Build and test (${{ matrix.flavor }})
+    needs: [prepare]
+    if: needs.prepare.outputs.branch != ''
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 90
-    needs: [check]
     env:
       VERSION_SUFFIX: -test
     strategy:
       fail-fast: false
       matrix:
-        flavor: [slim, plain, aws-azure-gcp]
+        flavor: [slim, plain, aws, azure, aws-azure, gcp, aws-gcp, azure-gcp, aws-azure-gcp]
     steps:
-      - name: Checkout
+      - name: Checkout dependency branch
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0
-          fetch-tags: true
-          ref: ${{ needs.check.outputs.branch_name }}
+          ref: ${{ needs.prepare.outputs.branch }}
 
       - name: Install Task
         uses: go-task/setup-task@v2
@@ -96,6 +110,20 @@ jobs:
           image: tonistiigi/binfmt:latest
           platforms: amd64,arm64
 
+      - name: Resolve image versions
+        run: |
+          {
+            echo "TF_VERSION=$(sed -nE 's/^ARG TF_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "OT_VERSION=$(sed -nE 's/^ARG OT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "TG_VERSION=$(sed -nE 's/^ARG TG_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "TFLINT_VERSION=$(sed -nE 's/^ARG TFLINT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "HCLEDIT_VERSION=$(sed -nE 's/^ARG HCLEDIT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "AWS_VERSION=$(sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1)"
+            echo "GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)"
+            echo "AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1)"
+          } >> "$GITHUB_ENV"
+
       - name: Build and push
         env:
           BUILDX_NO_DEFAULT_ATTESTATIONS: 1
@@ -103,83 +131,114 @@ jobs:
           DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TERM: xterm-256color
+        run: task push-${{ matrix.flavor }}
+
+      - name: Verify published images
         run: |
-          VERSION="$(task version:get)"
-          TF_VERSION=$(printf "%s" "$VERSION" | sed -E \
-            's/^tf-([0-9]+\.[0-9]+\.[0-9]+)-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
-          OT_VERSION=$(printf "%s" "$VERSION" | sed -E \
-            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-([0-9]+\.[0-9]+\.[0-9]+)-tg-[0-9]+\.[0-9]+\.[0-9]+$/\1/')
-          TG_VERSION=$(printf "%s" "$VERSION" | sed -E \
-            's/^tf-[0-9]+\.[0-9]+\.[0-9]+-ot-[0-9]+\.[0-9]+\.[0-9]+-tg-([0-9]+\.[0-9]+\.[0-9]+)$/\1/')
-          TFLINT_VERSION=$(sed -nE 's/^ARG TFLINT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          HCLEDIT_VERSION=$(sed -nE 's/^ARG HCLEDIT_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          SOPS_VERSION=$(sed -nE 's/^ARG SOPS_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          AWS_VERSION=$(sed -nE 's/^aws-cli~=([0-9]+\.[0-9]+)$/\1/p' alpine-packages-aws.txt | head -1)
-          GCP_VERSION=$(sed -nE 's/^ARG GCP_VERSION=([0-9.]+)$/\1/p' Dockerfile | head -1)
-          AZ_VERSION=$(sed -nE 's/^ARG AZ_VERSION=([0-9.]+)$/\1/p' Dockerfile.azure | head -1)
-          {
-            echo "TF_VERSION=${TF_VERSION}"
-            echo "OT_VERSION=${OT_VERSION}"
-            echo "TG_VERSION=${TG_VERSION}"
-            echo "TFLINT_VERSION=${TFLINT_VERSION}"
-            echo "HCLEDIT_VERSION=${HCLEDIT_VERSION}"
-            echo "SOPS_VERSION=${SOPS_VERSION}"
-            echo "AWS_VERSION=${AWS_VERSION}"
-            echo "GCP_VERSION=${GCP_VERSION}"
-            echo "AZ_VERSION=${AZ_VERSION}"
-          } >> "$GITHUB_ENV"
-          docker buildx create --use || true
-          task login
-          task push-${{ matrix.flavor }}
-          GHCR_IMAGE="ghcr.io/devops-infra/docker-terragrunt"
-          DOCKER_IMAGE="devopsinfra/docker-terragrunt"
-          pull_with_retry() {
-            image="$1"
-            max_attempts="${2:-5}"
-            attempt=1
-            while [ "$attempt" -le "$max_attempts" ]; do
-              if docker pull "$image"; then
-                return 0
-              fi
-              if [ "$attempt" -eq "$max_attempts" ]; then
-                echo "Failed to pull ${image} after ${max_attempts} attempts."
-                return 1
-              fi
-              echo "Pull failed for ${image} (attempt ${attempt}/${max_attempts}); retrying in 5 seconds..."
-              attempt=$((attempt + 1))
+          for image in \
+            "devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${VERSION_SUFFIX}" \
+            "devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${VERSION_SUFFIX}" \
+            "ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${VERSION_SUFFIX}" \
+            "ghcr.io/devops-infra/docker-terragrunt:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${VERSION_SUFFIX}"; do
+            for attempt in 1 2 3 4 5; do
+              docker pull "$image" && break
+              [ "$attempt" -lt 5 ] || exit 1
               sleep 5
             done
-          }
-          sleep 5
-          pull_with_retry "${GHCR_IMAGE}:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
-          pull_with_retry "${GHCR_IMAGE}:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
-          pull_with_retry "${DOCKER_IMAGE}:${{ matrix.flavor }}-tf-${TF_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
-          pull_with_retry "${DOCKER_IMAGE}:${{ matrix.flavor }}-ot-${OT_VERSION}-tg-${TG_VERSION}${{ env.VERSION_SUFFIX }}"
+          done
 
-      - name: Cont.Struc.Test - ${{ matrix.flavor }} (TF image)
+      - name: Test Terraform image
         uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
             devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
-          config: tests/${{ matrix.flavor }}.yml
+          config: |
+            tests/${{ matrix.flavor }}.yml
+            tests/tf.yml
 
-      - name: Cont.Struc.Test - ${{ matrix.flavor }} (OT image)
+      - name: Test OpenTofu image
         uses: devops-infra/action-container-structure-test@v1
         with:
           image: >-
             devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
-          config: tests/${{ matrix.flavor }}.yml
+          config: |
+            tests/${{ matrix.flavor }}.yml
+            tests/ot.yml
 
-      - name: Cont.Struc.Test - Terraform
-        uses: devops-infra/action-container-structure-test@v1
+  report:
+    name: Report and create pull request
+    needs: [prepare, lint, build]
+    if: always() && needs.prepare.outputs.branch != ''
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout dependency branch
+        uses: actions/checkout@v7
         with:
-          image: >-
-            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-tf-${{ env.TF_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
-          config: tests/tf.yml
+          ref: ${{ needs.prepare.outputs.branch }}
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Cont.Struc.Test - OpenTofu
-        uses: devops-infra/action-container-structure-test@v1
+      - name: Install Task
+        uses: go-task/setup-task@v2
         with:
-          image: >-
-            devopsinfra/docker-terragrunt:${{ matrix.flavor }}-ot-${{ env.OT_VERSION }}-tg-${{ env.TG_VERSION }}${{ env.VERSION_SUFFIX }}
-          config: tests/ot.yml
+          version: 3.x
+
+      - name: Create validation report and check
+        id: validation
+        uses: actions/github-script@v9
+        env:
+          BUILD_RESULT: ${{ needs.build.result }}
+          HEAD_SHA: ${{ needs.prepare.outputs.sha }}
+          LINT_RESULT: ${{ needs.lint.result }}
+        with:
+          script: |
+            const fs = require('fs')
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              ...context.repo, run_id: context.runId, per_page: 100
+            })
+            const jobs = new Map(data.jobs.map(job => [job.name, job]))
+            const checks = ['Lint', 'slim', 'plain', 'aws', 'azure', 'aws-azure', 'gcp', 'aws-gcp', 'azure-gcp', 'aws-azure-gcp']
+            const lines = checks.map(name => {
+              const job = jobs.get(name === 'Lint' ? name : `Build and test (${name})`)
+              const passed = job?.conclusion === 'success'
+              const label = name === 'Lint' ? name : `\`${name}\` — build and container tests`
+              return `- [${passed ? 'x' : ' '}] ${label}${passed ? '' : ` — ${job?.conclusion || 'missing'}`} ([details](${job?.html_url || runUrl}))`
+            })
+            const failed = process.env.LINT_RESULT !== 'success' || process.env.BUILD_RESULT !== 'success'
+            const report = `## Dependency validation\n\n${lines.join('\n')}\n\n**Overall:** ${failed ? 'Failed' : 'Passed'}  \n[Open workflow run](${runUrl})\n`
+            fs.writeFileSync(`${process.env.RUNNER_TEMP}/dependency-validation.md`, report)
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report)
+            core.setOutput('failed', String(failed))
+            await github.rest.checks.create({
+              ...context.repo,
+              name: 'Dependency validation',
+              head_sha: process.env.HEAD_SHA,
+              status: 'completed',
+              conclusion: failed ? 'failure' : 'success',
+              details_url: runUrl,
+              output: { title: failed ? 'Dependency validation failed' : 'Dependency validation passed', summary: report }
+            })
+
+      - name: Get pull request template
+        run: task git:get-pr-template
+
+      - name: Add validation report to template
+        run: |
+          cp .tmp/PULL_REQUEST_TEMPLATE.md "$RUNNER_TEMP/PULL_REQUEST_TEMPLATE.md"
+          cat "$RUNNER_TEMP/dependency-validation.md" "$RUNNER_TEMP/PULL_REQUEST_TEMPLATE.md" > .tmp/PULL_REQUEST_TEMPLATE.md
+
+      - name: Create pull request
+        uses: devops-infra/action-pull-request@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: ${{ needs.prepare.outputs.branch }}
+          target_branch: ${{ github.event.repository.default_branch }}
+          title: "chore(deps): bump ${{ needs.prepare.outputs.version }}"
+          template: .tmp/PULL_REQUEST_TEMPLATE.md
+          get_diff: true
+          draft: ${{ steps.validation.outputs.failed }}
+
+      - name: Fail unsuccessful validation
+        if: steps.validation.outputs.failed == 'true'
+        run: exit 1
