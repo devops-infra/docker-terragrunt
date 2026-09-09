@@ -229,6 +229,7 @@ jobs:
           cat "$RUNNER_TEMP/dependency-validation.md" "$RUNNER_TEMP/PULL_REQUEST_TEMPLATE.md" > .tmp/PULL_REQUEST_TEMPLATE.md
 
       - name: Create pull request
+        id: pull_request
         uses: devops-infra/action-pull-request@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -238,6 +239,16 @@ jobs:
           template: .tmp/PULL_REQUEST_TEMPLATE.md
           get_diff: true
           draft: ${{ steps.validation.outputs.failed }}
+
+      - name: Mark pull request ready
+        if: steps.validation.outputs.failed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pull_request.outputs.pr_number }}
+        run: |
+          if [ "$(gh pr view "$PR_NUMBER" --json isDraft --jq .isDraft)" = "true" ]; then
+            gh pr ready "$PR_NUMBER"
+          fi
 
       - name: Fail unsuccessful validation
         if: steps.validation.outputs.failed == 'true'
