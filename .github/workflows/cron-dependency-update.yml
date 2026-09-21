@@ -48,7 +48,7 @@ jobs:
         if: env.VERSION_TAG != ''
         uses: devops-infra/action-commit-push@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PUSH_TOKEN }}
           target_branch: dependency/${{ env.VERSION_BRANCH }}
           commit_message: "chore(deps): bump ${{ env.VERSION_TAG }}"
           signing_mode: ssh
