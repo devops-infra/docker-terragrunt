@@ -26,6 +26,7 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+          persist-credentials: false
 
       - name: Install Task
         uses: go-task/setup-task@v2
