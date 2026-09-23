@@ -1,4 +1,4 @@
-FROM alpine:3.24.1
+FROM alpine:3.24.2
 
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
@@ -14,10 +14,10 @@ ARG AWS=no
 ARG GCP=no
 
 # Versions of dependencies
-ARG GCP_VERSION=585.0.0
+ARG GCP_VERSION=586.0.0
 ARG TF_VERSION=1.16.3
 ARG OT_VERSION=1.12.6
-ARG TG_VERSION=1.1.5
+ARG TG_VERSION=1.1.6
 
 # Pinned tool versions (override via --build-arg if needed)
 ARG TFLINT_VERSION=0.64.0
