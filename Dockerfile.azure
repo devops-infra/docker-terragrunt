@@ -1,4 +1,4 @@
-ARG AZ_VERSION=2.89.1
+ARG AZ_VERSION=2.90.0
 
 FROM ghcr.io/devops-infra/docker-azure-cli:${AZ_VERSION}
 
@@ -18,14 +18,14 @@ ARG AWS=no
 ARG GCP=no
 
 # Versions of dependencies
-ARG GCP_VERSION=585.0.0
-ARG TF_VERSION=1.16.3
-ARG OT_VERSION=1.12.6
-ARG TG_VERSION=1.1.5
+ARG GCP_VERSION=591.0.0
+ARG TF_VERSION=1.17.0
+ARG OT_VERSION=1.13.2
+ARG TG_VERSION=1.2.1
 
 # Pinned tool versions (override via --build-arg if needed)
-ARG TFLINT_VERSION=0.64.0
-ARG HCLEDIT_VERSION=0.2.18
+ARG TFLINT_VERSION=0.65.0
+ARG HCLEDIT_VERSION=0.2.19
 ARG SOPS_VERSION=3.13.3
 
 COPY alpine-packages.txt /tmp/alpine-packages.txt
